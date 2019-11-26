@@ -1,0 +1,7 @@
+/geo-data-server/target/
+/geo-data-model/target/
+/target
+
+# IntelliJ
+/.idea
+*.iml
