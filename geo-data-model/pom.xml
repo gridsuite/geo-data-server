@@ -10,8 +10,8 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pgs-geo-data-model</artifactId>
-    <name>PGS geo data model</name>
+    <artifactId>powsybl-geo-data-model</artifactId>
+    <name>Geo data model</name>
 
     <properties>
         <guava.version>21.0</guava.version>
