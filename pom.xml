@@ -1,4 +1,12 @@
 <?xml version="1.0"?>
+<!--
+
+    Copyright (c) 2019, RTE (http://www.rte-france.com)
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+-->
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -9,7 +17,21 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <name>Powsybl Rte geo data store</name>
+    <name>Geo data store</name>
+    <url>http://www.powsybl.org</url>
+
+    <licenses>
+        <license>
+            <name>Mozilla Public License, Version 2.0</name>
+            <url>https://www.mozilla.org/en-US/MPL/2.0/</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/powsybl/powsybl-geo-data-store.git</connection>
+        <developerConnection>scm:git:https://github.com/powsybl/powsybl-geo-data-store.git</developerConnection>
+        <url>https://github.com/powsybl/powsybl-geo-data-store</url>
+    </scm>
 
     <developers>
         <developer>
@@ -36,7 +58,6 @@
 
         <cassandraunit.version>3.11.2.0</cassandraunit.version>
         <guava.version>27.0.1-jre</guava.version>
-        <jib.version>1.0.0</jib.version>
         <jodatime.version>2.10.2</jodatime.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.18.8</lombok.version>
@@ -46,17 +67,7 @@
         <springfox.version>2.9.2</springfox.version>
         <rtree.version>0.8.5</rtree.version>
 
-
         <powsyblcore.version>3.0.0</powsyblcore.version>
-
-        <sonar.jacoco.reportPaths>
-            ../target/jacoco-merge.exec,
-            ../../target/jacoco-merge.exec,
-            ../../../target/jacoco-merge.exec
-        </sonar.jacoco.reportPaths>
-        <sonar.exclusions>
-            **/generated/**/*
-        </sonar.exclusions>
     </properties>
 
     <modules>
