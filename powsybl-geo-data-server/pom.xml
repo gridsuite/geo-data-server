@@ -13,7 +13,6 @@
     <artifactId>powsybl-geo-data-server</artifactId>
     <name>Geo data server</name>
 
-
     <build>
         <plugins>
             <plugin>

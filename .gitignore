@@ -1,5 +1,5 @@
-/geo-data-server/target/
-/geo-data-model/target/
+/powsybl-geo-data-server/target/
+/powsybl-geo-data-model/target/
 /target
 
 # IntelliJ

@@ -1,12 +1,4 @@
 <?xml version="1.0"?>
-<!--
-
-    Copyright (c) 2019, RTE (http://www.rte-france.com)
-    This Source Code Form is subject to the terms of the Mozilla Public
-    License, v. 2.0. If a copy of the MPL was not distributed with this
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
--->
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -42,6 +34,11 @@
         </developer>
     </developers>
 
+    <modules>
+         <module>powsybl-geo-data-model</module>
+         <module>powsybl-geo-data-server</module>
+    </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -69,11 +66,6 @@
 
         <powsyblcore.version>3.0.0</powsyblcore.version>
     </properties>
-
-    <modules>
-        <module>geo-data-server</module>
-        <module>geo-data-model</module>
-    </modules>
 
     <build>
         <pluginManagement>

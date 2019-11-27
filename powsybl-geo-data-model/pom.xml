@@ -16,6 +16,7 @@
     <properties>
         <guava.version>21.0</guava.version>
     </properties>
+
     <dependencies>
         <!-- compile scope -->
         <dependency>
