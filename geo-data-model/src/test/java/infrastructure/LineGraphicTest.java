@@ -9,9 +9,9 @@ package infrastructure;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import javafx.scene.paint.Color;
 import org.junit.Test;
 
+import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;

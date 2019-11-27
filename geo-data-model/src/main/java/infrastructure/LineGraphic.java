@@ -9,14 +9,15 @@ package infrastructure;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Line;
-import javafx.scene.paint.Color;
 import lombok.*;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.GeoDataUtils;
 
+import java.awt.Color;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +41,7 @@ public class LineGraphic {
     private Country country;
 
     @JsonIgnore
-    private  Color color;
+    private Color color;
 
     private  boolean aerial;
 

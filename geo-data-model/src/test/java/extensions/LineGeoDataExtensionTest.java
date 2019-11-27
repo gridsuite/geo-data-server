@@ -12,9 +12,9 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import infrastructure.Coordinate;
 import infrastructure.LineGraphic;
-import javafx.scene.paint.Color;
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;

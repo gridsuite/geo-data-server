@@ -14,10 +14,10 @@ import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.iidm.xml.NetworkXml;
 import infrastructure.Coordinate;
 import infrastructure.LineGraphic;
-import javafx.scene.paint.Color;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**

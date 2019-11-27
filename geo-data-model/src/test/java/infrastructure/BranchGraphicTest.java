@@ -6,9 +6,9 @@
  */
 package infrastructure;
 
-import javafx.scene.paint.Color;
 import org.junit.Test;
 
+import java.awt.*;
 import java.util.ArrayDeque;
 
 import static org.junit.Assert.*;
