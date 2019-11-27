@@ -14,7 +14,10 @@ import com.powsybl.iidm.xml.NetworkXml;
 import infrastructure.Coordinate;
 
 import infrastructure.SubstationGraphic;
+import org.joda.time.Chronology;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,7 +33,12 @@ public class SubstationGeoDataSerializerTest extends AbstractConverterTest {
     @Test
     public void test() throws IOException {
         Network network = EurostagTutorialExample1Factory.create();
-        network.setCaseDate(new DateTime("2019-08-20T15:09:13.492Z"));
+
+        DateTimeZone zone = DateTimeZone.forID("Europe/Paris");
+        Chronology isoChronology = ISOChronology.getInstance(zone);
+        DateTime dateTime = new DateTime("2019-08-20T17:09:13.492+02:00", isoChronology);
+
+        network.setCaseDate(dateTime);
 
         Substation substation = network.getSubstation("P1");
         assertNotNull(substation);

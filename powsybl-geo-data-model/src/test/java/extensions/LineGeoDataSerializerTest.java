@@ -14,7 +14,10 @@ import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.iidm.xml.NetworkXml;
 import infrastructure.Coordinate;
 import infrastructure.LineGraphic;
+import org.joda.time.Chronology;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
 import org.junit.Test;
 
 import java.awt.*;
@@ -28,7 +31,12 @@ public class LineGeoDataSerializerTest extends AbstractConverterTest {
     @Test
     public void test() throws IOException {
         Network network = EurostagTutorialExample1Factory.create();
-        network.setCaseDate(new DateTime("2019-08-20T13:43:58.556Z"));
+
+        DateTimeZone zone = DateTimeZone.forID("Europe/Paris");
+        Chronology isoChronology = ISOChronology.getInstance(zone);
+        DateTime dateTime = new DateTime("2019-08-20T15:43:58.556+02:00", isoChronology);
+
+        network.setCaseDate(dateTime);
         Line line = network.getLine("NHV1_NHV2_1");
 
         LineGraphic lineGraphic =  new LineGraphic("line", 0, Color.BLACK, 400, true);
@@ -40,7 +48,7 @@ public class LineGeoDataSerializerTest extends AbstractConverterTest {
 
         NetworkXml.write(network, System.out);
 
-        Network network2 = roundTripXmlTest(network,
+        roundTripXmlTest(network,
                 NetworkXml::writeAndValidate,
                 NetworkXml::read,
                 "/networkwithLineGeoDataExtension.xml");
