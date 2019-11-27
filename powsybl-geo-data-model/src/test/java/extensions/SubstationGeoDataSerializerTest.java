@@ -30,7 +30,7 @@ public class SubstationGeoDataSerializerTest extends AbstractConverterTest {
     @Test
     public void test() throws IOException {
         Network network = EurostagTutorialExample1Factory.create();
-        network.setCaseDate(new DateTime("2019-08-20T17:09:13.492+02:00"));
+        network.setCaseDate(new DateTime("2019-08-20T15:09:13.492Z"));
 
         Substation substation = network.getSubstation("P1");
         assertNotNull(substation);

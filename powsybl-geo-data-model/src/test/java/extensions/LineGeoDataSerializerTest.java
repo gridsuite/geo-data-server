@@ -28,7 +28,7 @@ public class LineGeoDataSerializerTest extends AbstractConverterTest {
     @Test
     public void test() throws IOException {
         Network network = EurostagTutorialExample1Factory.create();
-        network.setCaseDate(new DateTime("2019-08-20T15:43:58.556+02:00"));
+        network.setCaseDate(new DateTime("2019-08-20T13:43:58.556Z"));
         Line line = network.getLine("NHV1_NHV2_1");
 
         LineGraphic lineGraphic =  new LineGraphic("line", 0, Color.BLACK, 400, true);
