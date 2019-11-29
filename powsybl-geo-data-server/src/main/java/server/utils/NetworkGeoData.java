@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package server.utils;
-import com.pgs.data.store.server.repositories.*;
+import com.powsybl.data.store.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import extensions.SubstationGeoData;
 import infrastructure.*;
