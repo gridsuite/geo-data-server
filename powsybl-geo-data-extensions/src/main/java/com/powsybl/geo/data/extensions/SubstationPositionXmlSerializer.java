@@ -71,7 +71,7 @@ public class SubstationPositionXmlSerializer implements ExtensionXmlSerializer<S
         XmlUtil.readUntilEndElement(getExtensionName(), context.getReader(), () -> {
             double longitude = XmlUtil.readDoubleAttribute(context.getReader(), "longitude");
             double latitude = XmlUtil.readDoubleAttribute(context.getReader(), "latitude");
-             coordinate[0] = new Coordinate(latitude, longitude);
+            coordinate[0] = new Coordinate(latitude, longitude);
         });
         return new SubstationPosition(substation, coordinate[0]);
     }
