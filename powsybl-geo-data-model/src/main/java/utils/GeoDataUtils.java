@@ -6,8 +6,8 @@
  */
 package utils;
 
-import infrastructure.BaseVoltage;
-import infrastructure.Coordinate;
+import tdo.BaseVoltage;
+import tdo.Coordinate;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>

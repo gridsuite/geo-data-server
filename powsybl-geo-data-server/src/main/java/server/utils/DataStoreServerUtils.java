@@ -1,8 +1,8 @@
 package server.utils;
 
 import com.powsybl.iidm.network.Network;
-import infrastructure.LineGraphic;
-import infrastructure.SubstationGraphic;
+import tdo.LineGraphic;
+import tdo.SubstationGraphic;
 
 import java.util.ArrayList;
 import java.util.List;

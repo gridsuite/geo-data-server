@@ -8,8 +8,8 @@ package com.powsybl.data.store.server.repositories;
 
 import com.datastax.driver.core.*;
 import com.powsybl.iidm.network.Country;
-import infrastructure.Coordinate;
-import infrastructure.LineGraphic;
+import tdo.Coordinate;
+import tdo.LineGraphic;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

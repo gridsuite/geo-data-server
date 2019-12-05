@@ -9,14 +9,14 @@ package com.powsybl.data.store.server;
 import com.powsybl.data.store.server.repositories.*;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
-import infrastructure.LineGraphic;
+import tdo.LineGraphic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.powsybl.data.store.server.repositories.LinesCustomRepository;
 import server.utils.DataStoreServerUtils;
 import server.utils.NetworkGeoData;
-import infrastructure.SubstationGraphic;
+import tdo.SubstationGraphic;
 import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
