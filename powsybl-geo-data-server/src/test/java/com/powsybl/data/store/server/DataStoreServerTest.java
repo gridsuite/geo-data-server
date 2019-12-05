@@ -84,25 +84,25 @@ public class DataStoreServerTest {
 
         given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
 
-        mvc.perform(get("/" + VERSION + "/substations-graphics/" + networdUuidString)
+        mvc.perform(get("/" + VERSION + "/substations/" + networdUuidString)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/substations-graphics-with-pagination/" + networdUuidString + "/?page=1&size=1")
+        mvc.perform(get("/" + VERSION + "/substations-with-pagination/" + networdUuidString + "/?page=1&size=1")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines-graphics/" + networdUuidString)
+        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines-graphics-with-pagination/" + networdUuidString + "/?page=1&size=1")
+        mvc.perform(get("/" + VERSION + "/lines-with-pagination/" + networdUuidString + "/?page=1&size=1")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
