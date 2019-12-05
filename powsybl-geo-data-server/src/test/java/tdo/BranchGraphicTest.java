@@ -6,6 +6,7 @@
  */
 package tdo;
 
+import com.powsybl.geo.data.extensions.Coordinate;
 import org.junit.Test;
 
 import java.awt.*;
@@ -24,9 +25,9 @@ public class BranchGraphicTest {
         BranchGraphic branchGraphic = new BranchGraphic(new ArrayDeque<>(), lineGraphic);
         assertTrue(branchGraphic.getPylons().isEmpty());
         assertEquals(branchGraphic.getLine(), lineGraphic);
-        branchGraphic.getPylons().add(new PylonGraphic(new Coordinate(1, 1)));
-        branchGraphic.getPylons().add(new PylonGraphic(new Coordinate(2, 1)));
-        branchGraphic.getPylons().add(new PylonGraphic(new Coordinate(1, 2)));
+        branchGraphic.getPylons().add(new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(1, 1)));
+        branchGraphic.getPylons().add(new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(2, 1)));
+        branchGraphic.getPylons().add(new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(1, 2)));
         branchGraphic.getPylons().add(new PylonGraphic(new Coordinate(2, 2)));
 
         BranchGraphic branchGraphic2 = new BranchGraphic();

@@ -7,6 +7,7 @@
 package tdo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.geo.data.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Line;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.GeoDataUtils;
+import server.utils.GeoDataUtils;
 
 import java.awt.*;
 import java.util.List;
@@ -50,7 +51,7 @@ public class LineGraphic {
 
     private boolean ordered;
 
-    private Deque<Coordinate> coordinates = new ArrayDeque<>();
+    private Deque<com.powsybl.geo.data.extensions.Coordinate> coordinates = new ArrayDeque<>();
 
     @JsonIgnore
     private Line model;

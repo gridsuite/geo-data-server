@@ -11,7 +11,6 @@ import com.powsybl.commons.xml.XmlReaderContext;
 import com.powsybl.commons.xml.XmlUtil;
 import com.powsybl.commons.xml.XmlWriterContext;
 import com.powsybl.iidm.network.Substation;
-import tdo.Coordinate;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;

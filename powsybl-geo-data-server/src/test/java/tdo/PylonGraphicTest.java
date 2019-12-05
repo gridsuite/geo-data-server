@@ -6,6 +6,7 @@
  */
 package tdo;
 
+import com.powsybl.geo.data.extensions.Coordinate;
 import org.junit.Test;
 
 import java.awt.*;
@@ -21,8 +22,8 @@ public class PylonGraphicTest {
 
     @Test
     public void test() {
-        PylonGraphic pylonGraphic = new PylonGraphic(new Coordinate(1, 1));
-        PylonGraphic pylonGraphic2 = new PylonGraphic(new Coordinate(2, 2));
+        PylonGraphic pylonGraphic = new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(1, 1));
+        PylonGraphic pylonGraphic2 = new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(2, 2));
 
         LineGraphic lineGraphic = new LineGraphic("l", 1, Color.RED, 400, true);
         SegmentGraphic segmentGraphic = new SegmentGraphic(pylonGraphic.getCoordinate(), pylonGraphic2.getCoordinate(), lineGraphic);

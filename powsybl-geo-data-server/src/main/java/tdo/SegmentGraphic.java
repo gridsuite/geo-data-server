@@ -7,6 +7,7 @@
 package tdo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.geo.data.extensions.Coordinate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -21,14 +22,14 @@ import java.util.Objects;
 @ToString(exclude = "line")
 public class SegmentGraphic {
 
-    private  Coordinate coordinate1;
+    private com.powsybl.geo.data.extensions.Coordinate coordinate1;
 
-    private  Coordinate coordinate2;
+    private com.powsybl.geo.data.extensions.Coordinate coordinate2;
 
     @JsonIgnore
     private  LineGraphic line;
 
-    public SegmentGraphic(Coordinate coordinate1, Coordinate coordinate2, LineGraphic line) {
+    public SegmentGraphic(com.powsybl.geo.data.extensions.Coordinate coordinate1, Coordinate coordinate2, LineGraphic line) {
         this.coordinate1 = Objects.requireNonNull(coordinate1);
         this.coordinate2 = Objects.requireNonNull(coordinate2);
         this.line = line;

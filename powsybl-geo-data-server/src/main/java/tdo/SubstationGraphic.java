@@ -7,6 +7,7 @@
 package tdo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.geo.data.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Substation;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ public class SubstationGraphic {
 
     private String id;
 
-    private  Coordinate position;
+    private com.powsybl.geo.data.extensions.Coordinate position;
 
     private List<Integer> voltages;
 

@@ -13,7 +13,6 @@ import com.powsybl.commons.xml.XmlWriterContext;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Line;
-import tdo.Coordinate;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;

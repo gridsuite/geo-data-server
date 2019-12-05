@@ -4,16 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package tdo;
+package com.powsybl.geo.data.extensions;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-
 public class CoordinateTest {
 
     @Test
@@ -21,12 +19,12 @@ public class CoordinateTest {
         Coordinate coordinate = new Coordinate(1, 2);
         Coordinate coordinate2 = new Coordinate(1, 2);
         Coordinate coordinate13 = new Coordinate(coordinate);
-        assertEquals(1, coordinate.getLat(), 0);
-        assertEquals(2, coordinate.getLon(), 0);
-        assertEquals("Coordinate(lat=1.0, lon=2.0)", coordinate.toString());
-        assertEquals(coordinate, coordinate2);
-        assertEquals(coordinate.hashCode(), coordinate2.hashCode());
+        Assert.assertEquals(1, coordinate.getLat(), 0);
+        Assert.assertEquals(2, coordinate.getLon(), 0);
+        Assert.assertEquals("Coordinate(lat=1.0, lon=2.0)", coordinate.toString());
+        Assert.assertEquals(coordinate, coordinate2);
+        Assert.assertEquals(coordinate.hashCode(), coordinate2.hashCode());
         Coordinate coordinate3 = new Coordinate(coordinate);
-        assertEquals(coordinate3, coordinate);
+        Assert.assertEquals(coordinate3, coordinate);
     }
 }

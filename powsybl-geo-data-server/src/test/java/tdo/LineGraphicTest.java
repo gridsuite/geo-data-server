@@ -6,6 +6,7 @@
  */
 package tdo;
 
+import com.powsybl.geo.data.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
@@ -37,11 +38,11 @@ public class LineGraphicTest {
         lineGraphic.setModel(line);
         assertEquals(lineGraphic.getModel(), line);
 
-        SubstationGraphic side1 = new SubstationGraphic("id", new Coordinate(0, 0));
-        SubstationGraphic side2 = new SubstationGraphic("id", new Coordinate(9, 18));
+        SubstationGraphic side1 = new SubstationGraphic("id", new com.powsybl.geo.data.extensions.Coordinate(0, 0));
+        SubstationGraphic side2 = new SubstationGraphic("id", new com.powsybl.geo.data.extensions.Coordinate(9, 18));
 
-        lineGraphic.getCoordinates().addAll(Arrays.asList(new Coordinate(1, 2), new Coordinate(2, 3),
-                new Coordinate(3, 3), new Coordinate(5, 4)));
+        lineGraphic.getCoordinates().addAll(Arrays.asList(new com.powsybl.geo.data.extensions.Coordinate(1, 2), new com.powsybl.geo.data.extensions.Coordinate(2, 3),
+                new com.powsybl.geo.data.extensions.Coordinate(3, 3), new com.powsybl.geo.data.extensions.Coordinate(5, 4)));
 
         lineGraphic.orderCoordinates(side1, side2, new HashMap<>());
 
@@ -56,8 +57,8 @@ public class LineGraphicTest {
                 .voltage(400)
                 .build();
 
-        lineGraphic1.getCoordinates().addAll(Arrays.asList(new Coordinate(1, 1), new Coordinate(2, 2),
-                new Coordinate(3, 3), new Coordinate(7, 9)));
+        lineGraphic1.getCoordinates().addAll(Arrays.asList(new com.powsybl.geo.data.extensions.Coordinate(1, 1), new com.powsybl.geo.data.extensions.Coordinate(2, 2),
+                new com.powsybl.geo.data.extensions.Coordinate(3, 3), new Coordinate(7, 9)));
         lineGraphic1.orderCoordinates(side1, side2, new HashMap<>());
         lineGraphic1.addExtremities(side1, side2);
 

@@ -7,7 +7,6 @@ package com.powsybl.geo.data.extensions; /**
 
 import com.powsybl.commons.extensions.AbstractExtension;
 import com.powsybl.iidm.network.Substation;
-import tdo.Coordinate;
 
 import java.util.Objects;
 

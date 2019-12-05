@@ -6,6 +6,7 @@
  */
 package tdo;
 
+import com.powsybl.geo.data.extensions.Coordinate;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class SubstationGraphicTest {
 
     @Test
     public void test() {
-        SubstationGraphic substationGraphic = new SubstationGraphic("id", new Coordinate(1, 2));
+        SubstationGraphic substationGraphic = new SubstationGraphic("id", new com.powsybl.geo.data.extensions.Coordinate(1, 2));
         assertEquals("id", substationGraphic.getId());
         assertEquals(substationGraphic.getPosition(), new Coordinate(1, 2));
         assertNull(substationGraphic.getModel());

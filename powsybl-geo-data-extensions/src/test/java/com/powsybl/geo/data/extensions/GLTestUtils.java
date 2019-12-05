@@ -7,7 +7,6 @@
 package com.powsybl.geo.data.extensions;
 
 import com.powsybl.iidm.network.*;
-import tdo.Coordinate;
 import org.joda.time.DateTime;
 
 import static org.junit.Assert.assertEquals;

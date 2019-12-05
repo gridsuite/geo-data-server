@@ -7,6 +7,7 @@
 package tdo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.geo.data.extensions.Coordinate;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -39,7 +40,7 @@ public class PylonGraphic {
         }
     }
 
-    private final Coordinate coordinate;
+    private final com.powsybl.geo.data.extensions.Coordinate coordinate;
 
     @JsonIgnore
     private final Set<Neighbor> neighbors = new HashSet<>();
@@ -48,7 +49,7 @@ public class PylonGraphic {
         coordinate = null;
     }
 
-    public PylonGraphic(Coordinate coordinate) {
+    public PylonGraphic(com.powsybl.geo.data.extensions.Coordinate coordinate) {
         this.coordinate = Objects.requireNonNull(coordinate);
     }
 

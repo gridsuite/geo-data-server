@@ -12,7 +12,7 @@ import com.powsybl.data.store.server.repositories.SubstationsRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
-import tdo.Coordinate;
+import com.powsybl.geo.data.extensions.Coordinate;
 import tdo.LineGraphic;
 import tdo.SubstationGraphic;
 import org.cassandraunit.spring.CassandraDataSet;

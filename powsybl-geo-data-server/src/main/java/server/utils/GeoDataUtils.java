@@ -7,7 +7,7 @@
 package server.utils;
 
 import tdo.BaseVoltage;
-import tdo.Coordinate;
+import com.powsybl.geo.data.extensions.Coordinate;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>

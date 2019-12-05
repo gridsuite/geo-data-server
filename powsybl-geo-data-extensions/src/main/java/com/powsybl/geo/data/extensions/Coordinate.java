@@ -4,9 +4,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package tdo;
+package com.powsybl.geo.data.extensions;
 
-import lombok.*;
+import groovy.transform.builder.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
