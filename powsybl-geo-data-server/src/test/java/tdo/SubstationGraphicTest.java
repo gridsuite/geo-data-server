@@ -10,7 +10,8 @@ import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>

@@ -42,7 +42,6 @@
     </developers>
 
     <modules>
-         <module>powsybl-geo-data-model</module>
          <module>powsybl-geo-data-server</module>
         <module>powsybl-geo-data-extensions</module>
     </modules>

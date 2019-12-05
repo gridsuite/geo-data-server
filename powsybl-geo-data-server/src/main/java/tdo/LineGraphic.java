@@ -9,15 +9,18 @@ package tdo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Line;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.GeoDataUtils;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

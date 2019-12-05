@@ -6,8 +6,7 @@
  */
 package tdo;
 
-import java.awt.Color;
-
+import java.awt.*;
 import java.util.Objects;
 
 /**

@@ -8,7 +8,9 @@ package tdo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
