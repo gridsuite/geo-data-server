@@ -8,14 +8,14 @@ package com.powsybl.data.store.server.repositories;
 
 import com.datastax.driver.core.*;
 import com.powsybl.iidm.network.Country;
-import infrastructure.Coordinate;
-import infrastructure.LineGraphic;
+import com.powsybl.geo.data.extensions.Coordinate;
+import server.utils.GeoDataUtils;
+import tdo.LineGraphic;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import utils.GeoDataUtils;
 
 import java.util.ArrayDeque;
 import java.util.List;

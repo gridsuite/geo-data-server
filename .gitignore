@@ -1,6 +1,4 @@
-/powsybl-geo-data-server/target/
-/powsybl-geo-data-model/target/
-/target
+target/
 
 # IntelliJ
 /.idea

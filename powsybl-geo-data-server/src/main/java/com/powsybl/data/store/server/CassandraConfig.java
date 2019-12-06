@@ -7,7 +7,7 @@
 package com.powsybl.data.store.server;
 
 import com.datastax.driver.core.*;
-import infrastructure.Coordinate;
+import com.powsybl.geo.data.extensions.Coordinate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;

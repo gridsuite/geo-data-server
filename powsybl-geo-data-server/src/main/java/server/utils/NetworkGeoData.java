@@ -6,16 +6,18 @@
  */
 package server.utils;
 import com.powsybl.data.store.server.repositories.*;
+import com.powsybl.geo.data.extensions.SubstationPosition;
 import com.powsybl.iidm.network.*;
-import extensions.SubstationGeoData;
-import infrastructure.*;
+
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import utils.GeoDataUtils;
+import com.powsybl.geo.data.extensions.Coordinate;
+import tdo.LineGraphic;
+import tdo.SubstationGraphic;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -136,9 +138,9 @@ public final class NetworkGeoData {
                 .stream()
                 .filter(e -> !ids.contains(e.getKey()) && !e.getValue().isEmpty())
                 .sorted((e1, e2) ->
-                        e2.getValue().stream().map(s -> network.getSubstation(s).getExtension(SubstationGeoData.class)).filter(Objects::nonNull)
+                        e2.getValue().stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull)
                                 .collect(Collectors.toSet()).size() -
-                                e1.getValue().stream().map(s -> network.getSubstation(s).getExtension(SubstationGeoData.class)).filter(Objects::nonNull)
+                                e1.getValue().stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull)
                                         .collect(Collectors.toSet()).size())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
@@ -252,7 +254,7 @@ public final class NetworkGeoData {
 
             substationGraphic = new SubstationGraphic(substation.getId(), new Coordinate(lat, lon));
             substationGraphic.setModel(substation);
-            substation.addExtension(SubstationGeoData.class, new SubstationGeoData(substation, substationGraphic));
+            substation.addExtension(SubstationPosition.class, new SubstationPosition(substation, substationGraphic.getPosition()));
 
             return substationGraphic;
         } else {
