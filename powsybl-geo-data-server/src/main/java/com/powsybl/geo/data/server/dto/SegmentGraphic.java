@@ -27,9 +27,9 @@ public class SegmentGraphic {
     private com.powsybl.geo.data.extensions.Coordinate coordinate2;
 
     @JsonIgnore
-    private  LineGraphic line;
+    private LineGeoData line;
 
-    public SegmentGraphic(com.powsybl.geo.data.extensions.Coordinate coordinate1, Coordinate coordinate2, LineGraphic line) {
+    public SegmentGraphic(com.powsybl.geo.data.extensions.Coordinate coordinate1, Coordinate coordinate2, LineGeoData line) {
         this.coordinate1 = Objects.requireNonNull(coordinate1);
         this.coordinate2 = Objects.requireNonNull(coordinate2);
         this.line = line;

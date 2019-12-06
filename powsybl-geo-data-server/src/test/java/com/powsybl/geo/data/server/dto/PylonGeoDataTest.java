@@ -10,24 +10,28 @@ import com.powsybl.geo.data.extensions.Coordinate;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 
-public class SegmentGraphicTest {
+public class PylonGeoDataTest {
 
     @Test
     public void test() {
         PylonGeoData pylonGeoData = new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 1));
-        PylonGeoData pylonGeoData2 = new PylonGeoData(new Coordinate(2, 2));
+        PylonGeoData pylonGeoData2 = new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(2, 2));
 
         LineGeoData lineGeoData = new LineGeoData("l", 400, true);
         SegmentGraphic segmentGraphic = new SegmentGraphic(pylonGeoData.getCoordinate(), pylonGeoData2.getCoordinate(), lineGeoData);
+        PylonGeoData.Neighbor neighbor = new PylonGeoData.Neighbor(pylonGeoData2, segmentGraphic);
+        assertEquals(neighbor.getPylon(), pylonGeoData2);
+        assertEquals(neighbor.getSegment(), segmentGraphic);
 
-        assertEquals(segmentGraphic.getCoordinate1(), pylonGeoData.getCoordinate());
-        assertEquals(segmentGraphic.getCoordinate2(), pylonGeoData2.getCoordinate());
-        assertEquals(segmentGraphic.getLine(), lineGeoData);
-        assertEquals("SegmentGraphic(coordinate1=Coordinate(lat=1.0, lon=1.0), coordinate2=Coordinate(lat=2.0, lon=2.0))", segmentGraphic.toString());
+        assertEquals(pylonGeoData.getCoordinate(), new Coordinate(1, 1));
+        assertTrue(pylonGeoData.getNeighbors().isEmpty());
+        assertTrue(pylonGeoData.getNeighbors().add(neighbor));
+        assertEquals(1, pylonGeoData.getNeighbors().size());
     }
 }

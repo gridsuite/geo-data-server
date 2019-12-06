@@ -6,7 +6,7 @@
  */
 package com.powsybl.geo.data.server.utils;
 import com.powsybl.geo.data.extensions.SubstationPosition;
-import com.powsybl.geo.data.server.dto.SubstationGraphic;
+import com.powsybl.geo.data.server.dto.SubstationGeoData;
 import com.powsybl.geo.data.server.repositories.*;
 import com.powsybl.iidm.network.*;
 
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.powsybl.geo.data.extensions.Coordinate;
-import com.powsybl.geo.data.server.dto.LineGraphic;
+import com.powsybl.geo.data.server.dto.LineGeoData;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -48,33 +48,33 @@ public final class NetworkGeoData {
     private NetworkGeoData() {
     }
 
-    private Map<String, SubstationGraphic> initializeSubstationsFromDB() {
+    private Map<String, SubstationGeoData> initializeSubstationsFromDB() {
         // Read substations from DB
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Map<String, SubstationGraphic> substationsGeoDataDB;
+        Map<String, SubstationGeoData> substationsGeoDataDB;
         List<SubstationEntity> substationEntities = substationsRepository.findAll();
         substationsGeoDataDB = substationEntities.stream()
-                .map(s -> new SubstationGraphic(Country.valueOf(s.getCountry()), s.getSubstationID(),
+                .map(s -> new SubstationGeoData(Country.valueOf(s.getCountry()), s.getSubstationID(),
                         new Coordinate(s.getCoordinate().getLat(), s.getCoordinate().getLon()), null, null))
-                .collect(Collectors.toMap(SubstationGraphic::getId, Function.identity()));
+                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
         logger.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(),  stopWatch.getTime());
         return substationsGeoDataDB;
     }
 
-    public  Map<String, SubstationGraphic> getSubstationsCoordinates(Network network) {
+    public  Map<String, SubstationGeoData> getSubstationsCoordinates(Network network) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("BEGIN [/v1/substations-graphics/{idNetwork}]");
 
-        Map<String, SubstationGraphic> substationsGeoDataDB = initializeSubstationsFromDB();
+        Map<String, SubstationGeoData> substationsGeoDataDB = initializeSubstationsFromDB();
 
-        Map<String, SubstationGraphic> substationsGraphicMap = new HashMap<>();
+        Map<String, SubstationGeoData> substationsGraphicMap = new HashMap<>();
 
         // Known substations having  gps coordinates
         List<String> knownSubstationsIds = substationsGeoDataDB.values()
                 .stream()
-                .map(SubstationGraphic::getId)
+                .map(SubstationGeoData::getId)
                 .collect(Collectors.toList());
 
         // Ignore all stranger substations
@@ -125,7 +125,7 @@ public final class NetworkGeoData {
         return substationsGraphicMap;
     }
 
-    private  void substationsReplacementStrategy(Network network, List<Substation> networkSubstations, List<String> ids, Map<String, SubstationGraphic> substationGraphicMap) {
+    private  void substationsReplacementStrategy(Network network, List<Substation> networkSubstations, List<String> ids, Map<String, SubstationGeoData> substationGraphicMap) {
 
         AtomicInteger remaining = new AtomicInteger();
 
@@ -160,7 +160,7 @@ public final class NetworkGeoData {
 
     }
 
-    private  void stepOne(Network network, AtomicInteger remaining, List<String> ids, HashMap<String, Set<String>> sortedByNeigboursCountHavingKnownGpsCoords, Map<String, SubstationGraphic> substationGraphicMap) {
+    private  void stepOne(Network network, AtomicInteger remaining, List<String> ids, HashMap<String, Set<String>> sortedByNeigboursCountHavingKnownGpsCoords, Map<String, SubstationGeoData> substationGraphicMap) {
         int corrected = 0;
         // STEP 1
         for (int iteration = 0; iteration < iterations; iteration++) {
@@ -168,11 +168,11 @@ public final class NetworkGeoData {
             for (Entry<String, Set<String>> entry : sortedByNeigboursCountHavingKnownGpsCoords.entrySet()) {
                 if (!ids.contains(entry.getKey())) {
                     // cfinalentroid calculation
-                    SubstationGraphic substationGraphic = calculateCentroidGeoData(network.getSubstation(entry.getKey()), entry.getValue(), 1, substationGraphicMap);
-                    if (substationGraphic != null) {
+                    SubstationGeoData substationGeoData = calculateCentroidGeoData(network.getSubstation(entry.getKey()), entry.getValue(), 1, substationGraphicMap);
+                    if (substationGeoData != null) {
                         ids.add(entry.getKey());
                         corrected++;
-                        substationGraphicMap.put(entry.getKey(), substationGraphic);
+                        substationGraphicMap.put(entry.getKey(), substationGeoData);
                     } else {
                         remaining.getAndIncrement();
                     }
@@ -189,7 +189,7 @@ public final class NetworkGeoData {
     }
 
     private  void stepTwo(Network network, List<String> ids,
-                          HashMap<String, Set<String>> sortedByNeigboursCountHavingKnownGpsCoords, Map<String, SubstationGraphic> substationGraphicMap) {
+                          HashMap<String, Set<String>> sortedByNeigboursCountHavingKnownGpsCoords, Map<String, SubstationGeoData> substationGraphicMap) {
         // we have substations that we can't calculate their centroid becauce they have zero or one neigbours known GPS coords
         // step 1
         HashMap<String, Set<String>> remainingMap = sortedByNeigboursCountHavingKnownGpsCoords.entrySet()
@@ -207,12 +207,12 @@ public final class NetworkGeoData {
             for (Entry<String, Set<String>> entry : remainingMap.entrySet()) {
                 if (!ids.contains(entry.getKey())) {
                     // centroid calculation
-                    SubstationGraphic substationGraphic = calculateCentroidGeoData(network.getSubstation(entry.getKey()), entry.getValue(), 2, substationGraphicMap);
-                    if (substationGraphic != null) {
+                    SubstationGeoData substationGeoData = calculateCentroidGeoData(network.getSubstation(entry.getKey()), entry.getValue(), 2, substationGraphicMap);
+                    if (substationGeoData != null) {
                         ids.add(entry.getKey());
                         checkCalculated++;
                         checkRemaining--;
-                        substationGraphicMap.put(entry.getKey(), substationGraphic);
+                        substationGraphicMap.put(entry.getKey(), substationGeoData);
                     }
                 }
             }
@@ -225,14 +225,14 @@ public final class NetworkGeoData {
         }
     }
 
-    private  SubstationGraphic calculateCentroidGeoData(Substation substation, Set<String> neighbours, int step, Map<String, SubstationGraphic> substationGraphicMap) {
+    private SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, int step, Map<String, SubstationGeoData> substationGraphicMap) {
 
         // Get neigbours geo data
-        List<SubstationGraphic> neighboursGeoData = neighbours.stream().map(substationGraphicMap::get)
+        List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationGraphicMap::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        SubstationGraphic substationGraphic = null;
+        SubstationGeoData substationGeoData = null;
 
         if (neighboursGeoData.size() > 1) {
             // Centroid calculation
@@ -241,10 +241,10 @@ public final class NetworkGeoData {
             lat = neighboursGeoData.stream().mapToDouble(n -> n.getPosition().getLat()).average();
             lon = neighboursGeoData.stream().mapToDouble(n -> n.getPosition().getLon()).average();
             if (lat.isPresent() && lon.isPresent()) {
-                substationGraphic = new SubstationGraphic(substation.getId(), new Coordinate(lat.getAsDouble(), lon.getAsDouble()));
-                substationGraphic.setModel(substation);
+                substationGeoData = new SubstationGeoData(substation.getId(), new Coordinate(lat.getAsDouble(), lon.getAsDouble()));
+                substationGeoData.setModel(substation);
             }
-            return substationGraphic;
+            return substationGeoData;
         } else if (neighboursGeoData.size() == 1 && step == 2) {
             // Centroid calculation
             final double lat;
@@ -252,11 +252,11 @@ public final class NetworkGeoData {
             lat = neighboursGeoData.get(0).getPosition().getLat() - 0.002; //1° correspond à 111KM
             lon = neighboursGeoData.get(0).getPosition().getLon() - 0.007; //1° correspond à 111.11 cos(1) = 60KM
 
-            substationGraphic = new SubstationGraphic(substation.getId(), new Coordinate(lat, lon));
-            substationGraphic.setModel(substation);
-            substation.addExtension(SubstationPosition.class, new SubstationPosition(substation, substationGraphic.getPosition()));
+            substationGeoData = new SubstationGeoData(substation.getId(), new Coordinate(lat, lon));
+            substationGeoData.setModel(substation);
+            substation.addExtension(SubstationPosition.class, new SubstationPosition(substation, substationGeoData.getPosition()));
 
-            return substationGraphic;
+            return substationGeoData;
         } else {
             return null;
         }
@@ -288,18 +288,18 @@ public final class NetworkGeoData {
         return neighbours;
     }
 
-    private void saveNewCalculatedLine(LineGraphic lineGraphic) {
-        logger.warn("{} is now ready for use as precalculated line", lineGraphic.getId());
+    private void saveNewCalculatedLine(LineGeoData lineGeoData) {
+        logger.warn("{} is now ready for use as precalculated line", lineGeoData.getId());
         // now we are sure that it's ordered so we have to save the state
-        lineGraphic.setOrdered(true);
+        lineGeoData.setOrdered(true);
         linesRepository.save(LineEntity
                 .builder()
-                .country(lineGraphic.getCountry().toString())
-                .lineID(lineGraphic.getId())
-                .voltage(lineGraphic.getVoltage())
-                .aerial(lineGraphic.isAerial())
-                .ordered(lineGraphic.isOrdered())
-                .coordinates(lineGraphic.getCoordinates().stream()
+                .country(lineGeoData.getCountry().toString())
+                .lineID(lineGeoData.getId())
+                .voltage(lineGeoData.getVoltage())
+                .aerial(lineGeoData.isAerial())
+                .ordered(lineGeoData.isOrdered())
+                .coordinates(lineGeoData.getCoordinates().stream()
                         .map(p -> CoordinateEntity.builder()
                                 .lat(p.getLat())
                                 .lon(p.getLon()).build())
@@ -307,41 +307,41 @@ public final class NetworkGeoData {
                 .build());
     }
 
-    private void addSimpleLine(SubstationGraphic side1, SubstationGraphic side2, Map<String, LineGraphic> networkLineGraphicMap,
+    private void addSimpleLine(SubstationGeoData side1, SubstationGeoData side2, Map<String, LineGeoData> networkLineGraphicMap,
                                Line line, double voltage) {
         // we know substations to wchich the line is connected
         Deque<Coordinate> positions = new ArrayDeque<>();
         positions.add(side1.getPosition());
         positions.add(side2.getPosition());
 
-        LineGraphic lineGraphic = new LineGraphic();
-        lineGraphic.setVoltage((int) voltage);
-        lineGraphic.setCoordinates(positions);
-        lineGraphic.setId(line.getId());
+        LineGeoData lineGeoData = new LineGeoData();
+        lineGeoData.setVoltage((int) voltage);
+        lineGeoData.setCoordinates(positions);
+        lineGeoData.setId(line.getId());
 
-        networkLineGraphicMap.put(line.getId(), lineGraphic);
+        networkLineGraphicMap.put(line.getId(), lineGeoData);
     }
 
-    private void calculateLinesCoordinates(Network network, Map<String, SubstationGraphic> substationGraphicMap, Map<String,
-            LineGraphic> linesGeoDataDB, Map<String, LineGraphic> networkLineGraphicMap) {
+    private void calculateLinesCoordinates(Network network, Map<String, SubstationGeoData> substationGraphicMap, Map<String,
+            LineGeoData> linesGeoDataDB, Map<String, LineGeoData> networkLineGraphicMap) {
         // for statistics
         int tracedLines = 0;
         List<Line> ignoredLines = new ArrayList<>();
         // for each line of our network
         for (Line line : network.getLines()) {
-            SubstationGraphic side1 = substationGraphicMap.get(line.getTerminal1().getVoltageLevel().getSubstation().getId());
-            SubstationGraphic side2 = substationGraphicMap.get(line.getTerminal2().getVoltageLevel().getSubstation().getId());
+            SubstationGeoData side1 = substationGraphicMap.get(line.getTerminal1().getVoltageLevel().getSubstation().getId());
+            SubstationGeoData side2 = substationGraphicMap.get(line.getTerminal2().getVoltageLevel().getSubstation().getId());
 
             if (side1 != null && side2 != null) {
                 tracedLines++;
                 if (linesGeoDataDB.get(line.getId()) != null) {
-                    LineGraphic lineGraphic = linesGeoDataDB.get(line.getId());
-                    lineGraphic.orderCoordinates(side1, side2, linesGeoDataDB);
-                    if (!lineGraphic.isOrdered()) {
-                        saveNewCalculatedLine(lineGraphic);
+                    LineGeoData lineGeoData = linesGeoDataDB.get(line.getId());
+                    lineGeoData.orderCoordinates(side1, side2, linesGeoDataDB);
+                    if (!lineGeoData.isOrdered()) {
+                        saveNewCalculatedLine(lineGeoData);
                     }
-                    lineGraphic.addExtremities(side1, side2);
-                    networkLineGraphicMap.put(line.getId(), lineGraphic);
+                    lineGeoData.addExtremities(side1, side2);
+                    networkLineGraphicMap.put(line.getId(), lineGeoData);
                 } else {
                     addSimpleLine(side1, side2, networkLineGraphicMap, line, line.getTerminal1().getVoltageLevel().getNominalV());
                 }
@@ -355,15 +355,15 @@ public final class NetworkGeoData {
         logger.info("{} ignored lines ", network.getLineCount() - tracedLines);
     }
 
-    public  Map<String, LineGraphic> getNetworkLinesCoordinates(Network network) {
+    public  Map<String, LineGeoData> getNetworkLinesCoordinates(Network network) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("BEGIN [/v1/lines-graphics/{idNetwork}]");
 
         //get all substations coordinates
-        Map<String, SubstationGraphic> substationGraphicMap = getSubstationsCoordinates(network);
-        Map<String, LineGraphic> linesGeoDataDB = linesCustomRepository.getAllLines();
-        Map<String, LineGraphic> networkLineGraphicMap = new HashMap<>();
+        Map<String, SubstationGeoData> substationGraphicMap = getSubstationsCoordinates(network);
+        Map<String, LineGeoData> linesGeoDataDB = linesCustomRepository.getAllLines();
+        Map<String, LineGeoData> networkLineGraphicMap = new HashMap<>();
 
         calculateLinesCoordinates(network, substationGraphicMap, linesGeoDataDB, networkLineGraphicMap);
 
@@ -371,15 +371,15 @@ public final class NetworkGeoData {
         return networkLineGraphicMap;
     }
 
-    public  Map<String, LineGraphic> getNetworkLinesCoordinates(Network network, int voltage) {
+    public  Map<String, LineGeoData> getNetworkLinesCoordinates(Network network, int voltage) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("BEGIN [/v1/lines-graphics/{idNetwork}/{voltage}]");
 
         //get all substations coordinates
-        Map<String, SubstationGraphic> substationGraphicMap = getSubstationsCoordinates(network);
-        Map<String, LineGraphic> linesGeoDataDB = linesCustomRepository.getLines("FR", voltage);
-        Map<String, LineGraphic> networkLineGraphicMap = new HashMap<>();
+        Map<String, SubstationGeoData> substationGraphicMap = getSubstationsCoordinates(network);
+        Map<String, LineGeoData> linesGeoDataDB = linesCustomRepository.getLines("FR", voltage);
+        Map<String, LineGeoData> networkLineGraphicMap = new HashMap<>();
 
         calculateLinesCoordinates(network, substationGraphicMap, linesGeoDataDB, networkLineGraphicMap);
 
@@ -387,12 +387,12 @@ public final class NetworkGeoData {
         return networkLineGraphicMap;
     }
 
-    private void networkKnownLinesCoordinates(Network network, Map<String, LineGraphic> linesGeoDataDB, Map<String, LineGraphic> networkLineGraphicMap) {
+    private void networkKnownLinesCoordinates(Network network, Map<String, LineGeoData> linesGeoDataDB, Map<String, LineGeoData> networkLineGraphicMap) {
         // for each line of our network
         for (Line line : network.getLines()) {
             if (linesGeoDataDB.get(line.getId()) != null) {
-                LineGraphic lineGraphic = linesGeoDataDB.get(line.getId());
-                networkLineGraphicMap.put(line.getId(), lineGraphic);
+                LineGeoData lineGeoData = linesGeoDataDB.get(line.getId());
+                networkLineGraphicMap.put(line.getId(), lineGeoData);
             }
         }
 
@@ -400,14 +400,14 @@ public final class NetworkGeoData {
     }
 
     //This method returns only network's calculated lines even two sides are not known !
-    public  Map<String, LineGraphic> getKnownNetworkLinesCoordinates(Network network) {
+    public  Map<String, LineGeoData> getKnownNetworkLinesCoordinates(Network network) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("BEGIN [/v1/lines-graphics/{idNetwork}]");
 
         //get all substations coordinates
-        Map<String, LineGraphic> linesGeoDataDB = linesCustomRepository.getAllLines();
-        Map<String, LineGraphic> networkLineGraphicMap = new HashMap<>();
+        Map<String, LineGeoData> linesGeoDataDB = linesCustomRepository.getAllLines();
+        Map<String, LineGeoData> networkLineGraphicMap = new HashMap<>();
 
         networkKnownLinesCoordinates(network, linesGeoDataDB, networkLineGraphicMap);
         logger.info("Only known lines coordinates are sent, " +
@@ -415,13 +415,13 @@ public final class NetworkGeoData {
         return networkLineGraphicMap;
     }
 
-    public  Map<String, LineGraphic> getKnownNetworkLinesCoordinates(Network network, int voltage) {
+    public  Map<String, LineGeoData> getKnownNetworkLinesCoordinates(Network network, int voltage) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("BEGIN [/v1/lines-graphics/{idNetwork}/{voltage}]");
 
-        Map<String, LineGraphic> linesGeoDataDB = linesCustomRepository.getLines("FR", voltage);
-        Map<String, LineGraphic> networkLineGraphicMap = new HashMap<>();
+        Map<String, LineGeoData> linesGeoDataDB = linesCustomRepository.getLines("FR", voltage);
+        Map<String, LineGeoData> networkLineGraphicMap = new HashMap<>();
 
         networkKnownLinesCoordinates(network, linesGeoDataDB, networkLineGraphicMap);
 
@@ -436,9 +436,9 @@ public final class NetworkGeoData {
         logger.info("BEGIN [/v1/precalculate-lines-on-import/{idNetwork}]");
 
         //get all substations coordinates
-        Map<String, SubstationGraphic> substationGraphicMap = getSubstationsCoordinates(network);
-        Map<String, LineGraphic> linesGeoDataDB = linesCustomRepository.getAllLines();
-        Map<String, LineGraphic> networkLineGraphicMap = new HashMap<>();
+        Map<String, SubstationGeoData> substationGraphicMap = getSubstationsCoordinates(network);
+        Map<String, LineGeoData> linesGeoDataDB = linesCustomRepository.getAllLines();
+        Map<String, LineGeoData> networkLineGraphicMap = new HashMap<>();
 
         calculateLinesCoordinates(network, substationGraphicMap, linesGeoDataDB, networkLineGraphicMap);
 

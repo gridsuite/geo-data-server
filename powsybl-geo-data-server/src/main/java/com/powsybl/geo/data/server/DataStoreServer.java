@@ -9,14 +9,14 @@ package com.powsybl.geo.data.server;
 import com.powsybl.geo.data.server.repositories.*;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
-import com.powsybl.geo.data.server.dto.LineGraphic;
+import com.powsybl.geo.data.server.dto.LineGeoData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.powsybl.geo.data.server.repositories.LinesCustomRepository;
 import com.powsybl.geo.data.server.utils.DataStoreServerUtils;
 import com.powsybl.geo.data.server.utils.NetworkGeoData;
-import com.powsybl.geo.data.server.dto.SubstationGraphic;
+import com.powsybl.geo.data.server.dto.SubstationGeoData;
 import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
@@ -64,7 +64,7 @@ public class DataStoreServer {
     @GetMapping(value = "lines/{idNetwork}")
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of lines graphics")})
-    public ResponseEntity<List<LineGraphic>> getLinesGraphics(@PathVariable UUID idNetwork,
+    public ResponseEntity<List<LineGeoData>> getLinesGraphics(@PathVariable UUID idNetwork,
                                                               @RequestParam(name = "pagination", defaultValue = "false") boolean pagination,
                                                               @RequestParam(name = "page", defaultValue = "1") int page,
                                                               @RequestParam(name = "size", defaultValue = "100") int size) {
@@ -80,7 +80,7 @@ public class DataStoreServer {
     @GetMapping(value = "substations/{idNetwork}")
     @ApiOperation(value = "Get Network substations graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of substations graphics")})
-    public ResponseEntity<List<SubstationGraphic>> getSubstationsGraphic(@PathVariable UUID idNetwork,
+    public ResponseEntity<List<SubstationGeoData>> getSubstationsGraphic(@PathVariable UUID idNetwork,
                                                                          @RequestParam(name = "pagination", defaultValue = "false") boolean pagination,
                                                                          @RequestParam(name = "page", defaultValue = "1") int page,
                                                                          @RequestParam(name = "size", defaultValue = "100") int size) {
@@ -98,7 +98,7 @@ public class DataStoreServer {
     @GetMapping(value = "lines/{idNetwork}/{voltage}")
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of lines graphics")})
-    public ResponseEntity<List<LineGraphic>> getLinesGraphicsByVoltage(@PathVariable UUID idNetwork, @PathVariable int voltage) {
+    public ResponseEntity<List<LineGeoData>> getLinesGraphicsByVoltage(@PathVariable UUID idNetwork, @PathVariable int voltage) {
         Network network = service.getNetwork(idNetwork);
         return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getNetworkLinesCoordinates(network, voltage).values()));
     }
@@ -106,7 +106,7 @@ public class DataStoreServer {
     @GetMapping(value = "lines-basic/{idNetwork}/{voltage}")
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of known lines graphics")})
-    public ResponseEntity<List<LineGraphic>> getLinesGraphicsByVoltageLightVersion(@PathVariable UUID idNetwork, @PathVariable int voltage) {
+    public ResponseEntity<List<LineGeoData>> getLinesGraphicsByVoltageLightVersion(@PathVariable UUID idNetwork, @PathVariable int voltage) {
         Network network = service.getNetwork(idNetwork);
         return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getKnownNetworkLinesCoordinates(network, voltage).values()));
     }
@@ -116,7 +116,7 @@ public class DataStoreServer {
     @GetMapping(value = "lines-basic/{idNetwork}")
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of known lines graphics")})
-    public ResponseEntity<List<LineGraphic>> getLinesGraphicsLightVersion(@PathVariable UUID idNetwork) {
+    public ResponseEntity<List<LineGeoData>> getLinesGraphicsLightVersion(@PathVariable UUID idNetwork) {
         Network network = service.getNetwork(idNetwork);
         return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getKnownNetworkLinesCoordinates(network).values()));
     }
@@ -126,10 +126,10 @@ public class DataStoreServer {
     @PostMapping(value = "substations")
     @ApiOperation(value = "Save/Update substations")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "substations Saved")})
-    public ResponseEntity<Void> saveSubstations(@RequestBody List<SubstationGraphic> substationGraphics) {
+    public ResponseEntity<Void> saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
         LOGGER.info("/substations [POST] : Save Substations request received");
         List<SubstationEntity> substationEntities = new ArrayList<>();
-        substationGraphics.forEach(s -> substationEntities.add(SubstationEntity.builder()
+        substationGeoData.forEach(s -> substationEntities.add(SubstationEntity.builder()
                 .country(s.getCountry().toString())
                 .substationID(s.getId())
                 .coordinate(CoordinateEntity.builder().lat(s.getPosition().getLat()).lon(s.getPosition().getLon()).build())
@@ -141,11 +141,11 @@ public class DataStoreServer {
     @PostMapping(value = "lines")
     @ApiOperation(value = "Save/Update lines")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "lines Saved")})
-    public ResponseEntity<Void> saveLines(@RequestBody List<LineGraphic> linesGraphics) {
+    public ResponseEntity<Void> saveLines(@RequestBody List<LineGeoData> linesGraphics) {
         LOGGER.info("/lines [POST] : Save Lines request received");
         List<String> savedLines = new ArrayList<>(linesCustomRepository.getAllLines().keySet());
         // ignore lines that exist and calculated
-        List<LineGraphic> filteredLinesGraphics = linesGraphics.stream().filter(lg -> !savedLines.contains(lg.getId())).collect(Collectors.toList());
+        List<LineGeoData> filteredLinesGraphics = linesGraphics.stream().filter(lg -> !savedLines.contains(lg.getId())).collect(Collectors.toList());
 
         List<LineEntity> linesEntities = new ArrayList<>();
         filteredLinesGraphics.forEach(l -> linesEntities.add(LineEntity.builder()
@@ -168,7 +168,7 @@ public class DataStoreServer {
     @GetMapping(value = "precalculate-lines/{idNetwork}")
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of lines graphics")})
-    public ResponseEntity<List<LineGraphic>> precalculateLines(@PathVariable UUID idNetwork) {
+    public ResponseEntity<List<LineGeoData>> precalculateLines(@PathVariable UUID idNetwork) {
         Network network = service.getNetwork(idNetwork);
         networkGeoData.precalculateLines(network);
         return ResponseEntity.ok().build();

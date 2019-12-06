@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.powsybl.geo.data.server.utils.GeoDataUtils;
 
-import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,9 +31,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Data
 @Builder
-public class LineGraphic {
+public class LineGeoData {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LineGraphic.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LineGeoData.class);
 
     private  String id;
 
@@ -51,18 +50,18 @@ public class LineGraphic {
     @JsonIgnore
     private Line model;
 
-    public LineGraphic(String id, int voltage, boolean aerial) {
+    public LineGeoData(String id, int voltage, boolean aerial) {
         this.id = Objects.requireNonNull(id);
         this.aerial = aerial;
         this.voltage = voltage;
     }
 
-    public void addExtremities(SubstationGraphic side1, SubstationGraphic side2) {
+    public void addExtremities(SubstationGeoData side1, SubstationGeoData side2) {
         coordinates.addFirst(side1.getPosition());
         coordinates.addLast(side2.getPosition());
     }
 
-    public void orderCoordinates(SubstationGraphic side1, SubstationGraphic side2, Map<String, LineGraphic> lines) {
+    public void orderCoordinates(SubstationGeoData side1, SubstationGeoData side2, Map<String, LineGeoData> lines) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         if (lines.get(id) != null && lines.get(id).isOrdered()) {
@@ -71,14 +70,14 @@ public class LineGraphic {
         }
         // index segment by position side 1 and 2
         // create pylons
-        List<PylonGraphic> pylons = coordinates.stream().map(PylonGraphic::new).collect(Collectors.toList());
+        List<PylonGeoData> pylons = coordinates.stream().map(PylonGeoData::new).collect(Collectors.toList());
 
-        PylonGraphic current =  new PylonGraphic(side1.getPosition());
+        PylonGeoData current =  new PylonGeoData(side1.getPosition());
 
-        Deque<PylonGraphic> orderedPylons = new ArrayDeque<>();
+        Deque<PylonGeoData> orderedPylons = new ArrayDeque<>();
 
         while (!pylons.isEmpty()) {
-            PylonGraphic nearest = getNearestNeigbour(current, pylons);
+            PylonGeoData nearest = getNearestNeigbour(current, pylons);
             if (GeoDataUtils.distance(current.getCoordinate(), side2.getPosition(), "KM") < GeoDataUtils.distance(current.getCoordinate(), nearest.getCoordinate(), "KM")) {
                 break;
             }
@@ -91,13 +90,13 @@ public class LineGraphic {
         LOGGER.info("line {} was calculatd in {} ms", id, stopWatch.getTime());
     }
 
-    private PylonGraphic getNearestNeigbour(PylonGraphic pylonGraphic, List<PylonGraphic> pylons) {
-        PylonGraphic nearest = pylons.get(0);
-        double minDistance = GeoDataUtils.distance(pylonGraphic.getCoordinate(), nearest.getCoordinate(), "KM");
-        for (PylonGraphic p : pylons) {
-            if (GeoDataUtils.distance(pylonGraphic.getCoordinate(), p.getCoordinate(), "KM") < minDistance) {
+    private PylonGeoData getNearestNeigbour(PylonGeoData pylonGeoData, List<PylonGeoData> pylons) {
+        PylonGeoData nearest = pylons.get(0);
+        double minDistance = GeoDataUtils.distance(pylonGeoData.getCoordinate(), nearest.getCoordinate(), "KM");
+        for (PylonGeoData p : pylons) {
+            if (GeoDataUtils.distance(pylonGeoData.getCoordinate(), p.getCoordinate(), "KM") < minDistance) {
                 nearest = p;
-                minDistance = GeoDataUtils.distance(pylonGraphic.getCoordinate(), p.getCoordinate(), "KM");
+                minDistance = GeoDataUtils.distance(pylonGeoData.getCoordinate(), p.getCoordinate(), "KM");
             }
         }
         return nearest;

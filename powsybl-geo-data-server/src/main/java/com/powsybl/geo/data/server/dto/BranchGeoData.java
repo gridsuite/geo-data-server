@@ -20,10 +20,10 @@ import java.util.Deque;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = "line")
-public class BranchGraphic {
+public class BranchGeoData {
 
-    private Deque<PylonGraphic> pylons = new ArrayDeque<>();
+    private Deque<PylonGeoData> pylons = new ArrayDeque<>();
 
     @JsonIgnore
-    private  LineGraphic line;
+    private LineGeoData line;
 }

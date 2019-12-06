@@ -25,7 +25,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SubstationGraphic {
+public class SubstationGeoData {
 
     private Country country;
 
@@ -38,7 +38,7 @@ public class SubstationGraphic {
     @JsonIgnore
     private Substation model;
 
-    public SubstationGraphic(String id, Coordinate position) {
+    public SubstationGeoData(String id, Coordinate position) {
         this.id = Objects.requireNonNull(id);
         this.position = Objects.requireNonNull(position);
     }

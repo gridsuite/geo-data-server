@@ -7,14 +7,14 @@
 package com.powsybl.geo.data.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.geo.data.server.dto.SubstationGeoData;
 import com.powsybl.geo.data.server.repositories.LinesRepository;
 import com.powsybl.geo.data.server.repositories.SubstationsRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.geo.data.extensions.Coordinate;
-import com.powsybl.geo.data.server.dto.LineGraphic;
-import com.powsybl.geo.data.server.dto.SubstationGraphic;
+import com.powsybl.geo.data.server.dto.LineGeoData;
 import org.cassandraunit.spring.CassandraDataSet;
 import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
 import org.cassandraunit.spring.CassandraUnitTestExecutionListener;
@@ -111,7 +111,7 @@ public class DataStoreServerTest {
         mvc.perform(post("/" + VERSION + "/substations")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Collections.singleton(
-                        SubstationGraphic.builder()
+                        SubstationGeoData.builder()
                                 .country(Country.FR)
                                 .id("testID")
                                 .position(new Coordinate(1, 1))
@@ -121,7 +121,7 @@ public class DataStoreServerTest {
         mvc.perform(post("/" + VERSION + "/lines")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Collections.singleton(
-                        LineGraphic.builder()
+                        LineGeoData.builder()
                                 .voltage(400)
                                 .country(Country.FR)
                                 .aerial(true)

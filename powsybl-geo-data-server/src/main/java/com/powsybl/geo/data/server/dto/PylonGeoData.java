@@ -17,21 +17,21 @@ import java.util.Set;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  * @author Geoffroy Jamgotchian <geoffroy.jamgotchian at rte-france.com>
  */
-public class PylonGraphic {
+public class PylonGeoData {
 
     static class Neighbor {
 
-        private final PylonGraphic pylon;
+        private final PylonGeoData pylon;
 
         @JsonIgnore
         private final SegmentGraphic segment;
 
-        Neighbor(PylonGraphic pylon, SegmentGraphic segment) {
+        Neighbor(PylonGeoData pylon, SegmentGraphic segment) {
             this.pylon = Objects.requireNonNull(pylon);
             this.segment = Objects.requireNonNull(segment);
         }
 
-        PylonGraphic getPylon() {
+        PylonGeoData getPylon() {
             return pylon;
         }
 
@@ -45,11 +45,11 @@ public class PylonGraphic {
     @JsonIgnore
     private final Set<Neighbor> neighbors = new HashSet<>();
 
-    public PylonGraphic() {
+    public PylonGeoData() {
         coordinate = null;
     }
 
-    public PylonGraphic(com.powsybl.geo.data.extensions.Coordinate coordinate) {
+    public PylonGeoData(com.powsybl.geo.data.extensions.Coordinate coordinate) {
         this.coordinate = Objects.requireNonNull(coordinate);
     }
 

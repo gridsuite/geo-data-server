@@ -18,18 +18,18 @@ import static org.junit.Assert.assertNull;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 
-public class SubstationGraphicTest {
+public class SubstationGeoDataTest {
 
     @Test
     public void test() {
-        SubstationGraphic substationGraphic = new SubstationGraphic("id", new com.powsybl.geo.data.extensions.Coordinate(1, 2));
-        assertEquals("id", substationGraphic.getId());
-        assertEquals(substationGraphic.getPosition(), new Coordinate(1, 2));
-        assertNull(substationGraphic.getModel());
+        SubstationGeoData substationGeoData = new SubstationGeoData("id", new com.powsybl.geo.data.extensions.Coordinate(1, 2));
+        assertEquals("id", substationGeoData.getId());
+        assertEquals(substationGeoData.getPosition(), new Coordinate(1, 2));
+        assertNull(substationGeoData.getModel());
         Substation s = EurostagTutorialExample1Factory.create().getSubstation("P1");
-        substationGraphic.setModel(s);
-        assertEquals(substationGraphic.getModel(), s);
-        System.out.println(substationGraphic);
-        assertEquals("SubstationGraphic(country=null, id=id, position=Coordinate(lat=1.0, lon=2.0), voltages=null, model=P1)", substationGraphic.toString());
+        substationGeoData.setModel(s);
+        assertEquals(substationGeoData.getModel(), s);
+        System.out.println(substationGeoData);
+        assertEquals("SubstationGeoData(country=null, id=id, position=Coordinate(lat=1.0, lon=2.0), voltages=null, model=P1)", substationGeoData.toString());
     }
 }

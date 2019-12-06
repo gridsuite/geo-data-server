@@ -6,13 +6,13 @@
  */
 package com.powsybl.geo.data.server.utils;
 
-import com.powsybl.geo.data.server.dto.BaseVoltage;
 import com.powsybl.geo.data.extensions.Coordinate;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 public final class GeoDataUtils {
+
     private GeoDataUtils() {
     }
 
@@ -33,34 +33,6 @@ public final class GeoDataUtils {
                 dist = dist * 0.8684;
             }
             return dist;
-        }
-    }
-
-    public static BaseVoltage baseVoltageFromVoltage(int voltage) {
-        switch (voltage) {
-            case 0:
-                return BaseVoltage.VL_OFF;
-            case 45:
-                return BaseVoltage.VL_45_KV;
-            case 63:
-                return BaseVoltage.VL_63_KV;
-            case 90:
-                return BaseVoltage.VL_90_KV;
-            case 150:
-                return BaseVoltage.VL_150_KV;
-            case 225:
-                return BaseVoltage.VL_225_KV;
-            case 400:
-            case 380:
-                return BaseVoltage.VL_400_KV;
-            case -1:
-            case 20:
-            case 42:
-                return BaseVoltage.VL_INF_45_KV;
-            case -99:
-                return BaseVoltage.VL_CONTINOUS_CURRENT;
-            default:
-                throw new AssertionError(voltage);
         }
     }
 }

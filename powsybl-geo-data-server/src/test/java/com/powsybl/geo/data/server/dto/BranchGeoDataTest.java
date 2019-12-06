@@ -10,7 +10,6 @@ import com.powsybl.geo.data.extensions.Coordinate;
 
 import org.junit.Test;
 
-import java.awt.*;
 import java.util.ArrayDeque;
 
 import static org.junit.Assert.*;
@@ -18,20 +17,20 @@ import static org.junit.Assert.*;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-public class BranchGraphicTest {
+public class BranchGeoDataTest {
 
     @Test
     public void test() {
-        LineGraphic lineGraphic = new LineGraphic("l", 400, true);
-        BranchGraphic branchGraphic = new BranchGraphic(new ArrayDeque<>(), lineGraphic);
+        LineGeoData lineGeoData = new LineGeoData("l", 400, true);
+        BranchGeoData branchGraphic = new BranchGeoData(new ArrayDeque<>(), lineGeoData);
         assertTrue(branchGraphic.getPylons().isEmpty());
-        assertEquals(branchGraphic.getLine(), lineGraphic);
-        branchGraphic.getPylons().add(new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(1, 1)));
-        branchGraphic.getPylons().add(new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(2, 1)));
-        branchGraphic.getPylons().add(new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(1, 2)));
-        branchGraphic.getPylons().add(new PylonGraphic(new Coordinate(2, 2)));
+        assertEquals(branchGraphic.getLine(), lineGeoData);
+        branchGraphic.getPylons().add(new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 1)));
+        branchGraphic.getPylons().add(new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(2, 1)));
+        branchGraphic.getPylons().add(new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 2)));
+        branchGraphic.getPylons().add(new PylonGeoData(new Coordinate(2, 2)));
 
-        BranchGraphic branchGraphic2 = new BranchGraphic();
+        BranchGeoData branchGraphic2 = new BranchGeoData();
         branchGraphic2.setLine(null);
         branchGraphic2.setPylons(branchGraphic.getPylons());
         assertNull(branchGraphic2.getLine());
