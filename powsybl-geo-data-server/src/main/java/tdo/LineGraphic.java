@@ -38,8 +38,6 @@ public class LineGraphic {
 
     private  String id;
 
-    private  int drawOrder;
-
     private int voltage;
 
     private Country country;
@@ -56,9 +54,8 @@ public class LineGraphic {
     @JsonIgnore
     private Line model;
 
-    public LineGraphic(String id, int drawOrder, Color color, int voltage, boolean aerial) {
+    public LineGraphic(String id, Color color, int voltage, boolean aerial) {
         this.id = Objects.requireNonNull(id);
-        this.drawOrder = drawOrder;
         this.color = Objects.requireNonNull(color);
         this.aerial = aerial;
         this.voltage = voltage;

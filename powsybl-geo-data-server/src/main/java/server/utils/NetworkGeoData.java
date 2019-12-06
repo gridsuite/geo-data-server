@@ -319,7 +319,6 @@ public final class NetworkGeoData {
         lineGraphic.setColor(GeoDataUtils.baseVoltageFromVoltage((int) voltage).getColor());
         lineGraphic.setCoordinates(positions);
         lineGraphic.setId(line.getId());
-        lineGraphic.setDrawOrder(GeoDataUtils.baseVoltageFromVoltage((int) voltage).getOrder());
 
         networkLineGraphicMap.put(line.getId(), lineGraphic);
     }

@@ -24,7 +24,7 @@ public class SegmentGraphicTest {
         PylonGraphic pylonGraphic = new PylonGraphic(new com.powsybl.geo.data.extensions.Coordinate(1, 1));
         PylonGraphic pylonGraphic2 = new PylonGraphic(new Coordinate(2, 2));
 
-        LineGraphic lineGraphic = new LineGraphic("l", 1, Color.RED, 400, true);
+        LineGraphic lineGraphic = new LineGraphic("l", Color.RED, 400, true);
         SegmentGraphic segmentGraphic = new SegmentGraphic(pylonGraphic.getCoordinate(), pylonGraphic2.getCoordinate(), lineGraphic);
 
         assertEquals(segmentGraphic.getCoordinate1(), pylonGraphic.getCoordinate());

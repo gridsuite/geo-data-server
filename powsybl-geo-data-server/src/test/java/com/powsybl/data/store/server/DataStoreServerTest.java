@@ -124,7 +124,6 @@ public class DataStoreServerTest {
                         LineGraphic.builder()
                                 .voltage(400)
                                 .country(Country.FR)
-                                .drawOrder(3)
                                 .aerial(true)
                                 .coordinates(new ArrayDeque<>())
                                 .build()))))

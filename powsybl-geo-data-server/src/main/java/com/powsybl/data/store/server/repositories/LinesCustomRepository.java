@@ -9,7 +9,6 @@ package com.powsybl.data.store.server.repositories;
 import com.datastax.driver.core.*;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.geo.data.extensions.Coordinate;
-import server.utils.GeoDataUtils;
 import tdo.LineGraphic;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -56,7 +55,6 @@ public  class LinesCustomRepository {
                         .id(r.get("lineId", String.class))
                         .aerial(r.get("aerial", Boolean.class))
                         .ordered(r.get("ordered", Boolean.class))
-                        .drawOrder(GeoDataUtils.baseVoltageFromVoltage(r.getInt("voltage")).getOrder())
                         .voltage(r.getInt("voltage"))
                         .country(Country.valueOf(r.getString("country")))
                         .coordinates(new ArrayDeque<>(r.getList("coordinates", Coordinate.class)))

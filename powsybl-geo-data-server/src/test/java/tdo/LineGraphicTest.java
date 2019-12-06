@@ -26,11 +26,10 @@ public class LineGraphicTest {
 
     @Test
     public void test() {
-        LineGraphic lineGraphic = new LineGraphic("l", 1, Color.RED, 400, true);
+        LineGraphic lineGraphic = new LineGraphic("l", Color.RED, 400, true);
 
         assertEquals("l", lineGraphic.getId());
         assertEquals(Color.RED, lineGraphic.getColor());
-        assertEquals(1, lineGraphic.getDrawOrder());
         assertTrue(lineGraphic.getCoordinates().isEmpty());
         assertNull(lineGraphic.getModel());
 
@@ -52,7 +51,6 @@ public class LineGraphicTest {
                 .aerial(true)
                 .color(Color.RED)
                 .coordinates(new ArrayDeque<>())
-                .drawOrder(3)
                 .country(Country.FR)
                 .voltage(400)
                 .build();

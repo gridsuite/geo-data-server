@@ -21,7 +21,7 @@ public class BranchGraphicTest {
 
     @Test
     public void test() {
-        LineGraphic lineGraphic = new LineGraphic("l", 1, Color.RED, 400, true);
+        LineGraphic lineGraphic = new LineGraphic("l", Color.RED, 400, true);
         BranchGraphic branchGraphic = new BranchGraphic(new ArrayDeque<>(), lineGraphic);
         assertTrue(branchGraphic.getPylons().isEmpty());
         assertEquals(branchGraphic.getLine(), lineGraphic);
