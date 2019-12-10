@@ -37,15 +37,15 @@ public class GeoDataSwaggerConfig {
     // Describe your apis
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("POWSYBL GEO DATA STORE API")
-                .description("This is the documentation of POWSYBL Geo Data Store API")
-                .version(GeoDataServer.API_VERSION)
+                .title("Geo data API")
+                .description("This is the documentation of PowSyBl geo Data API")
+                .version(GeoDataController.API_VERSION)
                 .build();
     }
 
     // Only select apis that matches the given Predicates.
     private Predicate<String> paths() {
         // Match all paths except /error
-        return Predicates.and(PathSelectors.regex("/" + GeoDataServer.API_VERSION + ".*"), Predicates.not(PathSelectors.regex("/error.*"))::apply);
+        return Predicates.and(PathSelectors.regex("/" + GeoDataController.API_VERSION + ".*"), Predicates.not(PathSelectors.regex("/error.*"))::apply);
     }
 }

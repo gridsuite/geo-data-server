@@ -48,14 +48,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(GeoDataServer.class)
+@WebMvcTest(GeoDataController.class)
 @ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class})
 @TestExecutionListeners(listeners = {CassandraUnitDependencyInjectionTestExecutionListener.class,
                                      CassandraUnitTestExecutionListener.class},
                         mergeMode = MERGE_WITH_DEFAULTS)
 @CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
 @EmbeddedCassandra
-public class GeoDataServerTest {
+public class GeoDataControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -102,7 +102,7 @@ public class GeoDataServerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString + "/?pagination=true&mvn page=1&size=1")
+        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString + "/?pagination=true&page=1&size=1")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
