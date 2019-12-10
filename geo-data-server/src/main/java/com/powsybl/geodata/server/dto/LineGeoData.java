@@ -6,11 +6,9 @@
  */
 package com.powsybl.geodata.server.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.utils.GeoDataUtils;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Line;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,9 +43,6 @@ public class LineGeoData {
     private boolean ordered;
 
     private Deque<Coordinate> coordinates = new ArrayDeque<>();
-
-    @JsonIgnore
-    private Line model;
 
     public LineGeoData(String id, int voltage, boolean aerial) {
         this.id = Objects.requireNonNull(id);
@@ -89,7 +84,7 @@ public class LineGeoData {
         LOGGER.info("line {} was calculatd in {} ms", id, stopWatch.getTime());
     }
 
-    private PylonGeoData getNearestNeigbour(PylonGeoData pylonGeoData, List<PylonGeoData> pylons) {
+    private static PylonGeoData getNearestNeigbour(PylonGeoData pylonGeoData, List<PylonGeoData> pylons) {
         PylonGeoData nearest = pylons.get(0);
         double minDistance = GeoDataUtils.distance(pylonGeoData.getCoordinate(), nearest.getCoordinate(), "KM");
         for (PylonGeoData p : pylons) {

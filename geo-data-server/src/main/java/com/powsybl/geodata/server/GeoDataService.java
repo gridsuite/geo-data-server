@@ -56,7 +56,7 @@ public final class GeoDataService {
         List<SubstationEntity> substationEntities = substationsRepository.findAll();
         substationsGeoDataDB = substationEntities.stream()
                 .map(s -> new SubstationGeoData(Country.valueOf(s.getCountry()), s.getSubstationID(),
-                        new Coordinate(s.getCoordinate().getLat(), s.getCoordinate().getLon()), null, null))
+                        new Coordinate(s.getCoordinate().getLat(), s.getCoordinate().getLon()), null))
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
         logger.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(),  stopWatch.getTime());
         return substationsGeoDataDB;
@@ -94,7 +94,6 @@ public final class GeoDataService {
 
         // Add coordinates to the known substations's gps coordinates
         for (Substation substation : readySubstations) {
-            substationsGeoDataDB.get(substation.getId()).setModel(substation);
             substationsGraphicMap.put(substation.getId(), substationsGeoDataDB.get(substation.getId()));
         }
 
@@ -242,7 +241,6 @@ public final class GeoDataService {
             lon = neighboursGeoData.stream().mapToDouble(n -> n.getPosition().getLon()).average();
             if (lat.isPresent() && lon.isPresent()) {
                 substationGeoData = new SubstationGeoData(substation.getId(), new Coordinate(lat.getAsDouble(), lon.getAsDouble()));
-                substationGeoData.setModel(substation);
             }
             return substationGeoData;
         } else if (neighboursGeoData.size() == 1 && step == 2) {
@@ -253,7 +251,6 @@ public final class GeoDataService {
             lon = neighboursGeoData.get(0).getPosition().getLon() - 0.007; //1° correspond à 111.11 cos(1) = 60KM
 
             substationGeoData = new SubstationGeoData(substation.getId(), new Coordinate(lat, lon));
-            substationGeoData.setModel(substation);
             substation.addExtension(SubstationPosition.class, new SubstationPosition(substation, substationGeoData.getPosition()));
 
             return substationGeoData;

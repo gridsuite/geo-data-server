@@ -6,10 +6,8 @@
  */
 package com.powsybl.geodata.server.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Substation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,9 +32,6 @@ public class SubstationGeoData {
     private Coordinate position;
 
     private List<Integer> voltages;
-
-    @JsonIgnore
-    private Substation model;
 
     public SubstationGeoData(String id, Coordinate position) {
         this.id = Objects.requireNonNull(id);

@@ -8,8 +8,6 @@ package com.powsybl.geodata.server.dto;
 
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Line;
-import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import org.junit.Test;
 
 import java.util.ArrayDeque;
@@ -29,11 +27,6 @@ public class LineGeoDataTest {
 
         assertEquals("l", lineGeoData.getId());
         assertTrue(lineGeoData.getCoordinates().isEmpty());
-        assertNull(lineGeoData.getModel());
-
-        Line line = EurostagTutorialExample1Factory.create().getLine("NHV1_NHV2_1");
-        lineGeoData.setModel(line);
-        assertEquals(lineGeoData.getModel(), line);
 
         SubstationGeoData side1 = new SubstationGeoData("id", new Coordinate(0, 0));
         SubstationGeoData side2 = new SubstationGeoData("id", new Coordinate(9, 18));

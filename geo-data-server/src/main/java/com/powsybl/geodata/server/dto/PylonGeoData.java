@@ -6,12 +6,9 @@
  */
 package com.powsybl.geodata.server.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.powsybl.geodata.extensions.Coordinate;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -19,31 +16,7 @@ import java.util.Set;
  */
 public class PylonGeoData {
 
-    static class Neighbor {
-
-        private final PylonGeoData pylon;
-
-        @JsonIgnore
-        private final SegmentGeoData segment;
-
-        Neighbor(PylonGeoData pylon, SegmentGeoData segment) {
-            this.pylon = Objects.requireNonNull(pylon);
-            this.segment = Objects.requireNonNull(segment);
-        }
-
-        PylonGeoData getPylon() {
-            return pylon;
-        }
-
-        SegmentGeoData getSegment() {
-            return segment;
-        }
-    }
-
     public final Coordinate coordinate;
-
-    @JsonIgnore
-    private final Set<Neighbor> neighbors = new HashSet<>();
 
     public PylonGeoData() {
         coordinate = null;
@@ -55,9 +28,5 @@ public class PylonGeoData {
 
     public Coordinate getCoordinate() {
         return coordinate;
-    }
-
-    public Set<Neighbor> getNeighbors() {
-        return neighbors;
     }
 }
