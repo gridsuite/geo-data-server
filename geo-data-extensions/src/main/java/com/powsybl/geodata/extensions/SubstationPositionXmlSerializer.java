@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.powsybl.geodata.extensions;
+
 import com.google.auto.service.AutoService;
 import com.powsybl.commons.extensions.ExtensionXmlSerializer;
 import com.powsybl.commons.xml.XmlReaderContext;

@@ -38,7 +38,7 @@ public class SubstationsRepositoryTest {
     private SubstationsRepository repository;
 
     @Test
-    public void test() throws InterruptedException {
+    public void test() {
         repository.save(SubstationEntity.builder()
                 .country("FR")
                 .substationID("ID")

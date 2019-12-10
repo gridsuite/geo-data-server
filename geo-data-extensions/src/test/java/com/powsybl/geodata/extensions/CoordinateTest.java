@@ -18,7 +18,6 @@ public class CoordinateTest {
     public void test() {
         Coordinate coordinate = new Coordinate(1, 2);
         Coordinate coordinate2 = new Coordinate(1, 2);
-        Coordinate coordinate13 = new Coordinate(coordinate);
         Assert.assertEquals(1, coordinate.getLat(), 0);
         Assert.assertEquals(2, coordinate.getLon(), 0);
         Assert.assertEquals("Coordinate(lat=1.0, lon=2.0)", coordinate.toString());

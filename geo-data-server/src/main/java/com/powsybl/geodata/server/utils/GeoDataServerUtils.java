@@ -7,9 +7,9 @@
 package com.powsybl.geodata.server.utils;
 
 import com.powsybl.geodata.server.GeoDataService;
+import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.geodata.server.dto.LineGeoData;
 
 import java.util.ArrayList;
 import java.util.List;

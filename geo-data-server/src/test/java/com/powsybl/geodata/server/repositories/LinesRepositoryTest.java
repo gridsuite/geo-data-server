@@ -38,7 +38,7 @@ public class LinesRepositoryTest {
     private LinesRepository repository;
 
     @Test
-    public void test() throws InterruptedException {
+    public void test() {
         List<CoordinateEntity> coordinateEntities = new ArrayList<>();
         coordinateEntities.add(CoordinateEntity.builder().lat(11).lon(12).build());
         coordinateEntities.add(CoordinateEntity.builder().lat(13).lon(14.1).build());

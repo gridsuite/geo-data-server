@@ -6,10 +6,12 @@
  */
 package com.powsybl.geodata.server.repositories;
 
-import com.datastax.driver.core.*;
-import com.powsybl.iidm.network.Country;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.dto.LineGeoData;
+import com.powsybl.iidm.network.Country;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

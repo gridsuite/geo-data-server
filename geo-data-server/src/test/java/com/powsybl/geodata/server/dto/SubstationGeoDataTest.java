@@ -29,7 +29,6 @@ public class SubstationGeoDataTest {
         Substation s = EurostagTutorialExample1Factory.create().getSubstation("P1");
         substationGeoData.setModel(s);
         assertEquals(substationGeoData.getModel(), s);
-        System.out.println(substationGeoData);
         assertEquals("SubstationGeoData(country=null, id=id, position=Coordinate(lat=1.0, lon=2.0), voltages=null, model=P1)", substationGeoData.toString());
     }
 }
