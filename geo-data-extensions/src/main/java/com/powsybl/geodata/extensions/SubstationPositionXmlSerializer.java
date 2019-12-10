@@ -7,6 +7,7 @@
 package com.powsybl.geodata.extensions;
 
 import com.google.auto.service.AutoService;
+import com.powsybl.commons.extensions.AbstractExtensionXmlSerializer;
 import com.powsybl.commons.extensions.ExtensionXmlSerializer;
 import com.powsybl.commons.xml.XmlReaderContext;
 import com.powsybl.commons.xml.XmlUtil;
@@ -14,48 +15,17 @@ import com.powsybl.commons.xml.XmlWriterContext;
 import com.powsybl.iidm.network.Substation;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.InputStream;
 
 /**
  *
  * @author Massimo Ferraro <massimo.ferraro@techrain.eu>
  */
 @AutoService(ExtensionXmlSerializer.class)
-public class SubstationPositionXmlSerializer implements ExtensionXmlSerializer<Substation, SubstationPosition> {
+public class SubstationPositionXmlSerializer extends AbstractExtensionXmlSerializer<Substation, SubstationPosition> {
 
-    @Override
-    public String getExtensionName() {
-        return SubstationPosition.NAME;
-    }
-
-    @Override
-    public String getCategoryName() {
-        return "network";
-    }
-
-    @Override
-    public Class<? super SubstationPosition> getExtensionClass() {
-        return SubstationPosition.class;
-    }
-
-    @Override
-    public boolean hasSubElements() {
-        return true;
-    }
-
-    @Override
-    public InputStream getXsdAsStream() {
-        return getClass().getResourceAsStream("/xsd/substationPosition.xsd");
-    }
-
-    @Override
-    public String getNamespaceUri() {
-        return "http://www.itesla_project.eu/schema/iidm/ext/substation_position/1_0";
-    }
-
-    @Override
-    public String getNamespacePrefix() {
-        return "sp";
+    public SubstationPositionXmlSerializer() {
+        super(SubstationPosition.NAME, "network", SubstationPosition.class, true, "substationPosition.xsd",
+                "http://www.itesla_project.eu/schema/iidm/ext/substation_position/1_0", "sp");
     }
 
     @Override
