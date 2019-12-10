@@ -42,8 +42,8 @@
     </developers>
 
     <modules>
-         <module>powsybl-geo-data-server</module>
-        <module>powsybl-geo-data-extensions</module>
+        <module>geo-data-server</module>
+        <module>geo-data-extensions</module>
     </modules>
 
     <properties>
@@ -59,11 +59,10 @@
         <maven.resources.version>3.1.0</maven.resources.version>
         <maven.site.version>3.7.1</maven.site.version>
         <maven.surefire.version>2.22.0</maven.surefire.version>
-        <jib.version>1.0.0</jib.version>
-        <guava.version>21.0</guava.version>
 
         <cassandraunit.version>3.11.2.0</cassandraunit.version>
         <guava.version>27.0.1-jre</guava.version>
+        <jib.version>1.0.0</jib.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.18.8</lombok.version>
         <metricscore.version>3.2.6</metricscore.version>
