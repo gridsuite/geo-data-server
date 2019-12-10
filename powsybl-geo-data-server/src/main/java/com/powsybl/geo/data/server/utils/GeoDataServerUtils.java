@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2019, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.powsybl.geo.data.server.utils;
 
 import com.powsybl.geo.data.server.GeoDataService;
@@ -8,6 +14,9 @@ import com.powsybl.geo.data.server.dto.LineGeoData;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
+ */
 public final class GeoDataServerUtils {
 
     private GeoDataServerUtils() {

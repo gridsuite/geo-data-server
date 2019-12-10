@@ -7,14 +7,14 @@
 package com.powsybl.geo.data.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.geo.data.extensions.Coordinate;
+import com.powsybl.geo.data.server.dto.LineGeoData;
 import com.powsybl.geo.data.server.dto.SubstationGeoData;
 import com.powsybl.geo.data.server.repositories.LinesRepository;
 import com.powsybl.geo.data.server.repositories.SubstationsRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
-import com.powsybl.geo.data.extensions.Coordinate;
-import com.powsybl.geo.data.server.dto.LineGeoData;
 import org.cassandraunit.spring.CassandraDataSet;
 import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
 import org.cassandraunit.spring.CassandraUnitTestExecutionListener;

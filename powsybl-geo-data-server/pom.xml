@@ -12,22 +12,13 @@
 
     <parent>
         <groupId>com.powsybl</groupId>
-        <artifactId>powsybl-geo-data-store</artifactId>
+        <artifactId>powsybl-geo-data</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>powsybl-geo-data-server</artifactId>
     <name>Geo data server</name>
-    <description>Geo data store server</description>
-
-    <developers>
-        <developer>
-            <name>Chamseddine BENHAMED</name>
-            <email>chamseddine.benhamed@rte-france.com</email>
-            <organization>RTE</organization>
-            <organizationUrl>http://www.rte-france.com</organizationUrl>
-        </developer>
-    </developers>
+    <description>Geographical data server</description>
 
     <build>
         <plugins>
@@ -48,18 +39,12 @@
         </plugins>
     </build>
 
-
-    <properties>
-        <powsyblcore.version>3.0.0</powsyblcore.version>
-        <network-store.version>1.0.0-SNAPSHOT</network-store.version>
-    </properties>
-
     <dependencies>
         <!-- compile scope -->
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-config-classic</artifactId>
-            <version>3.0.0</version>
+            <version>${powsyblcore.version}</version>
         </dependency>
 
         <dependency>
@@ -101,11 +86,16 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-geo-data-extensions</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <!-- test scope -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -121,6 +111,12 @@
             <artifactId>cassandra-unit-shaded</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-iidm-impl</artifactId>
