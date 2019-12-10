@@ -16,7 +16,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>powsybl-geo-data-extensions</artifactId>
-    <name>Powsybl geo data extensions</name>
+    <name>Geo data IIDM extensions</name>
     <description>extensions to represent geographic data</description>
 
         <dependencies>

@@ -48,14 +48,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(DataStoreServer.class)
-@ContextConfiguration(classes = {DataStoreApplication.class, CassandraConfig.class})
+@WebMvcTest(GeoDataServer.class)
+@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class})
 @TestExecutionListeners(listeners = {CassandraUnitDependencyInjectionTestExecutionListener.class,
                                      CassandraUnitTestExecutionListener.class},
                         mergeMode = MERGE_WITH_DEFAULTS)
 @CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
 @EmbeddedCassandra
-public class DataStoreServerTest {
+public class GeoDataServerTest {
 
     @Autowired
     private ObjectMapper objectMapper;

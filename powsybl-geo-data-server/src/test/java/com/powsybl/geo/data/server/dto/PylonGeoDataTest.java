@@ -20,14 +20,14 @@ public class PylonGeoDataTest {
 
     @Test
     public void test() {
-        PylonGeoData pylonGeoData = new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 1));
-        PylonGeoData pylonGeoData2 = new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(2, 2));
+        PylonGeoData pylonGeoData = new PylonGeoData(new Coordinate(1, 1));
+        PylonGeoData pylonGeoData2 = new PylonGeoData(new Coordinate(2, 2));
 
         LineGeoData lineGeoData = new LineGeoData("l", 400, true);
-        SegmentGraphic segmentGraphic = new SegmentGraphic(pylonGeoData.getCoordinate(), pylonGeoData2.getCoordinate(), lineGeoData);
-        PylonGeoData.Neighbor neighbor = new PylonGeoData.Neighbor(pylonGeoData2, segmentGraphic);
+        SegmentGeoData segmentGeoData = new SegmentGeoData(pylonGeoData.getCoordinate(), pylonGeoData2.getCoordinate(), lineGeoData);
+        PylonGeoData.Neighbor neighbor = new PylonGeoData.Neighbor(pylonGeoData2, segmentGeoData);
         assertEquals(neighbor.getPylon(), pylonGeoData2);
-        assertEquals(neighbor.getSegment(), segmentGraphic);
+        assertEquals(neighbor.getSegment(), segmentGeoData);
 
         assertEquals(pylonGeoData.getCoordinate(), new Coordinate(1, 1));
         assertTrue(pylonGeoData.getNeighbors().isEmpty());

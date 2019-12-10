@@ -24,9 +24,9 @@ public class PylonGeoData {
         private final PylonGeoData pylon;
 
         @JsonIgnore
-        private final SegmentGraphic segment;
+        private final SegmentGeoData segment;
 
-        Neighbor(PylonGeoData pylon, SegmentGraphic segment) {
+        Neighbor(PylonGeoData pylon, SegmentGeoData segment) {
             this.pylon = Objects.requireNonNull(pylon);
             this.segment = Objects.requireNonNull(segment);
         }
@@ -35,12 +35,12 @@ public class PylonGeoData {
             return pylon;
         }
 
-        SegmentGraphic getSegment() {
+        SegmentGeoData getSegment() {
             return segment;
         }
     }
 
-    public final com.powsybl.geo.data.extensions.Coordinate coordinate;
+    public final Coordinate coordinate;
 
     @JsonIgnore
     private final Set<Neighbor> neighbors = new HashSet<>();
@@ -49,7 +49,7 @@ public class PylonGeoData {
         coordinate = null;
     }
 
-    public PylonGeoData(com.powsybl.geo.data.extensions.Coordinate coordinate) {
+    public PylonGeoData(Coordinate coordinate) {
         this.coordinate = Objects.requireNonNull(coordinate);
     }
 

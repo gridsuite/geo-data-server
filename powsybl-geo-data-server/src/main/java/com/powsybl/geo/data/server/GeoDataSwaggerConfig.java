@@ -23,13 +23,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableSwagger2
-public class RteOpenDataSwaggerConfig {
+public class GeoDataSwaggerConfig {
     @Bean
     public Docket produceApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(DataStoreApplication.class.getPackage().getName()))
+                .apis(RequestHandlerSelectors.basePackage(GeoDataApplication.class.getPackage().getName()))
                 .paths(paths())
                 .build();
     }
@@ -39,13 +39,13 @@ public class RteOpenDataSwaggerConfig {
         return new ApiInfoBuilder()
                 .title("POWSYBL GEO DATA STORE API")
                 .description("This is the documentation of POWSYBL Geo Data Store API")
-                .version(DataStoreServer.API_VERSION)
+                .version(GeoDataServer.API_VERSION)
                 .build();
     }
 
     // Only select apis that matches the given Predicates.
     private Predicate<String> paths() {
         // Match all paths except /error
-        return Predicates.and(PathSelectors.regex("/" + DataStoreServer.API_VERSION + ".*"), Predicates.not(PathSelectors.regex("/error.*"))::apply);
+        return Predicates.and(PathSelectors.regex("/" + GeoDataServer.API_VERSION + ".*"), Predicates.not(PathSelectors.regex("/error.*"))::apply);
     }
 }

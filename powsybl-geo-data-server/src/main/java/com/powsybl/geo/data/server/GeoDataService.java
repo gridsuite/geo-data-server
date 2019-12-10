@@ -4,7 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.powsybl.geo.data.server.utils;
+package com.powsybl.geo.data.server;
+
 import com.powsybl.geo.data.extensions.SubstationPosition;
 import com.powsybl.geo.data.server.dto.SubstationGeoData;
 import com.powsybl.geo.data.server.repositories.*;
@@ -29,9 +30,9 @@ import java.util.stream.Collectors;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Component
-public final class NetworkGeoData {
+public final class GeoDataService {
 
-    private final Logger logger = LoggerFactory.getLogger(NetworkGeoData.class);
+    private final Logger logger = LoggerFactory.getLogger(GeoDataService.class);
 
     @Value("${network-geo-data.iterations}")
     private Integer iterations;
@@ -45,7 +46,7 @@ public final class NetworkGeoData {
     @Autowired
     private LinesCustomRepository linesCustomRepository;
 
-    private NetworkGeoData() {
+    private GeoDataService() {
     }
 
     private Map<String, SubstationGeoData> initializeSubstationsFromDB() {

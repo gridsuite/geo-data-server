@@ -31,7 +31,7 @@ public class SubstationGeoData {
 
     private String id;
 
-    private com.powsybl.geo.data.extensions.Coordinate position;
+    private Coordinate position;
 
     private List<Integer> voltages;
 

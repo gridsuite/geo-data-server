@@ -13,9 +13,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @SpringBootApplication
-public class DataStoreApplication {
+public class GeoDataApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DataStoreApplication.class, args);
+        SpringApplication.run(GeoDataApplication.class, args);
     }
 }

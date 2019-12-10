@@ -45,7 +45,7 @@ public class LineGeoData {
 
     private boolean ordered;
 
-    private Deque<com.powsybl.geo.data.extensions.Coordinate> coordinates = new ArrayDeque<>();
+    private Deque<Coordinate> coordinates = new ArrayDeque<>();
 
     @JsonIgnore
     private Line model;

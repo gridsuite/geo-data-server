@@ -14,8 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.powsybl.geo.data.server.repositories.LinesCustomRepository;
-import com.powsybl.geo.data.server.utils.DataStoreServerUtils;
-import com.powsybl.geo.data.server.utils.NetworkGeoData;
+import com.powsybl.geo.data.server.utils.GeoDataServerUtils;
 import com.powsybl.geo.data.server.dto.SubstationGeoData;
 import io.swagger.annotations.Api;
 
@@ -34,20 +33,20 @@ import java.util.stream.Collectors;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @RestController
-@RequestMapping(value = DataStoreServer.API_VERSION)
+@RequestMapping(value = GeoDataServer.API_VERSION)
 @Api(value = "/geo/data/store", tags = "Geo data store")
-@ComponentScan(basePackageClasses = {DataStoreServer.class, NetworkGeoData.class, NetworkStoreService.class})
-public class DataStoreServer {
+@ComponentScan(basePackageClasses = {GeoDataServer.class, GeoDataService.class, NetworkStoreService.class})
+public class GeoDataServer {
 
     static final String API_VERSION = "v1";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataStoreServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataServer.class);
 
     @Autowired
-    private NetworkGeoData networkGeoData;
+    private GeoDataService geoDataService;
 
     @Autowired
-    private NetworkStoreService service;
+    private NetworkStoreService networkStoreService;
 
     @Autowired
     private SubstationsRepository substationsRepository;
@@ -68,12 +67,12 @@ public class DataStoreServer {
                                                               @RequestParam(name = "pagination", defaultValue = "false") boolean pagination,
                                                               @RequestParam(name = "page", defaultValue = "1") int page,
                                                               @RequestParam(name = "size", defaultValue = "100") int size) {
-        Network network = service.getNetwork(idNetwork);
+        Network network = networkStoreService.getNetwork(idNetwork);
 
         if (pagination) {
-            return  ResponseEntity.ok().body(DataStoreServerUtils.getLinesGraphicsElements(networkGeoData, network, page, size));
+            return  ResponseEntity.ok().body(GeoDataServerUtils.getLinesGraphicsElements(geoDataService, network, page, size));
         } else {
-            return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getNetworkLinesCoordinates(network).values()));
+            return ResponseEntity.ok().body(new ArrayList<>(geoDataService.getNetworkLinesCoordinates(network).values()));
         }
     }
 
@@ -84,12 +83,12 @@ public class DataStoreServer {
                                                                          @RequestParam(name = "pagination", defaultValue = "false") boolean pagination,
                                                                          @RequestParam(name = "page", defaultValue = "1") int page,
                                                                          @RequestParam(name = "size", defaultValue = "100") int size) {
-        Network network = service.getNetwork(idNetwork);
+        Network network = networkStoreService.getNetwork(idNetwork);
         if (pagination) {
-            return ResponseEntity.ok().body(DataStoreServerUtils.getSubstationsGraphicsElements(networkGeoData, network, page, size));
+            return ResponseEntity.ok().body(GeoDataServerUtils.getSubstationsGraphicsElements(geoDataService, network, page, size));
 
         } else {
-            return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getSubstationsCoordinates(network).values()));
+            return ResponseEntity.ok().body(new ArrayList<>(geoDataService.getSubstationsCoordinates(network).values()));
         }
     }
 
@@ -99,16 +98,16 @@ public class DataStoreServer {
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of lines graphics")})
     public ResponseEntity<List<LineGeoData>> getLinesGraphicsByVoltage(@PathVariable UUID idNetwork, @PathVariable int voltage) {
-        Network network = service.getNetwork(idNetwork);
-        return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getNetworkLinesCoordinates(network, voltage).values()));
+        Network network = networkStoreService.getNetwork(idNetwork);
+        return ResponseEntity.ok().body(new ArrayList<>(geoDataService.getNetworkLinesCoordinates(network, voltage).values()));
     }
 
     @GetMapping(value = "lines-basic/{idNetwork}/{voltage}")
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of known lines graphics")})
     public ResponseEntity<List<LineGeoData>> getLinesGraphicsByVoltageLightVersion(@PathVariable UUID idNetwork, @PathVariable int voltage) {
-        Network network = service.getNetwork(idNetwork);
-        return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getKnownNetworkLinesCoordinates(network, voltage).values()));
+        Network network = networkStoreService.getNetwork(idNetwork);
+        return ResponseEntity.ok().body(new ArrayList<>(geoDataService.getKnownNetworkLinesCoordinates(network, voltage).values()));
     }
 
     // End points to get just the raw data
@@ -117,8 +116,8 @@ public class DataStoreServer {
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of known lines graphics")})
     public ResponseEntity<List<LineGeoData>> getLinesGraphicsLightVersion(@PathVariable UUID idNetwork) {
-        Network network = service.getNetwork(idNetwork);
-        return ResponseEntity.ok().body(new ArrayList<>(networkGeoData.getKnownNetworkLinesCoordinates(network).values()));
+        Network network = networkStoreService.getNetwork(idNetwork);
+        return ResponseEntity.ok().body(new ArrayList<>(geoDataService.getKnownNetworkLinesCoordinates(network).values()));
     }
 
     // End points to save or update data into the database
@@ -169,8 +168,8 @@ public class DataStoreServer {
     @ApiOperation(value = "Get Network lines graphics", produces = "application/json")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of lines graphics")})
     public ResponseEntity<List<LineGeoData>> precalculateLines(@PathVariable UUID idNetwork) {
-        Network network = service.getNetwork(idNetwork);
-        networkGeoData.precalculateLines(network);
+        Network network = networkStoreService.getNetwork(idNetwork);
+        geoDataService.precalculateLines(network);
         return ResponseEntity.ok().build();
     }
 }

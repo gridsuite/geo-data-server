@@ -20,16 +20,16 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @ToString(exclude = "line")
-public class SegmentGraphic {
+public class SegmentGeoData {
 
-    private com.powsybl.geo.data.extensions.Coordinate coordinate1;
+    private Coordinate coordinate1;
 
-    private com.powsybl.geo.data.extensions.Coordinate coordinate2;
+    private Coordinate coordinate2;
 
     @JsonIgnore
     private LineGeoData line;
 
-    public SegmentGraphic(com.powsybl.geo.data.extensions.Coordinate coordinate1, Coordinate coordinate2, LineGeoData line) {
+    public SegmentGeoData(Coordinate coordinate1, Coordinate coordinate2, LineGeoData line) {
         this.coordinate1 = Objects.requireNonNull(coordinate1);
         this.coordinate2 = Objects.requireNonNull(coordinate2);
         this.line = line;

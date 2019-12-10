@@ -35,11 +35,11 @@ public class LineGeoDataTest {
         lineGeoData.setModel(line);
         assertEquals(lineGeoData.getModel(), line);
 
-        SubstationGeoData side1 = new SubstationGeoData("id", new com.powsybl.geo.data.extensions.Coordinate(0, 0));
-        SubstationGeoData side2 = new SubstationGeoData("id", new com.powsybl.geo.data.extensions.Coordinate(9, 18));
+        SubstationGeoData side1 = new SubstationGeoData("id", new Coordinate(0, 0));
+        SubstationGeoData side2 = new SubstationGeoData("id", new Coordinate(9, 18));
 
-        lineGeoData.getCoordinates().addAll(Arrays.asList(new com.powsybl.geo.data.extensions.Coordinate(1, 2), new com.powsybl.geo.data.extensions.Coordinate(2, 3),
-                new com.powsybl.geo.data.extensions.Coordinate(3, 3), new com.powsybl.geo.data.extensions.Coordinate(5, 4)));
+        lineGeoData.getCoordinates().addAll(Arrays.asList(new Coordinate(1, 2), new Coordinate(2, 3),
+                new Coordinate(3, 3), new Coordinate(5, 4)));
 
         lineGeoData.orderCoordinates(side1, side2, new HashMap<>());
 
@@ -52,8 +52,8 @@ public class LineGeoDataTest {
                 .voltage(400)
                 .build();
 
-        lineGeoData1.getCoordinates().addAll(Arrays.asList(new com.powsybl.geo.data.extensions.Coordinate(1, 1), new com.powsybl.geo.data.extensions.Coordinate(2, 2),
-                new com.powsybl.geo.data.extensions.Coordinate(3, 3), new Coordinate(7, 9)));
+        lineGeoData1.getCoordinates().addAll(Arrays.asList(new Coordinate(1, 1), new Coordinate(2, 2),
+                new Coordinate(3, 3), new Coordinate(7, 9)));
         lineGeoData1.orderCoordinates(side1, side2, new HashMap<>());
         lineGeoData1.addExtremities(side1, side2);
 

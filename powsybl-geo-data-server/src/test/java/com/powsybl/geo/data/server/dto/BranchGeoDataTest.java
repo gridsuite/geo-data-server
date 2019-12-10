@@ -25,9 +25,9 @@ public class BranchGeoDataTest {
         BranchGeoData branchGraphic = new BranchGeoData(new ArrayDeque<>(), lineGeoData);
         assertTrue(branchGraphic.getPylons().isEmpty());
         assertEquals(branchGraphic.getLine(), lineGeoData);
-        branchGraphic.getPylons().add(new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 1)));
-        branchGraphic.getPylons().add(new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(2, 1)));
-        branchGraphic.getPylons().add(new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 2)));
+        branchGraphic.getPylons().add(new PylonGeoData(new Coordinate(1, 1)));
+        branchGraphic.getPylons().add(new PylonGeoData(new Coordinate(2, 1)));
+        branchGraphic.getPylons().add(new PylonGeoData(new Coordinate(1, 2)));
         branchGraphic.getPylons().add(new PylonGeoData(new Coordinate(2, 2)));
 
         BranchGeoData branchGraphic2 = new BranchGeoData();

@@ -22,7 +22,7 @@ public class SubstationGeoDataTest {
 
     @Test
     public void test() {
-        SubstationGeoData substationGeoData = new SubstationGeoData("id", new com.powsybl.geo.data.extensions.Coordinate(1, 2));
+        SubstationGeoData substationGeoData = new SubstationGeoData("id", new Coordinate(1, 2));
         assertEquals("id", substationGeoData.getId());
         assertEquals(substationGeoData.getPosition(), new Coordinate(1, 2));
         assertNull(substationGeoData.getModel());

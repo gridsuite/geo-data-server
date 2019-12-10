@@ -15,19 +15,19 @@ import static org.junit.Assert.assertEquals;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 
-public class SegmentGraphicTest {
+public class SegmentGeoDataTest {
 
     @Test
     public void test() {
-        PylonGeoData pylonGeoData = new PylonGeoData(new com.powsybl.geo.data.extensions.Coordinate(1, 1));
+        PylonGeoData pylonGeoData = new PylonGeoData(new Coordinate(1, 1));
         PylonGeoData pylonGeoData2 = new PylonGeoData(new Coordinate(2, 2));
 
         LineGeoData lineGeoData = new LineGeoData("l", 400, true);
-        SegmentGraphic segmentGraphic = new SegmentGraphic(pylonGeoData.getCoordinate(), pylonGeoData2.getCoordinate(), lineGeoData);
+        SegmentGeoData segmentGeoData = new SegmentGeoData(pylonGeoData.getCoordinate(), pylonGeoData2.getCoordinate(), lineGeoData);
 
-        assertEquals(segmentGraphic.getCoordinate1(), pylonGeoData.getCoordinate());
-        assertEquals(segmentGraphic.getCoordinate2(), pylonGeoData2.getCoordinate());
-        assertEquals(segmentGraphic.getLine(), lineGeoData);
-        assertEquals("SegmentGraphic(coordinate1=Coordinate(lat=1.0, lon=1.0), coordinate2=Coordinate(lat=2.0, lon=2.0))", segmentGraphic.toString());
+        assertEquals(segmentGeoData.getCoordinate1(), pylonGeoData.getCoordinate());
+        assertEquals(segmentGeoData.getCoordinate2(), pylonGeoData2.getCoordinate());
+        assertEquals(segmentGeoData.getLine(), lineGeoData);
+        assertEquals("SegmentGeoData(coordinate1=Coordinate(lat=1.0, lon=1.0), coordinate2=Coordinate(lat=2.0, lon=2.0))", segmentGeoData.toString());
     }
 }
