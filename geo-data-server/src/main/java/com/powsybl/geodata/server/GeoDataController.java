@@ -131,6 +131,7 @@ public class GeoDataController {
         substationGeoData.forEach(s -> substationEntities.add(SubstationEntity.builder()
                 .country(s.getCountry().toString())
                 .substationID(s.getId())
+                .voltages(s.getVoltages())
                 .coordinate(CoordinateEntity.builder().lat(s.getPosition().getLat()).lon(s.getPosition().getLon()).build())
                 .build()));
         substationsRepository.saveAll(substationEntities);
