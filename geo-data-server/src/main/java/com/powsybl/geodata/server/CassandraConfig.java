@@ -7,6 +7,7 @@
 package com.powsybl.geodata.server;
 
 import com.datastax.driver.core.*;
+import com.powsybl.commons.PowsyblException;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.repositories.LinesRepository;
 import org.springframework.context.annotation.Bean;
@@ -37,23 +38,25 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Bean
     public CassandraClusterFactoryBean cluster(Environment env) {
-
-        CassandraClusterFactoryBean cluster = new CassandraClusterFactoryBean();
-        cluster.setContactPoints(env.getRequiredProperty("cassandra.contact-points"));
-        cluster.setPort(Integer.parseInt(env.getRequiredProperty("cassandra.port")));
+        CassandraClusterFactoryBean clusterFactory = new CassandraClusterFactoryBean();
+        clusterFactory.setContactPoints(env.getRequiredProperty("cassandra.contact-points"));
+        clusterFactory.setPort(Integer.parseInt(env.getRequiredProperty("cassandra.port")));
 
         CodecRegistry codecRegistry = new CodecRegistry();
-        cluster.setClusterBuilderConfigurer(builder -> {
+        clusterFactory.setClusterBuilderConfigurer(builder -> {
             builder.withCodecRegistry(codecRegistry);
-            Cluster cluster1 = builder.build();
-
-            UserType coordinateType = cluster1.getMetadata().getKeyspace(CassandraConstants.KEYSPACE_GEO_DATA).getUserType("coordinate");
+            Cluster cluster = builder.build();
+            KeyspaceMetadata keyspace = cluster.getMetadata().getKeyspace(CassandraConstants.KEYSPACE_GEO_DATA);
+            if (keyspace == null) {
+                throw new PowsyblException("Keyspace '" + CassandraConstants.KEYSPACE_GEO_DATA + "' not found");
+            }
+            UserType coordinateType = keyspace.getUserType("coordinate");
             TypeCodec<UDTValue> coordinateTypeCodec = codecRegistry.codecFor(coordinateType);
             CoordinateCodec coordinateCodec = new CoordinateCodec(coordinateTypeCodec, Coordinate.class);
             codecRegistry.register(coordinateCodec);
             return builder;
         });
-        return cluster;
+        return clusterFactory;
     }
 
     @Bean
