@@ -52,31 +52,31 @@ public class GeoDataController {
         return countries != null ? countries.stream().map(Country::valueOf).collect(Collectors.toSet()) : Collections.emptySet();
     }
 
-    @GetMapping(value = "substations")
-    @ApiOperation(value = "Get substations geographical data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get substations geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkId,
+    public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
-        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countrySet, networkId);
-        Network network = networkStoreService.getNetwork(networkId);
+        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countrySet, networkUuid);
+        Network network = networkStoreService.getNetwork(networkUuid);
         List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet);
         return ResponseEntity.ok().body(substations);
     }
 
-    @GetMapping(value = "lines")
-    @ApiOperation(value = "Get lines geographical data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get lines geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data")})
-    public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkId,
+    public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,
                                                       @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
-        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countrySet, networkId);
-        Network network = networkStoreService.getNetwork(networkId);
+        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countrySet, networkUuid);
+        Network network = networkStoreService.getNetwork(networkUuid);
         List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
         return ResponseEntity.ok().body(lines);
     }
 
-    @PostMapping(value = "substations")
+    @PostMapping(value = "/substations")
     @ApiOperation(value = "Save substations geographical data")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data have been correctly saved")})
     public void saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
@@ -84,7 +84,7 @@ public class GeoDataController {
         geoDataService.saveSubstations(substationGeoData);
     }
 
-    @PostMapping(value = "lines")
+    @PostMapping(value = "/lines")
     @ApiOperation(value = "Save lines geographical data")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data have been correctly saved")})
     public void saveLines(@RequestBody List<LineGeoData> linesGeoData) {
