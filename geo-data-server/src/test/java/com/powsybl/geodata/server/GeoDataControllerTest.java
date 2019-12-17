@@ -68,13 +68,13 @@ public class GeoDataControllerTest {
 
         given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
 
-        mvc.perform(get("/" + VERSION + "/substations?networkId=" + networkUuid)
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines?networkId=" + networkUuid)
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
