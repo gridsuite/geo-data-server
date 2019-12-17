@@ -32,7 +32,5 @@ public class LineGeoData {
 
     private Country country2;
 
-    private boolean aerial;
-
     private List<Coordinate> coordinates = new ArrayList<>();
 }

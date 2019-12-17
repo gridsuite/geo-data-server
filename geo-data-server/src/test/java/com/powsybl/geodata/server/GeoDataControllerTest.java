@@ -98,7 +98,6 @@ public class GeoDataControllerTest {
 //                        LineGeoData.builder()
 //                                .country1(Country.FR)
 //                                .country2(Country.BE)
-//                                .aerial(true)
 //                                .coordinates(new ArrayList<>())
 //                                .build()))))
 //                .andExpect(status().isOk());

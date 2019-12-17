@@ -21,7 +21,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -48,7 +49,6 @@ public class LineRepositoryTest {
                 .side1(false)
                 .id("lineID")
                 .coordinates(coordinateEntities)
-                .aerial(true)
                 .build());
 
         List<LineEntity> lines = repository.findAll();
@@ -59,6 +59,5 @@ public class LineRepositoryTest {
         assertEquals("BE", lines.get(0).getOtherCountry());
         assertFalse(lines.get(0).isSide1());
         assertEquals(2, lines.get(0).getCoordinates().size());
-        assertTrue(lines.get(0).isAerial());
     }
 }

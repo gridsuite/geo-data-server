@@ -22,9 +22,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SubstationGeoData {
 
-    private Country country;
-
     private String id;
+
+    private Country country;
 
     private Coordinate position;
 }

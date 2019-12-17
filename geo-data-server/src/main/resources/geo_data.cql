@@ -25,7 +25,6 @@ CREATE TABLE lines (
     id text,
     side1 boolean,
     otherCountry text,
-    aerial boolean,
     coordinates frozen<list<geo_data.coordinate>>,
     PRIMARY KEY (country, id)
 );

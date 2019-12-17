@@ -13,7 +13,10 @@ import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.extensions.SubstationPosition;
 import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import com.powsybl.geodata.server.repositories.*;
+import com.powsybl.geodata.server.repositories.LineEntity;
+import com.powsybl.geodata.server.repositories.LineRepository;
+import com.powsybl.geodata.server.repositories.SubstationEntity;
+import com.powsybl.geodata.server.repositories.SubstationRepository;
 import com.powsybl.iidm.network.*;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -169,7 +172,6 @@ public final class GeoDataService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        Country country = substation.getCountry().orElseThrow(IllegalStateException::new);
         Coordinate coordinate = null;
         if (neighboursGeoData.size() > 1) {
             // centroid calculation
@@ -183,7 +185,8 @@ public final class GeoDataService {
             coordinate = new Coordinate(lat, lon);
         }
 
-        return coordinate != null ? new SubstationGeoData(country, substation.getId(), coordinate) : null;
+        Country country = substation.getCountry().orElseThrow(IllegalStateException::new);
+        return coordinate != null ? new SubstationGeoData(substation.getId(), country, coordinate) : null;
     }
 
     private static Map<String, Set<String>> getNeighbours(List<Substation> substations) {
@@ -222,31 +225,10 @@ public final class GeoDataService {
         List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
         for (LineGeoData l : linesGeoData) {
             if (l.getCountry1() == l.getCountry2())  {
-                linesEntities.add(LineEntity.builder()
-                        .country(l.getCountry1().toString())
-                        .otherCountry(l.getCountry2().toString())
-                        .side1(true)
-                        .id(l.getId())
-                        .aerial(l.isAerial())
-                        .coordinates(CoordinateEntity.create(l.getCoordinates()))
-                        .build());
+                linesEntities.add(LineEntity.create(l, true));
             } else {
-                linesEntities.add(LineEntity.builder()
-                        .country(l.getCountry1().toString())
-                        .otherCountry(l.getCountry2().toString())
-                        .side1(true)
-                        .id(l.getId())
-                        .aerial(l.isAerial())
-                        .coordinates(CoordinateEntity.create(l.getCoordinates()))
-                        .build());
-                linesEntities.add(LineEntity.builder()
-                        .country(l.getCountry2().toString())
-                        .otherCountry(l.getCountry1().toString())
-                        .side1(false)
-                        .id(l.getId())
-                        .aerial(l.isAerial())
-                        .coordinates(CoordinateEntity.create(l.getCoordinates()))
-                        .build());
+                linesEntities.add(LineEntity.create(l, true));
+                linesEntities.add(LineEntity.create(l, false));
             }
         }
         lineRepository.saveAll(linesEntities);
@@ -255,13 +237,11 @@ public final class GeoDataService {
     private static LineGeoData rowToLineGeoData(Row row) {
         String id = row.getString("id");
         boolean side1 = row.getBool("side1");
-        boolean aerial = row.getBool("aerial");
         Country country = Country.valueOf(row.getString("country"));
         Country otherCountry = Country.valueOf(row.getString("otherCountry"));
         List<Coordinate> coordinates = row.getList("coordinates", Coordinate.class);
         return LineGeoData.builder()
                 .id(id)
-                .aerial(aerial)
                 .country1(side1 ? country : otherCountry)
                 .country2(side1 ? otherCountry : country)
                 .coordinates(coordinates)
