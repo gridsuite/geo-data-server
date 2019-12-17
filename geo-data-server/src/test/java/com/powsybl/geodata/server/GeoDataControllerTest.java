@@ -7,6 +7,12 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.geodata.extensions.Coordinate;
+import com.powsybl.geodata.server.dto.LineGeoData;
+import com.powsybl.geodata.server.dto.SubstationGeoData;
+import com.powsybl.geodata.server.repositories.LineRepository;
+import com.powsybl.geodata.server.repositories.SubstationRepository;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import org.cassandraunit.spring.CassandraDataSet;
@@ -25,6 +31,8 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 import static com.powsybl.network.store.model.NetworkStoreApi.VERSION;
@@ -33,6 +41,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -44,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestExecutionListeners(listeners = {CassandraUnitDependencyInjectionTestExecutionListener.class,
                                      CassandraUnitTestExecutionListener.class},
                         mergeMode = MERGE_WITH_DEFAULTS)
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
+@CassandraDataSet(value = "geo_data.cql", keyspace = CassandraConstants.KEYSPACE_GEO_DATA)
 @EmbeddedCassandra
 public class GeoDataControllerTest {
 
@@ -56,6 +65,12 @@ public class GeoDataControllerTest {
 
     @MockBean
     private NetworkStoreService service;
+
+    @MockBean
+    private SubstationRepository substationRepository;
+
+    @MockBean
+    private LineRepository lineRepository;
 
     @Before
     public void setUp() {
@@ -80,26 +95,26 @@ public class GeoDataControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-//        String substationJson = objectMapper.writeValueAsString(Collections.singleton(
-//                SubstationGeoData.builder()
-//                        .country(Country.FR)
-//                        .id("testID")
-//                        .position(new Coordinate(1, 1))
-//                        .build()));
-//
-//        mvc.perform(post("/" + VERSION + "/substations")
-//                .contentType(APPLICATION_JSON)
-//                .content(substationJson))
-//                .andExpect(status().isOk());
-//
-//        mvc.perform(post("/" + VERSION + "/lines")
-//                .contentType(APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(Collections.singleton(
-//                        LineGeoData.builder()
-//                                .country1(Country.FR)
-//                                .country2(Country.BE)
-//                                .coordinates(new ArrayList<>())
-//                                .build()))))
-//                .andExpect(status().isOk());
+        String substationJson = objectMapper.writeValueAsString(Collections.singleton(
+                SubstationGeoData.builder()
+                        .id("testID")
+                        .country(Country.FR)
+                        .position(new Coordinate(1, 1))
+                        .build()));
+
+        mvc.perform(post("/" + VERSION + "/substations")
+                .contentType(APPLICATION_JSON)
+                .content(substationJson))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/" + VERSION + "/lines")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Collections.singleton(
+                        LineGeoData.builder()
+                                .country1(Country.FR)
+                                .country2(Country.BE)
+                                .coordinates(new ArrayList<>())
+                                .build()))))
+                .andExpect(status().isOk());
     }
 }

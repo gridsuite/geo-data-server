@@ -6,21 +6,19 @@
 -- for multi datacenters deployments
 CREATE KEYSPACE IF NOT EXISTS geo_data WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'dc1' : 1, 'dc2' : 1 };
 
-USE geo_data;
-
 CREATE TYPE geo_data.coordinate (
     lat double,
     lon double,
 );
 
-CREATE TABLE substations (
+CREATE TABLE geo_data.substations (
     country text,
     id text,
     coordinate frozen<geo_data.coordinate>,
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE lines (
+CREATE TABLE geo_data.lines (
     country text,
     id text,
     side1 boolean,

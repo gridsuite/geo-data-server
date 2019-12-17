@@ -6,17 +6,11 @@
  */
 package com.powsybl.geodata.server;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.extensions.SubstationPosition;
 import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import com.powsybl.geodata.server.repositories.LineEntity;
-import com.powsybl.geodata.server.repositories.LineRepository;
-import com.powsybl.geodata.server.repositories.SubstationEntity;
-import com.powsybl.geodata.server.repositories.SubstationRepository;
+import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -49,7 +43,7 @@ public final class GeoDataService {
     private LineRepository lineRepository;
 
     @Autowired
-    private Session session;
+    private LineCustomRepository lineCustomRepository;
 
     private Map<String, SubstationGeoData> readSubstationGeoDataFromDb(Set<Country> countries) {
         // read substations from DB
@@ -234,20 +228,6 @@ public final class GeoDataService {
         lineRepository.saveAll(linesEntities);
     }
 
-    private static LineGeoData rowToLineGeoData(Row row) {
-        String id = row.getString("id");
-        boolean side1 = row.getBool("side1");
-        Country country = Country.valueOf(row.getString("country"));
-        Country otherCountry = Country.valueOf(row.getString("otherCountry"));
-        List<Coordinate> coordinates = row.getList("coordinates", Coordinate.class);
-        return LineGeoData.builder()
-                .id(id)
-                .country1(side1 ? country : otherCountry)
-                .country2(side1 ? otherCountry : country)
-                .coordinates(coordinates)
-                .build();
-    }
-
     public List<LineGeoData> getLines(Network network, Set<Country> countries) {
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
@@ -256,11 +236,7 @@ public final class GeoDataService {
 
         // read lines from DB
         // TODO filter by country
-        ResultSet result = session.execute("select * from lines");
-        List<Row> rows = result.all();
-        Map<String, LineGeoData> linesGeoDataDb = rows.stream()
-                .map(GeoDataService::rowToLineGeoData)
-                .collect(Collectors.toMap(LineGeoData::getId, Function.identity()));
+        Map<String, LineGeoData> linesGeoDataDb = lineCustomRepository.getLines();
 
         List<LineGeoData> linesGeoDb = network.getLineStream()
                 .filter(line -> countries.isEmpty()
