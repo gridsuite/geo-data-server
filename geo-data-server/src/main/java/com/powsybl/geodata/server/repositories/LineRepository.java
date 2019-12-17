@@ -9,9 +9,13 @@ package com.powsybl.geodata.server.repositories;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Repository
-public interface SubstationsRepository extends CassandraRepository<SubstationEntity, String> {
+public interface LineRepository extends CassandraRepository<LineEntity, String> {
+
+    List<LineEntity> findByCountry(String country);
 }

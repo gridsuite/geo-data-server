@@ -29,14 +29,13 @@ public class LineEntity {
     private String country;
 
     @PrimaryKeyColumn(ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-    private int voltage;
+    private String id;
 
-    @PrimaryKeyColumn(ordinal = 2, type = PrimaryKeyType.CLUSTERED)
-    private String lineID;
+    private boolean side1;
+
+    private String otherCountry;
 
     private boolean aerial;
-
-    private boolean ordered;
 
     private List<CoordinateEntity> coordinates;
 }

@@ -7,12 +7,6 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.powsybl.geodata.extensions.Coordinate;
-import com.powsybl.geodata.server.dto.LineGeoData;
-import com.powsybl.geodata.server.dto.SubstationGeoData;
-import com.powsybl.geodata.server.repositories.LinesRepository;
-import com.powsybl.geodata.server.repositories.SubstationsRepository;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import org.cassandraunit.spring.CassandraDataSet;
@@ -31,8 +25,6 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.UUID;
 
 import static com.powsybl.network.store.model.NetworkStoreApi.VERSION;
@@ -41,7 +33,6 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -66,12 +57,6 @@ public class GeoDataControllerTest {
     @MockBean
     private NetworkStoreService service;
 
-    @MockBean
-    private SubstationsRepository substationsRepository;
-
-    @MockBean
-    private LinesRepository linesRepository;
-
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -79,54 +64,43 @@ public class GeoDataControllerTest {
 
     @Test
     public void test() throws Exception {
-        String networdUuidString = "7928181c-7977-4592-ba19-88027e4254e4";
-        UUID networkUuid = UUID.fromString(networdUuidString);
+        UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
 
         given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
 
-        mvc.perform(get("/" + VERSION + "/substations/" + networdUuidString)
+        mvc.perform(get("/" + VERSION + "/substations?networkId=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/substations/" + networdUuidString + "/?pagination=true&page=1&size=1")
+        mvc.perform(get("/" + VERSION + "/lines?networkId=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
-
-        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString + "/?pagination=true&page=1&size=1")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
-
-        mvc.perform(post("/" + VERSION + "/substations")
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Collections.singleton(
-                        SubstationGeoData.builder()
-                                .country(Country.FR)
-                                .id("testID")
-                                .position(new Coordinate(1, 1))
-                                .build()))))
-                .andExpect(status().isOk());
-
-        mvc.perform(post("/" + VERSION + "/lines")
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Collections.singleton(
-                        LineGeoData.builder()
-                                .voltage(400)
-                                .country(Country.FR)
-                                .aerial(true)
-                                .coordinates(new ArrayDeque<>())
-                                .build()))))
-                .andExpect(status().isOk());
+//        String substationJson = objectMapper.writeValueAsString(Collections.singleton(
+//                SubstationGeoData.builder()
+//                        .country(Country.FR)
+//                        .id("testID")
+//                        .position(new Coordinate(1, 1))
+//                        .build()));
+//
+//        mvc.perform(post("/" + VERSION + "/substations")
+//                .contentType(APPLICATION_JSON)
+//                .content(substationJson))
+//                .andExpect(status().isOk());
+//
+//        mvc.perform(post("/" + VERSION + "/lines")
+//                .contentType(APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(Collections.singleton(
+//                        LineGeoData.builder()
+//                                .country1(Country.FR)
+//                                .country2(Country.BE)
+//                                .aerial(true)
+//                                .coordinates(new ArrayList<>())
+//                                .build()))))
+//                .andExpect(status().isOk());
     }
 }
