@@ -15,9 +15,7 @@ import java.util.List;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Repository
-public interface LinesRepository extends CassandraRepository<LineEntity, String> {
+public interface SubstationRepository extends CassandraRepository<SubstationEntity, String> {
 
-    List<LineEntity> findByCountry(String country);
-
-    List<LineEntity> findByCountryAndVoltage(String country, int voltage);
+    List<SubstationEntity> findByCountry(String country);
 }

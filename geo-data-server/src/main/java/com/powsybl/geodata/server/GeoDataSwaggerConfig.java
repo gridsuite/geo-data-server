@@ -38,7 +38,7 @@ public class GeoDataSwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Geo data API")
-                .description("This is the documentation of PowSyBl geo Data API")
+                .description("This is the documentation of PowSyBl Geo Data API")
                 .version(GeoDataController.API_VERSION)
                 .build();
     }

@@ -18,7 +18,6 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -32,28 +31,25 @@ import static org.junit.Assert.assertEquals;
         DependencyInjectionTestExecutionListener.class })
 @CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
 @EmbeddedCassandra
-public class SubstationsRepositoryTest {
+public class SubstationRepositoryTest {
 
     @Autowired
-    private SubstationsRepository repository;
+    private SubstationRepository repository;
 
     @Test
     public void test() {
         repository.save(SubstationEntity.builder()
                 .country("FR")
-                .substationID("ID")
+                .id("ID")
                 .coordinate(CoordinateEntity.builder().lat(3).lon(2).build())
-                .voltages(Arrays.asList(225, 63))
                 .build());
 
         List<SubstationEntity> substations = repository.findAll();
 
         assertEquals(1, substations.size());
         assertEquals("FR", substations.get(0).getCountry());
-        assertEquals("ID", substations.get(0).getSubstationID());
+        assertEquals("ID", substations.get(0).getId());
         assertEquals(3, substations.get(0).getCoordinate().getLat(), 0);
         assertEquals(2, substations.get(0).getCoordinate().getLon(), 0);
-
-        assertEquals(2, substations.get(0).getVoltages().size());
     }
 }

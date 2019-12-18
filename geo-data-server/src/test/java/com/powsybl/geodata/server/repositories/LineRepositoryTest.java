@@ -21,7 +21,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -32,10 +33,10 @@ import static org.junit.Assert.*;
         DependencyInjectionTestExecutionListener.class })
 @CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
 @EmbeddedCassandra
-public class LinesRepositoryTest {
+public class LineRepositoryTest {
 
     @Autowired
-    private LinesRepository repository;
+    private LineRepository repository;
 
     @Test
     public void test() {
@@ -44,21 +45,19 @@ public class LinesRepositoryTest {
         coordinateEntities.add(CoordinateEntity.builder().lat(13).lon(14.1).build());
         repository.save(LineEntity.builder()
                 .country("FR")
-                .lineID("lineID")
-                .voltage(400)
+                .otherCountry("BE")
+                .side1(false)
+                .id("lineID")
                 .coordinates(coordinateEntities)
-                .aerial(true)
-                .ordered(false)
                 .build());
 
         List<LineEntity> lines = repository.findAll();
 
         assertEquals(1, lines.size());
-        assertEquals("lineID", lines.get(0).getLineID());
+        assertEquals("lineID", lines.get(0).getId());
         assertEquals("FR", lines.get(0).getCountry());
-        assertEquals(400, lines.get(0).getVoltage());
+        assertEquals("BE", lines.get(0).getOtherCountry());
+        assertFalse(lines.get(0).isSide1());
         assertEquals(2, lines.get(0).getCoordinates().size());
-        assertFalse(lines.get(0).isOrdered());
-        assertTrue(lines.get(0).isAerial());
     }
 }

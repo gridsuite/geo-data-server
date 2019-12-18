@@ -6,6 +6,7 @@
  */
 package com.powsybl.geodata.server.repositories;
 
+import com.powsybl.geodata.server.dto.LineGeoData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,18 +26,26 @@ import java.util.List;
 @Data
 @Builder
 public class LineEntity {
+
     @PrimaryKeyColumn(ordinal = 0, type = PrimaryKeyType.PARTITIONED)
     private String country;
 
     @PrimaryKeyColumn(ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-    private int voltage;
+    private String id;
 
-    @PrimaryKeyColumn(ordinal = 2, type = PrimaryKeyType.CLUSTERED)
-    private String lineID;
+    private boolean side1;
 
-    private boolean aerial;
-
-    private boolean ordered;
+    private String otherCountry;
 
     private List<CoordinateEntity> coordinates;
+
+    public static LineEntity create(LineGeoData l, boolean side1) {
+        return LineEntity.builder()
+                .country(side1 ? l.getCountry1().toString() : l.getCountry2().toString())
+                .otherCountry(side1 ? l.getCountry2().toString() : l.getCountry1().toString())
+                .side1(side1)
+                .id(l.getId())
+                .coordinates(CoordinateEntity.create(l.getCoordinates()))
+                .build();
+    }
 }

@@ -9,7 +9,7 @@ package com.powsybl.geodata.server;
 import com.datastax.driver.core.*;
 import com.powsybl.commons.PowsyblException;
 import com.powsybl.geodata.extensions.Coordinate;
-import com.powsybl.geodata.server.repositories.LinesRepository;
+import com.powsybl.geodata.server.repositories.LineRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 @Configuration
 @PropertySource(value = {"classpath:cassandra.properties"})
 @PropertySource(value = {"file:/config/cassandra.properties"}, ignoreResourceNotFound = true)
-@EnableCassandraRepositories(basePackageClasses = LinesRepository.class)
+@EnableCassandraRepositories(basePackageClasses = LineRepository.class)
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Override

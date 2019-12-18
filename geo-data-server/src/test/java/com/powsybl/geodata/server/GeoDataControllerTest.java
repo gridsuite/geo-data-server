@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import com.powsybl.geodata.server.repositories.LinesRepository;
-import com.powsybl.geodata.server.repositories.SubstationsRepository;
+import com.powsybl.geodata.server.repositories.LineRepository;
+import com.powsybl.geodata.server.repositories.SubstationRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
@@ -31,7 +31,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestExecutionListeners(listeners = {CassandraUnitDependencyInjectionTestExecutionListener.class,
                                      CassandraUnitTestExecutionListener.class},
                         mergeMode = MERGE_WITH_DEFAULTS)
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
+@CassandraDataSet(value = "geo_data.cql", keyspace = CassandraConstants.KEYSPACE_GEO_DATA)
 @EmbeddedCassandra
 public class GeoDataControllerTest {
 
@@ -67,10 +67,10 @@ public class GeoDataControllerTest {
     private NetworkStoreService service;
 
     @MockBean
-    private SubstationsRepository substationsRepository;
+    private SubstationRepository substationRepository;
 
     @MockBean
-    private LinesRepository linesRepository;
+    private LineRepository lineRepository;
 
     @Before
     public void setUp() {
@@ -79,53 +79,41 @@ public class GeoDataControllerTest {
 
     @Test
     public void test() throws Exception {
-        String networdUuidString = "7928181c-7977-4592-ba19-88027e4254e4";
-        UUID networkUuid = UUID.fromString(networdUuidString);
+        UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
 
         given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
 
-        mvc.perform(get("/" + VERSION + "/substations/" + networdUuidString)
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/substations/" + networdUuidString + "/?pagination=true&page=1&size=1")
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
-
-        mvc.perform(get("/" + VERSION + "/lines/" + networdUuidString + "/?pagination=true&page=1&size=1")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+        String substationJson = objectMapper.writeValueAsString(Collections.singleton(
+                SubstationGeoData.builder()
+                        .id("testID")
+                        .country(Country.FR)
+                        .coordinate(new Coordinate(1, 1))
+                        .build()));
 
         mvc.perform(post("/" + VERSION + "/substations")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Collections.singleton(
-                        SubstationGeoData.builder()
-                                .country(Country.FR)
-                                .id("testID")
-                                .position(new Coordinate(1, 1))
-                                .build()))))
+                .content(substationJson))
                 .andExpect(status().isOk());
 
         mvc.perform(post("/" + VERSION + "/lines")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Collections.singleton(
                         LineGeoData.builder()
-                                .voltage(400)
-                                .country(Country.FR)
-                                .aerial(true)
-                                .coordinates(new ArrayDeque<>())
+                                .country1(Country.FR)
+                                .country2(Country.BE)
+                                .coordinates(new ArrayList<>())
                                 .build()))))
                 .andExpect(status().isOk());
     }

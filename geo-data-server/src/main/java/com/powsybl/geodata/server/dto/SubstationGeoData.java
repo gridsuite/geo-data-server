@@ -13,9 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.Objects;
-
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
@@ -25,16 +22,9 @@ import java.util.Objects;
 @Builder
 public class SubstationGeoData {
 
-    private Country country;
-
     private String id;
 
-    private Coordinate position;
+    private Country country;
 
-    private List<Integer> voltages;
-
-    public SubstationGeoData(String id, Coordinate position) {
-        this.id = Objects.requireNonNull(id);
-        this.position = Objects.requireNonNull(position);
-    }
+    private Coordinate coordinate;
 }
