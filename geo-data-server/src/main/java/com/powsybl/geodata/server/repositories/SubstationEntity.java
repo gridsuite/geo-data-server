@@ -38,8 +38,8 @@ public class SubstationEntity {
                 .country(s.getCountry().toString())
                 .id(s.getId())
                 .coordinate(CoordinateEntity.builder()
-                        .lat(s.getPosition().getLat())
-                        .lon(s.getPosition().getLon())
+                        .lat(s.getCoordinate().getLat())
+                        .lon(s.getCoordinate().getLon())
                         .build())
                 .build();
     }
@@ -48,7 +48,7 @@ public class SubstationEntity {
         return SubstationGeoData.builder()
                 .country(Country.valueOf(country))
                 .id(id)
-                .position(Coordinate.builder()
+                .coordinate(Coordinate.builder()
                         .lat(coordinate.getLat())
                         .lon(coordinate.getLon())
                         .build())

@@ -99,7 +99,7 @@ public class GeoDataControllerTest {
                 SubstationGeoData.builder()
                         .id("testID")
                         .country(Country.FR)
-                        .position(new Coordinate(1, 1))
+                        .coordinate(new Coordinate(1, 1))
                         .build()));
 
         mvc.perform(post("/" + VERSION + "/substations")

@@ -26,5 +26,5 @@ public class SubstationGeoData {
 
     private Country country;
 
-    private Coordinate position;
+    private Coordinate coordinate;
 }

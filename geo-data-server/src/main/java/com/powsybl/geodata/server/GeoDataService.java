@@ -169,13 +169,13 @@ public final class GeoDataService {
         Coordinate coordinate = null;
         if (neighboursGeoData.size() > 1) {
             // centroid calculation
-            double lat = neighboursGeoData.stream().mapToDouble(n -> n.getPosition().getLat()).average().orElseThrow(IllegalStateException::new);
-            double lon = neighboursGeoData.stream().mapToDouble(n -> n.getPosition().getLon()).average().orElseThrow(IllegalStateException::new);
+            double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLat()).average().orElseThrow(IllegalStateException::new);
+            double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLon()).average().orElseThrow(IllegalStateException::new);
             coordinate = new Coordinate(lat, lon);
         } else if (neighboursGeoData.size() == 1 && step == Step.TWO) {
             // centroid calculation
-            double lat = neighboursGeoData.get(0).getPosition().getLat() - 0.002; // 1° correspond à 111KM
-            double lon = neighboursGeoData.get(0).getPosition().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
+            double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
+            double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
             coordinate = new Coordinate(lat, lon);
         }
 
