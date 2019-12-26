@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 
 @RunWith(SpringRunner.class)
@@ -27,6 +28,8 @@ public class GeoDataApplicationTest {
 
     @Test
     public void main() {
+        assertNotNull(geoDataService);
         GeoDataApplication.main(new String[] {});
+
     }
 }
