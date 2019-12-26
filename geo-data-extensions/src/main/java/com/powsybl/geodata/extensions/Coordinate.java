@@ -15,7 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
+@ToString
 public class Coordinate {
 
     private  double lat;

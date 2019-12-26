@@ -73,17 +73,26 @@ public final class GLTestUtils {
     public static void checkNetwork(Network network) {
         Substation substation1 = network.getSubstation("Substation1");
         SubstationPosition substation1Position = substation1.getExtension(SubstationPosition.class);
-        assertEquals(SUBSTATION_1, substation1Position.getCoordinate());
+        assertEquals(SUBSTATION_1.getLat(), substation1Position.getCoordinate().getLat(), 0);
+        assertEquals(SUBSTATION_1.getLon(), substation1Position.getCoordinate().getLon(), 0);
 
         Substation substation2 = network.getSubstation("Substation2");
         SubstationPosition substation2Position = substation2.getExtension(SubstationPosition.class);
-        assertEquals(SUBSTATION_2, substation2Position.getCoordinate());
+        assertEquals(SUBSTATION_2.getLat(), substation2Position.getCoordinate().getLat(), 0);
+        assertEquals(SUBSTATION_2.getLon(), substation2Position.getCoordinate().getLon(), 0);
 
         Line line = network.getLine("Line");
         LinePosition<Line> linePosition = line.getExtension(LinePosition.class);
-        assertEquals(SUBSTATION_1, linePosition.getCoordinates().get(0));
-        assertEquals(LINE_1, linePosition.getCoordinates().get(1));
-        assertEquals(LINE_2, linePosition.getCoordinates().get(2));
-        assertEquals(SUBSTATION_2, linePosition.getCoordinates().get(3));
+        assertEquals(SUBSTATION_1.getLat(), linePosition.getCoordinates().get(0).getLat(), 0);
+        assertEquals(SUBSTATION_1.getLon(), linePosition.getCoordinates().get(0).getLon(), 0);
+
+        assertEquals(LINE_1.getLat(), linePosition.getCoordinates().get(1).getLat(), 0);
+        assertEquals(LINE_1.getLon(), linePosition.getCoordinates().get(1).getLon(), 0);
+
+        assertEquals(LINE_2.getLat(), linePosition.getCoordinates().get(2).getLat(), 0);
+        assertEquals(LINE_2.getLon(), linePosition.getCoordinates().get(2).getLon(), 0);
+
+        assertEquals(SUBSTATION_2.getLat(), linePosition.getCoordinates().get(3).getLat(), 0);
+        assertEquals(SUBSTATION_2.getLon(), linePosition.getCoordinates().get(3).getLon(), 0);
     }
 }

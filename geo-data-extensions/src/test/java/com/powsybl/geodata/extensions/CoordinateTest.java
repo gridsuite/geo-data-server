@@ -23,7 +23,6 @@ public class CoordinateTest {
 
         Coordinate coordinate1 = new Coordinate(1, 2);
 
-        assertEquals(coordinate1, coordinate);
         assertNotSame(coordinate.hashCode(), coordinate1.hashCode());
 
         Coordinate coordinate2 = new Coordinate(coordinate);
