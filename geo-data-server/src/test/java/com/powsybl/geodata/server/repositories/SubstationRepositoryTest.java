@@ -7,6 +7,7 @@
 package com.powsybl.geodata.server.repositories;
 
 import com.powsybl.geodata.server.CassandraConfig;
+import com.powsybl.geodata.server.dto.SubstationGeoData;
 import org.cassandraunit.spring.CassandraDataSet;
 import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
 import org.cassandraunit.spring.EmbeddedCassandra;
@@ -45,6 +46,11 @@ public class SubstationRepositoryTest {
                 .build());
 
         List<SubstationEntity> substations = repository.findAll();
+
+        SubstationGeoData substationGeoData = substations.get(0).toGeoData();
+
+        assertEquals(3, substationGeoData.getCoordinate().getLat(), 0);
+        assertEquals(2, substationGeoData.getCoordinate().getLon(), 0);
 
         assertEquals(1, substations.size());
         assertEquals("FR", substations.get(0).getCountry());

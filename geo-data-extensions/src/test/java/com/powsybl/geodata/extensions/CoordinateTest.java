@@ -8,7 +8,7 @@ package com.powsybl.geodata.extensions;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -22,6 +22,7 @@ public class CoordinateTest {
         assertEquals(1, coordinate.getLat(), 0);
         assertEquals(2, coordinate.getLon(), 0);
         assertEquals(coordinate, coordinate2);
+        assertNotSame(coordinate, coordinate2);
         assertEquals(coordinate.hashCode(), coordinate2.hashCode());
         Coordinate coordinate3 = new Coordinate(coordinate);
         assertEquals(coordinate3, coordinate);

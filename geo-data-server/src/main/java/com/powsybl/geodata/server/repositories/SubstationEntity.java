@@ -11,7 +11,7 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
@@ -21,7 +21,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
  */
 @Table("substations")
 @AllArgsConstructor
-@Data
+@Getter
 @Builder
 public class SubstationEntity {
 
