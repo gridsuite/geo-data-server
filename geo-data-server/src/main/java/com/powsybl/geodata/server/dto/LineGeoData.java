@@ -8,10 +8,7 @@ package com.powsybl.geodata.server.dto;
 
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,7 @@ import java.util.List;
  */
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 @Builder
 public class LineGeoData {
 

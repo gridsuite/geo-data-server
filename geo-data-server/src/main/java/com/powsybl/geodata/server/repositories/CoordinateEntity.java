@@ -10,6 +10,7 @@ import com.powsybl.geodata.extensions.Coordinate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 @Builder
+@ToString
 public class CoordinateEntity {
 
     private double lat;

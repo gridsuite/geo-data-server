@@ -8,15 +8,12 @@ package com.powsybl.geodata.server.dto;
 
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

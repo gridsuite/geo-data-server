@@ -7,10 +7,7 @@
 package com.powsybl.geodata.server.repositories;
 
 import com.powsybl.geodata.server.dto.LineGeoData;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
@@ -23,7 +20,7 @@ import java.util.List;
 @Table("lines")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
 @Builder
 public class LineEntity {
 

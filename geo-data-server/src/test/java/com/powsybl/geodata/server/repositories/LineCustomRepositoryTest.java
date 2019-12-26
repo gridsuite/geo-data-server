@@ -50,6 +50,7 @@ public class LineCustomRepositoryTest {
         lineRepository.save(LineEntity.builder()
                 .country(String.valueOf(Country.FR))
                 .id("testId")
+                .country("FR")
                 .otherCountry("BE")
                 .build());
 

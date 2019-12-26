@@ -39,11 +39,15 @@ public class SubstationRepositoryTest {
 
     @Test
     public void test() {
-        repository.save(SubstationEntity.builder()
+
+        SubstationEntity.SubstationEntityBuilder substationEntityBuilder = SubstationEntity.builder()
                 .country("FR")
                 .id("ID")
-                .coordinate(CoordinateEntity.builder().lat(3).lon(2).build())
-                .build());
+                .coordinate(CoordinateEntity.builder().lat(3).lon(2).build());
+
+        assertEquals("SubstationEntity.SubstationEntityBuilder(country=FR, id=ID, coordinate=CoordinateEntity(lat=3.0, lon=2.0))", substationEntityBuilder.toString());
+
+        repository.save(substationEntityBuilder.build());
 
         List<SubstationEntity> substations = repository.findAll();
 

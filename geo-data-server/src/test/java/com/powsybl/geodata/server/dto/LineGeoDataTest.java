@@ -27,5 +27,11 @@ public class LineGeoDataTest {
         assertEquals(Country.FR, lineGeoData.getCountry1());
         assertEquals(Country.FR, lineGeoData.getCountry2());
         assertTrue(lineGeoData.getCoordinates().isEmpty());
+
+        LineGeoData.LineGeoDataBuilder lineGeoDataBuilder  =  LineGeoData.builder();
+        lineGeoDataBuilder.id("testId");
+
+        assertEquals("LineGeoData.LineGeoDataBuilder(id=testId, country1=null, country2=null, coordinates=null)", lineGeoDataBuilder.toString());
+
     }
 }

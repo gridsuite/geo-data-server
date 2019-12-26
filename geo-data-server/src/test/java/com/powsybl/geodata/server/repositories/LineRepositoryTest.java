@@ -43,13 +43,17 @@ public class LineRepositoryTest {
         List<CoordinateEntity> coordinateEntities = new ArrayList<>();
         coordinateEntities.add(CoordinateEntity.builder().lat(11).lon(12).build());
         coordinateEntities.add(CoordinateEntity.builder().lat(13).lon(14.1).build());
-        repository.save(LineEntity.builder()
-                .country("FR")
+
+        LineEntity.LineEntityBuilder lineEntityBuilder = LineEntity.builder();
+        lineEntityBuilder.country("FR")
                 .otherCountry("BE")
                 .side1(false)
                 .id("lineID")
-                .coordinates(coordinateEntities)
-                .build());
+                .coordinates(coordinateEntities);
+
+        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, coordinates=[CoordinateEntity(lat=11.0, lon=12.0), CoordinateEntity(lat=13.0, lon=14.1)])", lineEntityBuilder.toString());
+
+        repository.save(lineEntityBuilder.build());
 
         List<LineEntity> lines = repository.findAll();
 

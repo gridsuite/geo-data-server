@@ -25,5 +25,10 @@ public class SubstationGeoDataTest {
         assertEquals("id", substationGeoData.getId());
         assertEquals(Country.FR, substationGeoData.getCountry());
         assertEquals(new Coordinate(1, 1), substationGeoData.getCoordinate());
+
+        SubstationGeoData.SubstationGeoDataBuilder substationGeoDataBuilder = SubstationGeoData.builder();
+        substationGeoDataBuilder.id("testID");
+        assertEquals("SubstationGeoData.SubstationGeoDataBuilder(id=testID, country=null, coordinate=null)", substationGeoDataBuilder.toString());
+
     }
 }
