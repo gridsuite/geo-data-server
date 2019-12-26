@@ -18,13 +18,17 @@ public class CoordinateTest {
     @Test
     public void test() {
         Coordinate coordinate = new Coordinate(1, 2);
-        Coordinate coordinate2 = new Coordinate(1, 2);
         assertEquals(1, coordinate.getLat(), 0);
         assertEquals(2, coordinate.getLon(), 0);
-        assertEquals(coordinate, coordinate2);
-        assertNotSame(coordinate, coordinate2);
-        assertEquals(coordinate.hashCode(), coordinate2.hashCode());
-        Coordinate coordinate3 = new Coordinate(coordinate);
-        assertEquals(coordinate3, coordinate);
+
+        Coordinate coordinate2 = new Coordinate(coordinate);
+        assertEquals(coordinate.getLat(), coordinate2.getLat(), 0);
+        assertEquals(coordinate.getLon(), coordinate2.getLon(), 0);
+
+        Coordinate coordinate3 = new Coordinate();
+        coordinate3.setLat(1);
+        coordinate3.setLon(2);
+        assertEquals(1, coordinate3.getLat(), 0);
+        assertEquals(2, coordinate3.getLon(), 0);
     }
 }
