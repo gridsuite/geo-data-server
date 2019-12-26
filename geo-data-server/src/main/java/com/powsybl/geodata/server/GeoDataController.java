@@ -58,7 +58,6 @@ public class GeoDataController {
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
-        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countrySet, networkUuid);
         Network network = networkStoreService.getNetwork(networkUuid);
         List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet);
         return ResponseEntity.ok().body(substations);
@@ -70,7 +69,6 @@ public class GeoDataController {
     public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,
                                                       @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
-        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countrySet, networkUuid);
         Network network = networkStoreService.getNetwork(networkUuid);
         List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
         return ResponseEntity.ok().body(lines);
@@ -80,7 +78,6 @@ public class GeoDataController {
     @ApiOperation(value = "Save substations geographical data")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data have been correctly saved")})
     public void saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
-        LOGGER.info("Saving {} substations geo data", substationGeoData.size());
         geoDataService.saveSubstations(substationGeoData);
     }
 
@@ -88,7 +85,6 @@ public class GeoDataController {
     @ApiOperation(value = "Save lines geographical data")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data have been correctly saved")})
     public void saveLines(@RequestBody List<LineGeoData> linesGeoData) {
-        LOGGER.info("Saving {} lines geo data", linesGeoData.size());
         geoDataService.saveLines(linesGeoData);
     }
 }
