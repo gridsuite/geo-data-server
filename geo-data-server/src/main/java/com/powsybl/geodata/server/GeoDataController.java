@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 @ComponentScan(basePackageClasses = {GeoDataController.class, GeoDataService.class, NetworkStoreService.class})
 public class GeoDataController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataController.class);
-
     static final String API_VERSION = "v1";
 
     @Autowired
