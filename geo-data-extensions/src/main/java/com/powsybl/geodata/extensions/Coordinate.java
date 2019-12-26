@@ -6,16 +6,18 @@
  */
 package com.powsybl.geodata.extensions;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@EqualsAndHashCode
 public class Coordinate {
 
     private  double lat;

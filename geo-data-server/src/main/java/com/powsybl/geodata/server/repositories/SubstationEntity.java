@@ -48,10 +48,7 @@ public class SubstationEntity {
         return SubstationGeoData.builder()
                 .country(Country.valueOf(country))
                 .id(id)
-                .coordinate(Coordinate.builder()
-                        .lat(coordinate.getLat())
-                        .lon(coordinate.getLon())
-                        .build())
+                .coordinate(new Coordinate(coordinate.getLat(), coordinate.getLon()))
                 .build();
     }
 }

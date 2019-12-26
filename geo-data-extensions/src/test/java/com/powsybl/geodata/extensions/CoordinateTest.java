@@ -21,7 +21,6 @@ public class CoordinateTest {
         Coordinate coordinate2 = new Coordinate(1, 2);
         assertEquals(1, coordinate.getLat(), 0);
         assertEquals(2, coordinate.getLon(), 0);
-        assertEquals("Coordinate(lat=1.0, lon=2.0)", coordinate.toString());
         assertEquals(coordinate, coordinate2);
         assertEquals(coordinate.hashCode(), coordinate2.hashCode());
         Coordinate coordinate3 = new Coordinate(coordinate);
