@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Service
-public final class GeoDataService {
+final class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
@@ -50,6 +50,8 @@ public final class GeoDataService {
         // TODO filter by country
         StopWatch stopWatch = StopWatch.createStarted();
 
+        LOGGER.info("countries size {}", countries.size());
+
         List<SubstationEntity> substationEntities = substationRepository.findAll();
         Map<String, SubstationGeoData> substationsGeoDataDB = substationEntities.stream()
                 .map(SubstationEntity::toGeoData)
@@ -60,7 +62,7 @@ public final class GeoDataService {
         return substationsGeoDataDB;
     }
 
-    public List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
+    List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 
@@ -210,12 +212,12 @@ public final class GeoDataService {
         return neighbours;
     }
 
-    public void saveSubstations(List<SubstationGeoData> substationsGeoData) {
+    void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).collect(Collectors.toList());
         substationRepository.saveAll(substationEntities);
     }
 
-    public void saveLines(List<LineGeoData> linesGeoData) {
+    void saveLines(List<LineGeoData> linesGeoData) {
         List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
         for (LineGeoData l : linesGeoData) {
             if (l.getCountry1() == l.getCountry2())  {
@@ -228,7 +230,7 @@ public final class GeoDataService {
         lineRepository.saveAll(linesEntities);
     }
 
-    public List<LineGeoData> getLines(Network network, Set<Country> countries) {
+    List<LineGeoData> getLines(Network network, Set<Country> countries) {
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 
