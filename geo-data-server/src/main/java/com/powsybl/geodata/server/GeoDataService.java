@@ -33,6 +33,8 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
+    private static final String REGEX = "\"[\\n|\\r|\\t]\"";
+
     @Value("${network-geo-data.iterations}")
     private int maxIterations;
 
@@ -62,7 +64,7 @@ public class GeoDataService {
 
     List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
         String countiesSet = countries.toString();
-        countiesSet = countiesSet.replaceAll("[\n|\r|\t]", "_");
+        countiesSet = countiesSet.replaceAll(REGEX, "_");
         LOGGER.info("Loading substations geo data for countries {} of network '{}'", countiesSet, network.getId());
 
         Objects.requireNonNull(network);
@@ -216,7 +218,7 @@ public class GeoDataService {
 
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         String listSize = substationsGeoData.size() + "";
-        listSize = listSize.replaceAll("[\n|\r|\t]", "_");
+        listSize = listSize.replaceAll(REGEX, "_");
         LOGGER.info("Saving {} substations geo data", listSize);
 
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).collect(Collectors.toList());
@@ -225,7 +227,7 @@ public class GeoDataService {
 
     void saveLines(List<LineGeoData> linesGeoData) {
         String listSize = linesGeoData.size() + "";
-        listSize = listSize.replaceAll("[\n|\r|\t]", "_");
+        listSize = listSize.replaceAll(REGEX, "_");
         LOGGER.info("Saving {} lines geo data", listSize);
 
         List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
@@ -242,7 +244,7 @@ public class GeoDataService {
 
     List<LineGeoData> getLines(Network network, Set<Country> countries) {
         String countiesSet = countries.toString();
-        countiesSet = countiesSet.replaceAll("[\n|\r|\t]", "_");
+        countiesSet = countiesSet.replaceAll(REGEX, "_");
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countiesSet, network.getId());
 
         Objects.requireNonNull(network);
