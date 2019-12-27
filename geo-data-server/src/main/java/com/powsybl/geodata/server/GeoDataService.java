@@ -61,6 +61,7 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
+        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countries, network.getId());
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 
@@ -211,11 +212,15 @@ public class GeoDataService {
     }
 
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
+        LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
+
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).collect(Collectors.toList());
         substationRepository.saveAll(substationEntities);
     }
 
     void saveLines(List<LineGeoData> linesGeoData) {
+        LOGGER.info("Saving {} lines geo data", linesGeoData.size());
+
         List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
         for (LineGeoData l : linesGeoData) {
             if (l.getCountry1() == l.getCountry2())  {
@@ -229,6 +234,8 @@ public class GeoDataService {
     }
 
     List<LineGeoData> getLines(Network network, Set<Country> countries) {
+        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
+
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 
