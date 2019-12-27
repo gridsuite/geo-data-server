@@ -21,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
+@ToString
 public class LineGeoData {
 
     private  String id;

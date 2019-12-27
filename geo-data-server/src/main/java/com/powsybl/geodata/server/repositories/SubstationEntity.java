@@ -12,6 +12,7 @@ import com.powsybl.iidm.network.Country;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
@@ -23,6 +24,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @AllArgsConstructor
 @Getter
 @Builder
+@ToString
 public class SubstationEntity {
 
     @PrimaryKeyColumn(ordinal = 0, type = PrimaryKeyType.PARTITIONED)

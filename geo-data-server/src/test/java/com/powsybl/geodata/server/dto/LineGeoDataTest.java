@@ -6,10 +6,12 @@
  */
 package com.powsybl.geodata.server.dto;
 
+import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,8 +32,13 @@ public class LineGeoDataTest {
 
         LineGeoData.LineGeoDataBuilder lineGeoDataBuilder  =  LineGeoData.builder();
         lineGeoDataBuilder.id("testId");
+        lineGeoDataBuilder.country1(Country.FR);
+        lineGeoDataBuilder.country2(Country.FR);
+        lineGeoDataBuilder.coordinates(Arrays.asList(new Coordinate(1, 2), new Coordinate(3, 4)));
 
-        assertEquals("LineGeoData.LineGeoDataBuilder(id=testId, country1=null, country2=null, coordinates=null)", lineGeoDataBuilder.toString());
+        assertEquals("LineGeoData.LineGeoDataBuilder(id=testId, country1=FR, country2=FR, coordinates=[Coordinate(lat=1.0, lon=2.0), Coordinate(lat=3.0, lon=4.0)])",
+                lineGeoDataBuilder.toString());
+        assertEquals("LineGeoData(id=testId, country1=FR, country2=FR, coordinates=[Coordinate(lat=1.0, lon=2.0), Coordinate(lat=3.0, lon=4.0)])", lineGeoDataBuilder.build().toString());
 
     }
 }

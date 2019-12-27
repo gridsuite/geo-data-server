@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
@@ -29,7 +28,10 @@ public class SubstationGeoDataTest {
 
         SubstationGeoData.SubstationGeoDataBuilder substationGeoDataBuilder = SubstationGeoData.builder();
         substationGeoDataBuilder.id("testID");
-        assertEquals("SubstationGeoData.SubstationGeoDataBuilder(id=testID, country=null, coordinate=null)", substationGeoDataBuilder.toString());
+        substationGeoDataBuilder.country(Country.FR);
+        substationGeoDataBuilder.coordinate(new Coordinate(3, 4));
+        assertEquals("SubstationGeoData.SubstationGeoDataBuilder(id=testID, country=FR, coordinate=Coordinate(lat=3.0, lon=4.0))", substationGeoDataBuilder.toString());
+        assertEquals("SubstationGeoData(id=testID, country=FR, coordinate=Coordinate(lat=3.0, lon=4.0))", substationGeoDataBuilder.build().toString());
 
     }
 }

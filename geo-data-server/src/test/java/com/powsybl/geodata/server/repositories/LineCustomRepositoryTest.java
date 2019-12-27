@@ -9,7 +9,7 @@ package com.powsybl.geodata.server.repositories;
 import com.powsybl.geodata.server.CassandraConfig;
 import com.powsybl.geodata.server.GeoDataApplication;
 import com.powsybl.geodata.server.GeoDataService;
-import com.powsybl.iidm.network.Country;
+import com.powsybl.geodata.server.dto.LineGeoData;
 import org.cassandraunit.spring.CassandraDataSet;
 import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
 import org.cassandraunit.spring.EmbeddedCassandra;
@@ -21,6 +21,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+
+import java.util.ArrayList;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,12 +52,33 @@ public class LineCustomRepositoryTest {
     public void test() {
 
         lineRepository.save(LineEntity.builder()
-                .country(String.valueOf(Country.FR))
                 .id("testId")
                 .country("FR")
                 .otherCountry("BE")
                 .build());
 
-        assertEquals(1, lineCustomRepository.getLines().size());
+        lineRepository.save(LineEntity.builder()
+                .id("testId2")
+                .country("FR")
+                .otherCountry("FR")
+                .build());
+
+        lineRepository.save(LineEntity.builder()
+                .id("testId3")
+                .country("FR")
+                .otherCountry("GE")
+                .build());
+
+        Map<String, LineGeoData> lines = lineCustomRepository.getLines();
+
+        assertEquals(3, lines.size());
+
+        assertEquals("testId3", new ArrayList<>(lines.values()).get(0).getId());
+        assertEquals("GE", new ArrayList<>(lines.values()).get(0).getCountry1().toString());
+        assertEquals("FR", new ArrayList<>(lines.values()).get(0).getCountry2().toString());
+
+        assertEquals("testId", new ArrayList<>(lines.values()).get(2).getId());
+        assertEquals("BE", new ArrayList<>(lines.values()).get(2).getCountry1().toString());
+        assertEquals("FR", new ArrayList<>(lines.values()).get(2).getCountry2().toString());
     }
 }

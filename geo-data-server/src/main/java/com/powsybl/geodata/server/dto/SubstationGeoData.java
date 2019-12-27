@@ -17,6 +17,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class SubstationGeoData {
 
     private String id;
