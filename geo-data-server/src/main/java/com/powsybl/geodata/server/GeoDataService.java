@@ -35,7 +35,7 @@ public class GeoDataService {
 
     private static final String REGEX = "\"[\\n|\\r|\\t]\"";
 
-    @Value("${network-geo-data.iterations}")
+    @Value("${network-geo-data.iterations:5}")
     private int maxIterations;
 
     @Autowired
