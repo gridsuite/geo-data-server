@@ -50,8 +50,6 @@ public class GeoDataService {
         // TODO filter by country
         StopWatch stopWatch = StopWatch.createStarted();
 
-        LOGGER.info("countries size {}", countries.size());
-
         List<SubstationEntity> substationEntities = substationRepository.findAll();
         Map<String, SubstationGeoData> substationsGeoDataDB = substationEntities.stream()
                 .map(SubstationEntity::toGeoData)
