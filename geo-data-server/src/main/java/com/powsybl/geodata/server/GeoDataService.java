@@ -212,6 +212,7 @@ public class GeoDataService {
         return neighbours;
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
 
@@ -219,6 +220,7 @@ public class GeoDataService {
         substationRepository.saveAll(substationEntities);
     }
 
+    @SuppressWarnings("javasecurity:S5145")
     void saveLines(List<LineGeoData> linesGeoData) {
         LOGGER.info("Saving {} lines geo data", linesGeoData.size());
 
