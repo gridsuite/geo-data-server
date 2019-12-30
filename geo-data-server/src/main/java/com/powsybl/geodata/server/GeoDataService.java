@@ -33,8 +33,6 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
-    private static final String REGEX = "\"[\\n|\\r|\\t]\"";
-
     @Value("${network-geo-data.iterations:5}")
     private int maxIterations;
 
@@ -63,9 +61,7 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
-        String countiesSet = countries.toString();
-        countiesSet = countiesSet.replaceAll(REGEX, "_");
-        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countiesSet, network.getId());
+        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
@@ -217,18 +213,14 @@ public class GeoDataService {
     }
 
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
-        String listSize = substationsGeoData.size() + "";
-        listSize = listSize.replaceAll(REGEX, "_");
-        LOGGER.info("Saving {} substations geo data", listSize);
+        LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
 
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).collect(Collectors.toList());
         substationRepository.saveAll(substationEntities);
     }
 
     void saveLines(List<LineGeoData> linesGeoData) {
-        String listSize = linesGeoData.size() + "";
-        listSize = listSize.replaceAll(REGEX, "_");
-        LOGGER.info("Saving {} lines geo data", listSize);
+        LOGGER.info("Saving {} lines geo data", linesGeoData.size());
 
         List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
         for (LineGeoData l : linesGeoData) {
@@ -243,9 +235,7 @@ public class GeoDataService {
     }
 
     List<LineGeoData> getLines(Network network, Set<Country> countries) {
-        String countiesSet = countries.toString();
-        countiesSet = countiesSet.replaceAll(REGEX, "_");
-        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countiesSet, network.getId());
+        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
