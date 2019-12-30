@@ -66,7 +66,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
         return mappingContext;
     }
 
-    private static class CoordinateCodec extends TypeCodec<Coordinate> {
+    static class CoordinateCodec extends TypeCodec<Coordinate> {
 
         private final TypeCodec<UDTValue> innerCodec;
 

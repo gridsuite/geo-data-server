@@ -11,11 +11,11 @@ import lombok.*;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@Setter
+@ToString
 public class Coordinate {
 
     private  double lat;

@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Service
-public final class GeoDataService {
+public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
-    @Value("${network-geo-data.iterations}")
+    @Value("${network-geo-data.iterations:5}")
     private int maxIterations;
 
     @Autowired
@@ -60,7 +60,9 @@ public final class GeoDataService {
         return substationsGeoDataDB;
     }
 
-    public List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
+    List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
+        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countries, network.getId());
+
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 
@@ -210,12 +212,18 @@ public final class GeoDataService {
         return neighbours;
     }
 
-    public void saveSubstations(List<SubstationGeoData> substationsGeoData) {
+    @SuppressWarnings("javasecurity:S5145")
+    void saveSubstations(List<SubstationGeoData> substationsGeoData) {
+        LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
+
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).collect(Collectors.toList());
         substationRepository.saveAll(substationEntities);
     }
 
-    public void saveLines(List<LineGeoData> linesGeoData) {
+    @SuppressWarnings("javasecurity:S5145")
+    void saveLines(List<LineGeoData> linesGeoData) {
+        LOGGER.info("Saving {} lines geo data", linesGeoData.size());
+
         List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
         for (LineGeoData l : linesGeoData) {
             if (l.getCountry1() == l.getCountry2())  {
@@ -228,7 +236,9 @@ public final class GeoDataService {
         lineRepository.saveAll(linesEntities);
     }
 
-    public List<LineGeoData> getLines(Network network, Set<Country> countries) {
+    List<LineGeoData> getLines(Network network, Set<Country> countries) {
+        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
+
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 

@@ -9,7 +9,8 @@ package com.powsybl.geodata.server.repositories;
 import com.powsybl.geodata.extensions.Coordinate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
 import java.util.List;
@@ -20,15 +21,16 @@ import java.util.stream.Collectors;
  */
 @UserDefinedType("coordinate")
 @AllArgsConstructor
-@Data
+@Getter
 @Builder
+@ToString
 public class CoordinateEntity {
 
     private double lat;
 
     private double lon;
 
-    public static List<CoordinateEntity> create(List<Coordinate> coordinates) {
+    static List<CoordinateEntity> create(List<Coordinate> coordinates) {
         return coordinates.stream()
                 .map(p -> CoordinateEntity.builder()
                         .lat(p.getLat())

@@ -11,7 +11,8 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
@@ -21,8 +22,9 @@ import org.springframework.data.cassandra.core.mapping.Table;
  */
 @Table("substations")
 @AllArgsConstructor
-@Data
+@Getter
 @Builder
+@ToString
 public class SubstationEntity {
 
     @PrimaryKeyColumn(ordinal = 0, type = PrimaryKeyType.PARTITIONED)
@@ -48,10 +50,7 @@ public class SubstationEntity {
         return SubstationGeoData.builder()
                 .country(Country.valueOf(country))
                 .id(id)
-                .coordinate(Coordinate.builder()
-                        .lat(coordinate.getLat())
-                        .lon(coordinate.getLon())
-                        .build())
+                .coordinate(new Coordinate(coordinate.getLat(), coordinate.getLon()))
                 .build();
     }
 }

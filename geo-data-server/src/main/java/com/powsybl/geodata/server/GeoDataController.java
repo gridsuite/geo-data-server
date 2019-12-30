@@ -15,8 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -38,8 +36,6 @@ import java.util.stream.Collectors;
 @ComponentScan(basePackageClasses = {GeoDataController.class, GeoDataService.class, NetworkStoreService.class})
 public class GeoDataController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataController.class);
-
     static final String API_VERSION = "v1";
 
     @Autowired
@@ -58,7 +54,6 @@ public class GeoDataController {
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
-        LOGGER.info("Loading substations geo data for countries {} of network '{}'", countrySet, networkUuid);
         Network network = networkStoreService.getNetwork(networkUuid);
         List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet);
         return ResponseEntity.ok().body(substations);
@@ -70,7 +65,6 @@ public class GeoDataController {
     public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,
                                                       @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
-        LOGGER.info("Loading lines geo data for countries {} of network '{}'", countrySet, networkUuid);
         Network network = networkStoreService.getNetwork(networkUuid);
         List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
         return ResponseEntity.ok().body(lines);
@@ -80,7 +74,6 @@ public class GeoDataController {
     @ApiOperation(value = "Save substations geographical data")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data have been correctly saved")})
     public void saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
-        LOGGER.info("Saving {} substations geo data", substationGeoData.size());
         geoDataService.saveSubstations(substationGeoData);
     }
 
@@ -88,7 +81,6 @@ public class GeoDataController {
     @ApiOperation(value = "Save lines geographical data")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data have been correctly saved")})
     public void saveLines(@RequestBody List<LineGeoData> linesGeoData) {
-        LOGGER.info("Saving {} lines geo data", linesGeoData.size());
         geoDataService.saveLines(linesGeoData);
     }
 }
