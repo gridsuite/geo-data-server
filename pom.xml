@@ -64,7 +64,6 @@
 
         <cassandraunit.version>3.11.2.0</cassandraunit.version>
         <guava.version>27.0.1-jre</guava.version>
-        <jib.version>1.0.0</jib.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.18.8</lombok.version>
         <metricscore.version>3.2.6</metricscore.version>
@@ -75,7 +74,7 @@
         <slf4j.version>1.7.22</slf4j.version>
         <xmlunit.version>2.3.0</xmlunit.version>
 
-        <powsyblcore.version>3.0.0</powsyblcore.version>
+        <powsybl-core.version>3.1.0</powsybl-core.version>
         <network-store.version>1.0.0-SNAPSHOT</network-store.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>
