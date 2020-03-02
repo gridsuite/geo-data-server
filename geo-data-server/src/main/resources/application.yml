@@ -1,5 +1,5 @@
 server:
-  port : 8087
+  port : 8089
 
 network-store-server:
    base-uri: http://localhost:8080

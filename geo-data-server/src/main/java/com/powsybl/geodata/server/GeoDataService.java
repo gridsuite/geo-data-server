@@ -181,7 +181,7 @@ public class GeoDataService {
             coordinate = new Coordinate(lat, lon);
         }
 
-        Country country = substation.getCountry().orElseThrow(IllegalStateException::new);
+        Country country = substation.getCountry().orElse(null);
         return coordinate != null ? new SubstationGeoData(substation.getId(), country, coordinate) : null;
     }
 
