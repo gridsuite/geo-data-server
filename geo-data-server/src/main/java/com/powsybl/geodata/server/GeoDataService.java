@@ -119,7 +119,7 @@ public class GeoDataService {
         Map<String, Set<String>> sortedNeighbours = neighbours
                 .entrySet()
                 .stream()
-                .filter(e -> !substationsGeoData.containsKey(e.getKey()) && !e.getValue().isEmpty())
+                .filter(e -> !substationsGeoData.containsKey(e.getKey()))
                 .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
