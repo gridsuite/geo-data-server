@@ -7,23 +7,19 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.google.common.collect.ImmutableList;
 import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,12 +29,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class})
-@TestExecutionListeners({ CassandraUnitDependencyInjectionTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class })
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
-@EmbeddedCassandra
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
+@EmbeddedCassandra(scripts = "classpath:geo_data_test.cql")
 public class GeoDataServiceTest {
 
     @Autowired

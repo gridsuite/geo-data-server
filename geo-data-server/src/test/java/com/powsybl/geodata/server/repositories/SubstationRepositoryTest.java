@@ -6,18 +6,17 @@
  */
 package com.powsybl.geodata.server.repositories;
 
+import com.github.nosan.embedded.cassandra.api.Cassandra;
+import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.server.CassandraConfig;
+import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
@@ -26,16 +25,21 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CassandraConfig.class)
-@TestExecutionListeners({ CassandraUnitDependencyInjectionTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class })
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
-@EmbeddedCassandra
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
+@EmbeddedCassandra(scripts = "classpath:geo_data_test.cql")
 public class SubstationRepositoryTest {
 
     @Autowired
     private SubstationRepository repository;
+
+    @Autowired
+    private Cassandra cassandra;
+
+    @After
+    public void destroyCassandra() {
+        cassandra.stop();
+    }
 
     @Test
     public void test() {
