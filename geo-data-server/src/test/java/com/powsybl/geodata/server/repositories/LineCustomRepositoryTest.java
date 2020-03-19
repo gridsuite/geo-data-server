@@ -6,6 +6,7 @@
  */
 package com.powsybl.geodata.server.repositories;
 
+import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.server.CassandraConfig;
 import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
@@ -43,9 +44,12 @@ public class LineCustomRepositoryTest {
     @Autowired
     private LineRepository lineRepository;
 
-    @After
-    public void destroyCassandra() {
+    @Autowired
+    private Cassandra cassandra;
 
+    @After
+    public void stopCassandra() {
+        cassandra.stop();
     }
 
     @Test

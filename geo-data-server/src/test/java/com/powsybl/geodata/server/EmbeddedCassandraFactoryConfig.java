@@ -21,7 +21,7 @@ public class EmbeddedCassandraFactoryConfig {
     CassandraFactory embeddedCassandraFactory() throws UnknownHostException {
         EmbeddedCassandraFactory cassandraFactory = new EmbeddedCassandraFactory();
         Version version = Version.of("4.0-alpha3");
-        Path directory = Paths.get("/apache-cassandra-4.0-alpha3");
+        Path directory = Paths.get(System.getProperty("user.home") + "/apache-cassandra-4.0-alpha3");
         cassandraFactory.setArtifact(new DefaultArtifact(version, directory));
         cassandraFactory.setPort(9142);
         cassandraFactory.setAddress(InetAddress.getByName("localhost"));

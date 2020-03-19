@@ -7,6 +7,7 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.google.common.collect.ImmutableList;
 import com.powsybl.geodata.server.dto.LineGeoData;
@@ -14,6 +15,7 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +47,14 @@ public class GeoDataServiceTest {
 
     @Autowired
     GeoDataService geoDataService;
+
+    @Autowired
+    private Cassandra cassandra;
+
+    @After
+    public void destroyCassandra() {
+        cassandra.stop();
+    }
 
     @Before
     public void setUp() throws InterruptedException {

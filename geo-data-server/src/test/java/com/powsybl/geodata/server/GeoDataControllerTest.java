@@ -7,6 +7,7 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.dto.LineGeoData;
@@ -16,6 +17,7 @@ import com.powsybl.geodata.server.repositories.SubstationRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +68,14 @@ public class GeoDataControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Autowired
+    private Cassandra cassandra;
+
+    @After
+    public void destroyCassandra() {
+        cassandra.stop();
     }
 
     @Test

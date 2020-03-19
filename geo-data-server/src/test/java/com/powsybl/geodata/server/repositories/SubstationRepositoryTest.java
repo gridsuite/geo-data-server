@@ -10,6 +10,7 @@ import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.server.CassandraConfig;
 import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
+import com.powsybl.geodata.server.GeoDataApplication;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
 import org.junit.After;
 import org.junit.Test;
@@ -25,8 +26,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
+
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
+@ContextConfiguration(classes = {CassandraConfig.class, GeoDataApplication.class, EmbeddedCassandraFactoryConfig.class})
 @EmbeddedCassandra(scripts = "classpath:geo_data_test.cql")
 public class SubstationRepositoryTest {
 
@@ -37,7 +39,7 @@ public class SubstationRepositoryTest {
     private Cassandra cassandra;
 
     @After
-    public void destroyCassandra() {
+    public void stopCassandra() {
         cassandra.stop();
     }
 

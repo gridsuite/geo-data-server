@@ -6,9 +6,11 @@
  */
 package com.powsybl.geodata.server.repositories;
 
+import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.server.CassandraConfig;
 import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,14 @@ public class LineRepositoryTest {
 
     @Autowired
     private LineRepository repository;
+
+    @Autowired
+    private Cassandra cassandra;
+
+    @After
+    public void destroyCassandra() {
+        cassandra.stop();
+    }
 
     @Test
     public void test() {
