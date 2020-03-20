@@ -48,7 +48,7 @@ public class GeoDataController {
         return countries != null ? countries.stream().map(Country::valueOf).collect(Collectors.toSet()) : Collections.emptySet();
     }
 
-    @GetMapping(value = "/substations/{networkUuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get substations geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam(required = false) UUID networkUuid,
@@ -60,7 +60,7 @@ public class GeoDataController {
         return ResponseEntity.ok().body(substations);
     }
 
-    @GetMapping(value = "/lines/{networkUuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get lines geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@RequestParam(required = false) UUID networkUuid,
