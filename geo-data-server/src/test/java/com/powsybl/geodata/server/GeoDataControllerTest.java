@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(GeoDataController.class)
 @ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
-@EmbeddedCassandra(scripts = "classpath:geo_data_test.cql")
+@EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
 public class GeoDataControllerTest {
 
     @Autowired
@@ -74,7 +74,7 @@ public class GeoDataControllerTest {
     private Cassandra cassandra;
 
     @After
-    public void destroyCassandra() {
+    public void stopCassandra() {
         cassandra.stop();
     }
 

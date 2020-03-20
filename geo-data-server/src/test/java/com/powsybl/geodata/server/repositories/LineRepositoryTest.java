@@ -28,7 +28,7 @@ import static org.junit.Assert.assertFalse;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
-@EmbeddedCassandra(scripts = "classpath:geo_data_test.cql")
+@EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
 public class LineRepositoryTest {
 
     @Autowired
@@ -38,7 +38,7 @@ public class LineRepositoryTest {
     private Cassandra cassandra;
 
     @After
-    public void destroyCassandra() {
+    public void stopCassandra() {
         cassandra.stop();
     }
 

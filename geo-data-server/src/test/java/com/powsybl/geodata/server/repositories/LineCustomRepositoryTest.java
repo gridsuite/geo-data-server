@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
-@EmbeddedCassandra(scripts = "classpath:geo_data_test.cql")
+@EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
 public class LineCustomRepositoryTest {
 
     @MockBean
@@ -54,7 +54,6 @@ public class LineCustomRepositoryTest {
 
     @Test
     public void test() {
-
         lineRepository.save(LineEntity.builder()
                 .id("testId")
                 .country("FR")
