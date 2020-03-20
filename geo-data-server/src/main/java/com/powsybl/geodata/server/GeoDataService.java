@@ -62,6 +62,7 @@ public class GeoDataService {
 
     List<SubstationGeoData> getSubstations() {
         LOGGER.info("Loading all substations geo data");
+
         return new ArrayList<>(readSubstationGeoDataFromDb(null).values());
     }
 
