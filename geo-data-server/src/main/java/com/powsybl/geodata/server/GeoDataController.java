@@ -49,6 +49,13 @@ public class GeoDataController {
     }
 
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get all substations geographical data", response = List.class)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "All substations geographical data")})
+    public ResponseEntity<List<SubstationGeoData>> getSubstations() {
+        return ResponseEntity.ok().body(geoDataService.getSubstations());
+    }
+
+    @GetMapping(value = "/substations/{networkUuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get substations geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
@@ -60,6 +67,13 @@ public class GeoDataController {
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get all lines geographical data", response = List.class)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "All lines geographical data")})
+    public ResponseEntity<List<LineGeoData>> getLines() {
+        return ResponseEntity.ok().body(geoDataService.getLines());
+    }
+
+    @GetMapping(value = "/lines/{networkUuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get lines geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,

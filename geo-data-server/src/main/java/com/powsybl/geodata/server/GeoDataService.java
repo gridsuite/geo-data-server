@@ -60,6 +60,11 @@ public class GeoDataService {
         return substationsGeoDataDB;
     }
 
+    List<SubstationGeoData> getSubstations() {
+        LOGGER.info("Loading all substations geo data");
+        return new ArrayList<>(readSubstationGeoDataFromDb(null).values());
+    }
+
     List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
         LOGGER.info("Loading substations geo data for countries {} of network '{}'", countries, network.getId());
 
@@ -234,6 +239,12 @@ public class GeoDataService {
             }
         }
         lineRepository.saveAll(linesEntities);
+    }
+
+    List<LineGeoData> getLines() {
+        LOGGER.info("Loading all lines geo data");
+
+        return new ArrayList<>(lineCustomRepository.getLines().values());
     }
 
     List<LineGeoData> getLines(Network network, Set<Country> countries) {
