@@ -6,14 +6,13 @@
  */
 package com.powsybl.geodata.server.repositories;
 
-import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.server.CassandraConfig;
 import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -29,18 +28,11 @@ import static org.junit.Assert.assertFalse;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
 @EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
+@DirtiesContext
 public class LineRepositoryTest {
 
     @Autowired
     private LineRepository repository;
-
-    @Autowired
-    private Cassandra cassandra;
-
-    @After
-    public void stopCassandra() {
-        cassandra.stop();
-    }
 
     @Test
     public void test() {

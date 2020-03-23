@@ -7,7 +7,6 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.google.common.collect.ImmutableList;
 import com.powsybl.geodata.server.dto.LineGeoData;
@@ -15,11 +14,11 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -34,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
 @EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
+@DirtiesContext
 public class GeoDataServiceTest {
 
     @Autowired
@@ -47,14 +47,6 @@ public class GeoDataServiceTest {
 
     @Autowired
     GeoDataService geoDataService;
-
-    @Autowired
-    private Cassandra cassandra;
-
-    @After
-    public void stopCassandra() {
-        cassandra.stop();
-    }
 
     @Before
     public void setUp() throws InterruptedException {
