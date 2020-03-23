@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.powsybl.geodata.server;
 
 import com.github.nosan.embedded.cassandra.EmbeddedCassandraFactory;
@@ -13,6 +19,9 @@ import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
+ */
 @Configuration
 public class EmbeddedCassandraFactoryConfig {
 
@@ -24,6 +33,8 @@ public class EmbeddedCassandraFactoryConfig {
         Path directory = Paths.get(System.getProperty("user.home") + "/apache-cassandra-4.0-alpha3");
         cassandraFactory.setArtifact(new DefaultArtifact(version, directory));
         cassandraFactory.setPort(9142);
+        cassandraFactory.setJmxLocalPort(0);
+        cassandraFactory.setRpcPort(0);
         cassandraFactory.setAddress(InetAddress.getByName("localhost"));
         return cassandraFactory;
     }

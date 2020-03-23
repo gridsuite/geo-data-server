@@ -6,13 +6,11 @@
  */
 package com.powsybl.geodata.server.repositories;
 
-import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.server.CassandraConfig;
 import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
 import com.powsybl.geodata.server.GeoDataApplication;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +34,6 @@ public class SubstationRepositoryTest {
 
     @Autowired
     private SubstationRepository repository;
-
-    @Autowired
-    private Cassandra cassandra;
-
-    @After
-    public void stopCassandra() {
-        cassandra.stop();
-    }
 
     @Test
     public void test() {
