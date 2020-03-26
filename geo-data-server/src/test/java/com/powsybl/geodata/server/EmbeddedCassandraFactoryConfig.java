@@ -35,6 +35,7 @@ public class EmbeddedCassandraFactoryConfig {
         cassandraFactory.setPort(9142);
         cassandraFactory.setJmxLocalPort(0);
         cassandraFactory.setRpcPort(0);
+        cassandraFactory.setStoragePort(16432);
         cassandraFactory.setAddress(InetAddress.getByName("localhost"));
         return cassandraFactory;
     }
