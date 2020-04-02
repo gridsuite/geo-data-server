@@ -7,6 +7,7 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.nosan.embedded.cassandra.api.connection.CqlSessionCassandraConnection;
 import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.dto.LineGeoData;
@@ -28,6 +29,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
@@ -45,9 +49,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(GeoDataController.class)
-@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
+@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class,
+        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionFactoryTest.class})
 @EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class GeoDataControllerTest {
 
     @Autowired
@@ -65,9 +70,25 @@ public class GeoDataControllerTest {
     @MockBean
     private LineRepository lineRepository;
 
+    @Autowired
+    private CqlSessionCassandraConnection cqlSessionCassandraConnection;
+
     @Before
-    public void setUp() {
+    public void setup() throws IOException {
         MockitoAnnotations.initMocks(this);
+        String truncateScriptPath = getClass().getClassLoader().getResource("truncate.cql").getPath();
+        String truncateScript = Files.readString(Paths.get(truncateScriptPath));
+        executeScript(truncateScript);
+    }
+
+    public void executeScript(String script) {
+        String cleanedScript = script.replace("\n", "");
+        String[] requests = cleanedScript.split("(?<=;)");
+        for (String request : requests) {
+            if (!request.equals(" ")) {
+                cqlSessionCassandraConnection.execute(request);
+            }
+        }
     }
 
     @Test

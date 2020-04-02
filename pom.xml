@@ -63,6 +63,7 @@
         <maven.site.version>3.7.1</maven.site.version>
         <maven.surefire.version>2.22.0</maven.surefire.version>
 
+        <datastax.java-driver.version>4.5.1</datastax.java-driver.version>
         <embedded-cassandra.version>3.0.3</embedded-cassandra.version>
         <guava.version>27.0.1-jre</guava.version>
         <junit.version>4.12</junit.version>
