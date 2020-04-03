@@ -13,7 +13,6 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,8 +22,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,10 +49,6 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
     @Before
     public void setUp() throws InterruptedException, IOException {
-        InputStream truncateScriptIS = getClass().getClassLoader().getResourceAsStream("truncate.cql");
-        String truncateScript = IOUtils.toString(truncateScriptIS, StandardCharsets.UTF_8);
-        executeScript(truncateScript);
-
         List<SubstationEntity> substationEntities = new ArrayList<>();
 
         substationEntities.add(SubstationEntity.builder()
