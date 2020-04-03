@@ -6,14 +6,8 @@
  */
 package com.powsybl.geodata.server.repositories;
 
-import com.github.nosan.embedded.cassandra.api.connection.CqlSessionCassandraConnection;
-import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
-import com.powsybl.geodata.server.CassandraConfig;
-import com.powsybl.geodata.server.CqlCassandraConnectionFactoryTest;
-import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
-import com.powsybl.geodata.server.GeoDataApplication;
+import com.powsybl.geodata.server.*;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +15,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -34,33 +25,12 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {CassandraConfig.class, GeoDataApplication.class,
-        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionFactoryTest.class})
-@EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
+        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class SubstationRepositoryTest {
+public class SubstationRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
     @Autowired
     private SubstationRepository repository;
-
-    @Autowired
-    private CqlSessionCassandraConnection cqlSessionCassandraConnection;
-
-    @Before
-    public void setup() throws IOException {
-        String truncateScriptPath = getClass().getClassLoader().getResource("truncate.cql").getPath();
-        String truncateScript = Files.readString(Paths.get(truncateScriptPath));
-        executeScript(truncateScript);
-    }
-
-    public void executeScript(String script) {
-        String cleanedScript = script.replace("\n", "");
-        String[] requests = cleanedScript.split("(?<=;)");
-        for (String request : requests) {
-            if (!request.equals(" ")) {
-                cqlSessionCassandraConnection.execute(request);
-            }
-        }
-    }
 
     @Test
     public void test() {

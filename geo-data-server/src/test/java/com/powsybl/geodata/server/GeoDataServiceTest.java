@@ -7,14 +7,13 @@
 package com.powsybl.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.nosan.embedded.cassandra.api.connection.CqlSessionCassandraConnection;
-import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import com.google.common.collect.ImmutableList;
 import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +23,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,9 +35,8 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
-@EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class GeoDataServiceTest {
+public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -52,23 +50,10 @@ public class GeoDataServiceTest {
     @Autowired
     GeoDataService geoDataService;
 
-    @Autowired
-    private CqlSessionCassandraConnection cqlSessionCassandraConnection;
-
-    public void executeScript(String script) {
-        String cleanedScript = script.replace("\n", "");
-        String[] requests = cleanedScript.split("(?<=;)");
-        for (String request : requests) {
-            if (!request.equals(" ")) {
-                cqlSessionCassandraConnection.execute(request);
-            }
-        }
-    }
-
     @Before
     public void setUp() throws InterruptedException, IOException {
-        String truncateScriptPath = getClass().getClassLoader().getResource("truncate.cql").getPath();
-        String truncateScript = Files.readString(Paths.get(truncateScriptPath));
+        InputStream truncateScriptIS = getClass().getClassLoader().getResourceAsStream("truncate.cql");
+        String truncateScript = IOUtils.toString(truncateScriptIS, StandardCharsets.UTF_8);
         executeScript(truncateScript);
 
         List<SubstationEntity> substationEntities = new ArrayList<>();
