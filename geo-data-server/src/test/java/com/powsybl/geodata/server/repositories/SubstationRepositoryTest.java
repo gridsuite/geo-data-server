@@ -6,18 +6,14 @@
  */
 package com.powsybl.geodata.server.repositories;
 
-import com.powsybl.geodata.server.CassandraConfig;
+import com.powsybl.geodata.server.*;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
@@ -26,20 +22,18 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CassandraConfig.class)
-@TestExecutionListeners({ CassandraUnitDependencyInjectionTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class })
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
-@EmbeddedCassandra
-public class SubstationRepositoryTest {
+
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {CassandraConfig.class, GeoDataApplication.class,
+        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class SubstationRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
     @Autowired
     private SubstationRepository repository;
 
     @Test
     public void test() {
-
         SubstationEntity.SubstationEntityBuilder substationEntityBuilder = SubstationEntity.builder()
                 .country("FR")
                 .id("ID")

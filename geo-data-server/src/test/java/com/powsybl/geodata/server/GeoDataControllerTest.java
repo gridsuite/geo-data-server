@@ -15,19 +15,13 @@ import com.powsybl.geodata.server.repositories.SubstationRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.CassandraUnitTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,7 +33,6 @@ import static com.powsybl.network.store.model.NetworkStoreApi.VERSION;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,13 +42,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(GeoDataController.class)
-@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class})
-@TestExecutionListeners(listeners = {CassandraUnitDependencyInjectionTestExecutionListener.class,
-                                     CassandraUnitTestExecutionListener.class},
-                        mergeMode = MERGE_WITH_DEFAULTS)
-@CassandraDataSet(value = "geo_data.cql", keyspace = CassandraConstants.KEYSPACE_GEO_DATA)
-@EmbeddedCassandra
-public class GeoDataControllerTest {
+@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class,
+        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class GeoDataControllerTest extends AbstractEmbeddedCassandraSetup  {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -71,11 +61,6 @@ public class GeoDataControllerTest {
 
     @MockBean
     private LineRepository lineRepository;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void test() throws Exception {

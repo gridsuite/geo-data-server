@@ -6,17 +6,16 @@
  */
 package com.powsybl.geodata.server.repositories;
 
+import com.powsybl.geodata.server.AbstractEmbeddedCassandraSetup;
 import com.powsybl.geodata.server.CassandraConfig;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
+import com.powsybl.geodata.server.CqlCassandraConnectionTestFactory;
+import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +26,10 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CassandraConfig.class)
-@TestExecutionListeners({ CassandraUnitDependencyInjectionTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class })
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
-@EmbeddedCassandra
-public class LineRepositoryTest {
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
     @Autowired
     private LineRepository repository;

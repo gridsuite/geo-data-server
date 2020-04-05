@@ -6,21 +6,15 @@
  */
 package com.powsybl.geodata.server.repositories;
 
-import com.powsybl.geodata.server.CassandraConfig;
-import com.powsybl.geodata.server.GeoDataApplication;
-import com.powsybl.geodata.server.GeoDataService;
+import com.powsybl.geodata.server.*;
 import com.powsybl.geodata.server.dto.LineGeoData;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 
@@ -31,13 +25,11 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class})
-@TestExecutionListeners({ CassandraUnitDependencyInjectionTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class })
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
-@EmbeddedCassandra
-public class LineCustomRepositoryTest {
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class,
+        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class LineCustomRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
     @MockBean
     GeoDataService geoDataService;
@@ -50,7 +42,6 @@ public class LineCustomRepositoryTest {
 
     @Test
     public void test() {
-
         lineRepository.save(LineEntity.builder()
                 .id("testId")
                 .country("FR")

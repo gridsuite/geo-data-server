@@ -13,17 +13,13 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.*;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import org.cassandraunit.spring.CassandraDataSet;
-import org.cassandraunit.spring.CassandraUnitDependencyInjectionTestExecutionListener;
-import org.cassandraunit.spring.EmbeddedCassandra;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,13 +29,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class})
-@TestExecutionListeners({ CassandraUnitDependencyInjectionTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class })
-@CassandraDataSet(value = "geo_data.cql", keyspace = "geo_data")
-@EmbeddedCassandra
-public class GeoDataServiceTest {
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -54,7 +47,7 @@ public class GeoDataServiceTest {
     GeoDataService geoDataService;
 
     @Before
-    public void setUp() throws InterruptedException {
+    public void setUp() {
         List<SubstationEntity> substationEntities = new ArrayList<>();
 
         substationEntities.add(SubstationEntity.builder()
@@ -97,7 +90,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void test() {
         Network network = createGeoDataNetwork();
 
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
