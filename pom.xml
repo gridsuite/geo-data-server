@@ -99,7 +99,7 @@
                     <version>${maven.jib.version}</version>
                     <configuration>
                         <from>
-                            <image>openjdk:8</image>
+                            <image>openjdk:11</image>
                         </from>
                     </configuration>
                 </plugin>
