@@ -21,7 +21,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
     GeoDataService geoDataService;
 
     @Before
-    public void setUp() throws InterruptedException, IOException {
+    public void setUp() {
         List<SubstationEntity> substationEntities = new ArrayList<>();
 
         substationEntities.add(SubstationEntity.builder()
@@ -91,7 +90,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
     }
 
     @Test
-    public void test() throws Exception {
+    public void test() {
         Network network = createGeoDataNetwork();
 
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
