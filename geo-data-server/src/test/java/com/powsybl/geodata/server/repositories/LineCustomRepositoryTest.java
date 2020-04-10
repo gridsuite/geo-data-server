@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class,
-        EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
+        EmbeddedCassandraFactoryConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class LineCustomRepositoryTest extends AbstractEmbeddedCassandraSetup {
 

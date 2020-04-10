@@ -8,7 +8,6 @@ package com.powsybl.geodata.server.repositories;
 
 import com.powsybl.geodata.server.AbstractEmbeddedCassandraSetup;
 import com.powsybl.geodata.server.CassandraConfig;
-import com.powsybl.geodata.server.CqlCassandraConnectionTestFactory;
 import com.powsybl.geodata.server.EmbeddedCassandraFactoryConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +26,7 @@ import static org.junit.Assert.assertFalse;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class, CqlCassandraConnectionTestFactory.class})
+@ContextConfiguration(classes = {CassandraConfig.class, EmbeddedCassandraFactoryConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
