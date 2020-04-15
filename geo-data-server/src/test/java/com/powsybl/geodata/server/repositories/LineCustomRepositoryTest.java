@@ -11,7 +11,6 @@ import com.powsybl.geodata.server.dto.LineGeoData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -30,9 +29,6 @@ import static org.junit.Assert.assertEquals;
         EmbeddedCassandraFactoryConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class LineCustomRepositoryTest extends AbstractEmbeddedCassandraSetup {
-
-    @MockBean
-    GeoDataService geoDataService;
 
     @Autowired
     private LineCustomRepository lineCustomRepository;
