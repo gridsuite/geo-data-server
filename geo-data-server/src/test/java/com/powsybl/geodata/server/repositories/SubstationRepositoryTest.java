@@ -11,8 +11,8 @@ import com.powsybl.geodata.server.dto.SubstationGeoData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -22,11 +22,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {CassandraConfig.class, GeoDataApplication.class,
-        EmbeddedCassandraFactoryConfig.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@ContextHierarchy({
+    @ContextConfiguration(classes = {GeoDataApplication.class})
+    })
 public class SubstationRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
     @Autowired

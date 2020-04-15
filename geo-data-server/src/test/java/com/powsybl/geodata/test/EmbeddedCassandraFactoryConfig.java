@@ -4,9 +4,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.powsybl.geodata.server;
+package com.powsybl.geodata.test;
 
 import com.github.nosan.embedded.cassandra.EmbeddedCassandraFactory;
+import com.github.nosan.embedded.cassandra.api.Cassandra;
 import com.github.nosan.embedded.cassandra.api.CassandraFactory;
 import com.github.nosan.embedded.cassandra.api.Version;
 import com.github.nosan.embedded.cassandra.artifact.DefaultArtifact;
@@ -20,11 +21,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.github.nosan.embedded.cassandra.api.cql.CqlDataSet;
+import com.github.nosan.embedded.cassandra.api.connection.CassandraConnection;
+import com.github.nosan.embedded.cassandra.api.connection.DefaultCassandraConnectionFactory;
+
 /**
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
  */
 @Configuration
 public class EmbeddedCassandraFactoryConfig {
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    Cassandra cassandra(CassandraFactory cassandraFactory) {
+        return cassandraFactory.create();
+    }
+
+    @Bean
+    CassandraConnection cassandraConnection(Cassandra cassandra) {
+        CassandraConnection cassandraConnection = new DefaultCassandraConnectionFactory().create(cassandra);
+        CqlDataSet.ofClasspaths("create_keyspace.cql", "geo_data.cql").forEachStatement(cassandraConnection::execute);
+        return cassandraConnection;
+    }
 
     @Bean
     @Scope("singleton")
