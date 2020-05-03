@@ -11,6 +11,7 @@ import com.powsybl.geodata.extensions.Coordinate;
 import com.powsybl.geodata.server.dto.LineGeoData;
 import com.powsybl.geodata.server.dto.SubstationGeoData;
 import com.powsybl.geodata.server.repositories.LineRepository;
+import com.powsybl.geodata.server.repositories.LineCustomRepository;
 import com.powsybl.geodata.server.repositories.SubstationRepository;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
@@ -20,8 +21,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -42,16 +41,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(GeoDataController.class)
-@ContextConfiguration(classes = {GeoDataApplication.class, CassandraConfig.class,
-        EmbeddedCassandraFactoryConfig.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class GeoDataControllerTest extends AbstractEmbeddedCassandraSetup  {
+public class GeoDataControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mvc;
+
+    @MockBean
+    private GeoDataService geoDataService;
+
+    @MockBean
+    private CassandraConfig cassandraConfig;
 
     @MockBean
     private NetworkStoreService service;
@@ -61,6 +63,9 @@ public class GeoDataControllerTest extends AbstractEmbeddedCassandraSetup  {
 
     @MockBean
     private LineRepository lineRepository;
+
+    @MockBean
+    private LineCustomRepository lineCustomRepository;
 
     @Test
     public void test() throws Exception {

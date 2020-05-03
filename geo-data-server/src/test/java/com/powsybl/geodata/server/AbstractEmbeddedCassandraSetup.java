@@ -8,14 +8,22 @@ package com.powsybl.geodata.server;
 
 import com.github.nosan.embedded.cassandra.api.connection.ClusterCassandraConnection;
 import com.github.nosan.embedded.cassandra.api.cql.CqlDataSet;
-import com.github.nosan.embedded.cassandra.spring.test.EmbeddedCassandra;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
+import com.powsybl.geodata.test.EmbeddedCassandraFactoryConfig;
 
 /**
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
+ *
+ * This base class is absolutely necessary to properly separate the parent
+ * context with the cassandra configuration and the child context when child contexts
+ * use @MockBean
  */
-@EmbeddedCassandra(scripts = {"classpath:create_keyspace.cql", "classpath:geo_data.cql"})
+@ContextHierarchy({
+    @ContextConfiguration(classes = {EmbeddedCassandraFactoryConfig.class, CassandraConfig.class}),
+    })
 public abstract class AbstractEmbeddedCassandraSetup {
 
     @Autowired

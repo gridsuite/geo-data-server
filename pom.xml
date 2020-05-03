@@ -86,8 +86,6 @@
         <sonar.exclusions>
             **/generated/**/*
         </sonar.exclusions>
-
-        <integration.skip>true</integration.skip>
     </properties>
 
     <build>
@@ -130,9 +128,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.version}</version>
-                    <configuration>
-                        <skipTests>${integration.skip}</skipTests>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -284,10 +279,32 @@
             </build>
         </profile>
         <profile>
-            <id>perform-integration-test</id>
-            <properties>
-                <integration.skip>false</integration.skip>
-            </properties>
+            <id>proxy</id>
+            <activation>
+              <property>
+                <name>proxyHost</name>
+              </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>${maven.surefire.version}</version>
+                            <configuration>
+                                <systemPropertyVariables>
+                                    <proxyHost>${proxyHost}</proxyHost>
+                                    <proxyPort>${proxyPort}</proxyPort>
+                                    <proxyUser>${proxyUser}</proxyUser>
+                                    <proxyPassword>${proxyPassword}</proxyPassword>
+                                    <jdk.http.auth.tunneling.disabledSchemes></jdk.http.auth.tunneling.disabledSchemes>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
     </profiles>
 </project>
