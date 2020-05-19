@@ -76,7 +76,7 @@
         <slf4j.version>1.7.22</slf4j.version>
         <xmlunit.version>2.3.0</xmlunit.version>
 
-        <powsybl-core.version>3.2.0</powsybl-core.version>
+        <powsybl-core.version>3.3.0</powsybl-core.version>
         <network-store.version>1.0.0-SNAPSHOT</network-store.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>
