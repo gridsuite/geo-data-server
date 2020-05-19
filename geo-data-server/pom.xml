@@ -43,12 +43,6 @@
     <dependencies>
         <!-- compile scope -->
         <dependency>
-            <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-config-classic</artifactId>
-            <version>${powsybl-core.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-cassandra</artifactId>
         </dependency>
@@ -91,6 +85,14 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- runtime scope -->
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-config-classic</artifactId>
+            <version>${powsybl-core.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- test scope -->
         <dependency>
             <groupId>com.github.nosan</groupId>
@@ -111,6 +113,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-config-test</artifactId>
+            <version>${powsybl-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
