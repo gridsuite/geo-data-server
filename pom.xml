@@ -82,23 +82,6 @@
         </sonar.exclusions>
     </properties>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
-                    <configuration>
-                        <classpathDependencyExcludes>
-                            <classpathDependencyExclude>com.powsybl:powsybl-config-classic</classpathDependencyExclude>
-                        </classpathDependencyExcludes>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-
     <dependencyManagement>
         <dependencies>
             <!-- Compilation dependencies -->
