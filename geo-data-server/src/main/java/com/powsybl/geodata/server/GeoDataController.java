@@ -51,22 +51,24 @@ public class GeoDataController {
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get substations geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
+    public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam(required = false) UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
-        List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet);
+        List<SubstationGeoData> substations = networkUuid != null ? geoDataService.getSubstations(network, countrySet)
+                                                                  : geoDataService.getSubstations();
         return ResponseEntity.ok().body(substations);
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get lines geographical data", response = List.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data")})
-    public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,
+    public ResponseEntity<List<LineGeoData>> getLines(@RequestParam(required = false) UUID networkUuid,
                                                       @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
-        List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
+        List<LineGeoData> lines = networkUuid != null ? geoDataService.getLines(network, countrySet)
+                                                      : geoDataService.getLines();
         return ResponseEntity.ok().body(lines);
     }
 
