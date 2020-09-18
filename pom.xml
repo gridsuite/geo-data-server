@@ -16,13 +16,14 @@
         <version>3</version>
     </parent>
 
-    <artifactId>powsybl-geo-data</artifactId>
+    <groupId>org.gridsuite</groupId>
+    <artifactId>gridsuite-geo-data</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>Geo data</name>
     <description>Geographical data management</description>
-    <url>http://www.powsybl.org</url>
+    <url>http://www.gridsuite.org/</url>
 
     <licenses>
         <license>
@@ -32,9 +33,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/powsybl/powsybl-geo-data-store.git</connection>
-        <developerConnection>scm:git:https://github.com/powsybl/powsybl-geo-data-store.git</developerConnection>
-        <url>https://github.com/powsybl/powsybl-geo-data-store</url>
+        <connection>scm:git:https://github.com/gridsuite/geo-data-store.git</connection>
+        <developerConnection>scm:git:https://github.com/gridsuite/geo-data-store.git</developerConnection>
+        <url>https://github.com/gridsuite/geo-data-store</url>
     </scm>
 
     <developers>
