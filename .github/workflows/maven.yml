@@ -44,8 +44,8 @@ jobs:
         run: >
           mvn --batch-mode -DskipTests sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.organization=powsybl-ci-github
-          -Dsonar.projectKey=com.powsybl:powsybl-geo-data
+          -Dsonar.organization=gridsuite
+          -Dsonar.projectKey=org.gridsuite:geo-data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -55,8 +55,8 @@ jobs:
         run: >
           mvn --batch-mode deploy -DskipTests -Dmaven.install.skip -Dmaven.deploy.skip -Dpowsybl.docker.deploy
           -Djib.httpTimeout=60000
-          -Djib.to.image=docker.io/powsybl/geo-data-server
-          -Djib.to.auth.username=powsyblci
+          -Djib.to.image=docker.io/gridsuite/geo-data-server
+          -Djib.to.auth.username=gridsuiteci
           -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Broadcast update event
@@ -64,5 +64,4 @@ jobs:
         uses: gridsuite/broadcast-event@master
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          organizations: gridsuite
           event-type: geo_data_updated
