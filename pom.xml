@@ -54,25 +54,11 @@
     </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
         <java.version>11</java.version>
 
-        <datastax.java-driver.version>4.5.1</datastax.java-driver.version>
-        <embedded-cassandra.version>3.0.3</embedded-cassandra.version>
-        <guava.version>27.0.1-jre</guava.version>
-        <junit.version>4.12</junit.version>
-        <lombok.version>1.18.8</lombok.version>
-        <metricscore.version>3.2.6</metricscore.version>
-        <mockito.version>2.28.2</mockito.version>
-        <springboot.version>2.2.7.RELEASE</springboot.version>
-        <springfox.version>2.9.2</springfox.version>
-        <jimfs.version>1.1</jimfs.version>
-        <slf4j.version>1.7.22</slf4j.version>
-        <xmlunit.version>2.3.0</xmlunit.version>
-
+        <gridsuite-dependencies.version>2</gridsuite-dependencies.version>
         <powsybl-core.version>3.6.0</powsybl-core.version>
-        <network-store.version>1.0.0-SNAPSHOT</network-store.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>
             ../geo-data-distribution/target/site/jacoco-aggregate/jacoco.xml
@@ -85,77 +71,29 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Compilation dependencies -->
+            <!-- overrides of imports -->
+
+            <!-- imports -->
             <dependency>
-                <groupId>io.dropwizard.metrics</groupId>
-                <artifactId>metrics-core</artifactId>
-                <version>${metricscore.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.version}</version>
+                <groupId>org.gridsuite</groupId>
+                <artifactId>gridsuite-dependencies</artifactId>
+                <version>${gridsuite-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
-            <!-- Test dependencies -->
+            <!-- project specific dependencies -->
             <dependency>
-                <groupId>com.github.nosan</groupId>
-                <artifactId>embedded-cassandra-spring-test</artifactId>
-                <version>${embedded-cassandra.version}</version>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-commons</artifactId>
+                <version>${powsybl-core.version}</version>
+                <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.google.jimfs</groupId>
-                <artifactId>jimfs</artifactId>
-                <version>${jimfs.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${springboot.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.xmlunit</groupId>
-                <artifactId>xmlunit-core</artifactId>
-                <version>${xmlunit.version}</version>
-                <scope>test</scope>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
