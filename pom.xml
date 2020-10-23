@@ -56,8 +56,7 @@
     <properties>
         <java.version>11</java.version>
 
-        <gridsuite-dependencies.version>2</gridsuite-dependencies.version>
-        <powsybl-core.version>3.6.0</powsybl-core.version>
+        <gridsuite-dependencies.version>3</gridsuite-dependencies.version>
         <commons-lang3.version>3.9</commons-lang3.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>
@@ -83,13 +82,6 @@
             </dependency>
 
             <!-- project specific dependencies -->
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-commons</artifactId>
-                <version>${powsybl-core.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
