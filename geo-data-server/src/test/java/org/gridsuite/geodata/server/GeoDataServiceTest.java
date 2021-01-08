@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -90,6 +91,12 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
         lineRepository.saveAll(lineEntities);
     }
 
+    static LineGeoData getFromList(List<LineGeoData> list, String id) {
+        Optional<LineGeoData> res = list.stream().filter(l -> l.getId().equals(id)).findAny();
+        assertTrue(res.isPresent());
+        return res.get();
+    }
+
     @Test
     public void test() {
         Network network = createGeoDataNetwork();
@@ -102,8 +109,9 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
-        assertEquals(2, linesGeoData.size());
-        assertEquals(3, linesGeoData.get(0).getCoordinates().size());
+        assertEquals(9, linesGeoData.size());
+        assertEquals(2, getFromList(linesGeoData, "NHV1_NHV2_1").getCoordinates().size()); // line with no coordinate, so [substation1, substation2]
+        assertEquals(5, getFromList(linesGeoData, "NHV2_NHV3").getCoordinates().size()); // line with 3 coordinate, so [substation1, c1, c2, c3, substation2]
 
         List<SubstationGeoData> substationsGeoData2 = geoDataService.getSubstations(network, new HashSet<>(ImmutableList.of(Country.FR, Country.BE)));
 
