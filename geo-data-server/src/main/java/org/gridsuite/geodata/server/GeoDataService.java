@@ -246,7 +246,7 @@ public class GeoDataService {
             return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
                 List.of(substation1Coordinate, substation2Coordinate));
         }
-        // now we are sure that there is at last 1 coordinate in geodata coordinate
+        // now we are sure that there is at least 1 coordinate in geodata coordinate
         if (distance(geoData.getCoordinates().get(0), substation1Coordinate) >
             distance(geoData.getCoordinates().get(0), substation2Coordinate)) {
             LineGeoData fullLine = new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
@@ -307,6 +307,6 @@ public class GeoDataService {
     }
 
     private Map<String, SubstationGeoData> getSubstationMap(Network network, Set<Country> countries) {
-        return getSubstations(network, countries).stream().collect(Collectors.toMap(SubstationGeoData::getId, geoData -> geoData));
+        return getSubstations(network, countries).stream().collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
     }
 }
