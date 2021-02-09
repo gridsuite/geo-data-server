@@ -85,7 +85,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
                 .id("NHV2_NHV3")
                 .country("FR")
                 .otherCountry("FR")
-                .substationStart("NVH2")
+                .substationStart("P2")
                 .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
                 .build());
 
@@ -93,7 +93,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
             .id("NHV3_NHV2")
             .country("FR")
             .otherCountry("FR")
-            .substationStart("NVH3")
+            .substationStart("P3")
             .coordinates(Arrays.asList(new CoordinateEntity(2, 7), new CoordinateEntity(5, 6), new CoordinateEntity(3, 1)))
             .build());
 
@@ -122,7 +122,6 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
         assertEquals(2, getFromList(linesGeoData, "NHV1_NHV2_1").getCoordinates().size()); // line with no coordinate, so [substation1, substation2]
         List<Coordinate> lineNHV2 = getFromList(linesGeoData, "NHV2_NHV3").getCoordinates();
         List<Coordinate> lineNHV3 = new ArrayList<>(getFromList(linesGeoData, "NHV3_NHV2").getCoordinates());
-        Collections.reverse(lineNHV3);
         assertEquals(lineNHV2, lineNHV3); // should be the same path
         assertEquals(5, lineNHV2.size()); // line with 3 coordinate, so [substation1, c1, c2, c3, substation2]
 
@@ -189,12 +188,12 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
         network.newLine()
             .setId("NHV3_NHV2")
-            .setVoltageLevel1(vlhv3.getId())
-            .setBus1(nhv3.getId())
-            .setConnectableBus1(nhv3.getId())
-            .setVoltageLevel2("VLHV2")
-            .setBus2("NHV2")
-            .setConnectableBus2("NHV2")
+            .setVoltageLevel2(vlhv3.getId())
+            .setBus2(nhv3.getId())
+            .setConnectableBus2(nhv3.getId())
+            .setVoltageLevel1("VLHV2")
+            .setBus1("NHV2")
+            .setConnectableBus1("NHV2")
             .setR(3.0)
             .setX(33.0)
             .setG1(0.0)
