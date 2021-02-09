@@ -6,17 +6,19 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import com.powsybl.iidm.network.Country;
 import org.gridsuite.geodata.server.AbstractEmbeddedCassandraSetup;
+import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -51,7 +53,15 @@ public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
         assertEquals("lineID", lines.get(0).getId());
         assertEquals("FR", lines.get(0).getCountry());
         assertEquals("BE", lines.get(0).getOtherCountry());
+        assertEquals("sub", lines.get(0).getSubstationStart());
         assertFalse(lines.get(0).isSide1());
         assertEquals(2, lines.get(0).getCoordinates().size());
+        LineEntity le = LineEntity.create(new LineGeoData("id", Country.AE, Country.AG, "Samy", Collections.emptyList()), true);
+        assertEquals("id", le.getId());
+        assertEquals("AE", le.getCountry());
+        assertEquals("AG", le.getOtherCountry());
+        assertEquals("Samy", le.getSubstationStart());
+        assertTrue(le.isSide1());
+
     }
 }
