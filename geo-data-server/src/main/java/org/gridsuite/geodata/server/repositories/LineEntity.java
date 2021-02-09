@@ -34,6 +34,8 @@ public class LineEntity {
 
     private String otherCountry;
 
+    private String substationStart;
+
     private List<CoordinateEntity> coordinates;
 
     public static LineEntity create(LineGeoData l, boolean side1) {
@@ -42,6 +44,7 @@ public class LineEntity {
                 .otherCountry(side1 ? l.getCountry2().toString() : l.getCountry1().toString())
                 .side1(side1)
                 .id(l.getId())
+                .substationStart(l.getSubstationStart())
                 .coordinates(CoordinateEntity.create(l.getCoordinates()))
                 .build();
     }

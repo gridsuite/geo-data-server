@@ -43,18 +43,21 @@ public class LineCustomRepositoryTest extends AbstractEmbeddedCassandraSetup {
                 .id("testId")
                 .country("FR")
                 .otherCountry("BE")
+                .substationStart("subBE")
                 .build());
 
         lineRepository.save(LineEntity.builder()
                 .id("testId2")
                 .country("FR")
                 .otherCountry("FR")
+                .substationStart("subFR")
                 .build());
 
         lineRepository.save(LineEntity.builder()
                 .id("testId3")
                 .country("FR")
                 .otherCountry("GE")
+                .substationStart("subGE")
                 .build());
 
         Map<String, LineGeoData> lines = lineCustomRepository.getLines();
@@ -64,9 +67,11 @@ public class LineCustomRepositoryTest extends AbstractEmbeddedCassandraSetup {
         assertEquals("testId3", new ArrayList<>(lines.values()).get(0).getId());
         assertEquals("GE", new ArrayList<>(lines.values()).get(0).getCountry1().toString());
         assertEquals("FR", new ArrayList<>(lines.values()).get(0).getCountry2().toString());
+        assertEquals("subGE", new ArrayList<>(lines.values()).get(0).getSubstationStart());
 
         assertEquals("testId", new ArrayList<>(lines.values()).get(2).getId());
         assertEquals("BE", new ArrayList<>(lines.values()).get(2).getCountry1().toString());
         assertEquals("FR", new ArrayList<>(lines.values()).get(2).getCountry2().toString());
+        assertEquals("subBE", new ArrayList<>(lines.values()).get(2).getSubstationStart());
     }
 }

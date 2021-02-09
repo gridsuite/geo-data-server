@@ -30,5 +30,7 @@ public class LineGeoData {
 
     private Country country2;
 
+    String substationStart;
+
     private List<Coordinate> coordinates = new ArrayList<>();
 }

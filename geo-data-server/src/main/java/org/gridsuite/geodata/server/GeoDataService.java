@@ -242,38 +242,26 @@ public class GeoDataService {
         Substation sub2 = line.getTerminal2().getVoltageLevel().getSubstation();
         Coordinate substation1Coordinate = substationGeoDataDb.get(sub1.getId()).getCoordinate();
         Coordinate substation2Coordinate = substationGeoDataDb.get(sub2.getId()).getCoordinate();
+
         if (geoData == null || geoData.getCoordinates().isEmpty()) {
-            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
+            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), "",
                 List.of(substation1Coordinate, substation2Coordinate));
         }
-        // now we are sure that there is at least 1 coordinate in geodata coordinate
-        if (distance(geoData.getCoordinates().get(0), substation1Coordinate) >
-            distance(geoData.getCoordinates().get(0), substation2Coordinate)) {
-            LineGeoData fullLine = new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
-                addCoordinates(substation2Coordinate, geoData.getCoordinates(), substation1Coordinate));
-            Collections.reverse(fullLine.getCoordinates());
-            return fullLine;
-        } else {
-            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
-                addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate));
-        }
 
+        boolean reverse = sub2.getId().equals(geoData.getSubstationStart());
+        return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
+            geoData.getSubstationStart(),
+            addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, reverse));
     }
 
-    private static double distance(Coordinate p1, Coordinate p2) {
-        double latDistance = Math.toRadians(p2.getLat() - p1.getLat());
-        double lonDistance = Math.toRadians(p2.getLon() - p1.getLon());
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-            + Math.cos(Math.toRadians(p1.getLat())) * Math.cos(Math.toRadians(p2.getLat()))
-            * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        return  Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    private List<Coordinate> addCoordinates(Coordinate prepend, List<Coordinate> list, Coordinate append) {
+    private List<Coordinate> addCoordinates(Coordinate prepend, List<Coordinate> list, Coordinate append, boolean reverse) {
         List<Coordinate> res = new ArrayList<>(list.size() + 2);
-        res.add(prepend);
+        res.add(reverse ? prepend : append);
         res.addAll(list);
-        res.add(append);
+        res.add(reverse ? append : prepend);
+        if (reverse) {
+            Collections.reverse(res);
+        }
         return res;
 
     }
