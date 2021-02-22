@@ -50,13 +50,4 @@ public class CoordinateTest {
         assertNotEquals(oneTwo, oneOne);
         assertNotEquals(oneTwo, null);
     }
-
-    @Test
-    public void testTestHashCode() {
-        double three = 3.;
-        double four = 4.;
-
-        assertEquals(new Coordinate(3, 4).hashCode(), Objects.hash(three, four));
-    }
-
 }
