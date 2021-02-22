@@ -8,8 +8,6 @@ package org.gridsuite.geodata.extensions;
 
 import org.junit.Test;
 
-import java.util.Objects;
-
 import static org.junit.Assert.*;
 
 /**
