@@ -40,15 +40,15 @@ public class CoordinateTest {
 
     @Test
     public void testTestEquals() {
-        Coordinate unDeux = new Coordinate(1, 2);
-        Coordinate unDeuxBis = new Coordinate(1, 2);
-        Coordinate unUn = new Coordinate(1, 1);
-        Coordinate deuxDeux = new Coordinate(2, 2);
-        assertEquals(unDeux, unDeux);
-        assertEquals(unDeux, unDeuxBis);
-        assertNotEquals(unDeux, deuxDeux);
-        assertNotEquals(unDeux, unUn);
-        assertNotEquals(unDeux, null);
+        Coordinate oneTwo = new Coordinate(1, 2);
+        Coordinate oneTwoBis = new Coordinate(1, 2);
+        Coordinate oneOne = new Coordinate(1, 1);
+        Coordinate twoTwo = new Coordinate(2, 2);
+        assertEquals(oneTwo, oneTwo);
+        assertEquals(oneTwo, oneTwoBis);
+        assertNotEquals(oneTwo, twoTwo);
+        assertNotEquals(oneTwo, oneOne);
+        assertNotEquals(oneTwo, null);
     }
 
     @Test

@@ -256,9 +256,9 @@ public class GeoDataService {
 
     private List<Coordinate> addCoordinates(Coordinate prepend, List<Coordinate> list, Coordinate append, boolean reverse) {
         List<Coordinate> res = new ArrayList<>(list.size() + 2);
-        res.add(reverse ? prepend : append);
+        res.add(prepend);
         res.addAll(list);
-        res.add(reverse ? append : prepend);
+        res.add(append);
         if (reverse) {
             Collections.reverse(res);
         }
