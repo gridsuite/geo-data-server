@@ -34,7 +34,11 @@ public class LineEntity {
 
     private String otherCountry;
 
-    private String substationStart;
+    @Builder.Default
+    private String substationStart = "";
+
+    @Builder.Default
+    private String substationEnd = "";
 
     private List<CoordinateEntity> coordinates;
 
@@ -45,6 +49,7 @@ public class LineEntity {
                 .side1(side1)
                 .id(l.getId())
                 .substationStart(l.getSubstationStart())
+                .substationEnd(l.getSubstationEnd())
                 .coordinates(CoordinateEntity.create(l.getCoordinates()))
                 .build();
     }

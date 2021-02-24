@@ -236,6 +236,10 @@ public class GeoDataService {
         lineRepository.saveAll(linesEntities);
     }
 
+    boolean emptyOrEquals(String emptyable, String s) {
+        return emptyable.isEmpty() || s.equals(emptyable);
+    }
+
     private LineGeoData getLineGeoDataWithEndSubstations(Map<String, LineGeoData> linesGeoDataDb, Map<String, SubstationGeoData> substationGeoDataDb, Line line) {
         LineGeoData geoData = linesGeoDataDb.get(line.getId());
         Substation sub1 = line.getTerminal1().getVoltageLevel().getSubstation();
@@ -243,23 +247,32 @@ public class GeoDataService {
         Coordinate substation1Coordinate = substationGeoDataDb.get(sub1.getId()).getCoordinate();
         Coordinate substation2Coordinate = substationGeoDataDb.get(sub2.getId()).getCoordinate();
 
-        if (geoData == null || geoData.getCoordinates().isEmpty()) {
-            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), "",
+        if (geoData == null || geoData.getCoordinates().isEmpty() || (geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty())) {
+            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
+                List.of(substation1Coordinate, substation2Coordinate));
+        }
+        boolean reverse = false;
+        if (emptyOrEquals(geoData.getSubstationStart(),  sub2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub1.getId())) {
+            reverse = true;
+        } else if (!(emptyOrEquals(geoData.getSubstationStart(), sub1.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub2.getId()))) {
+            LOGGER.error("line {} has different origin end in geographical data ({}, {}) and network data ({}, {})", line.getId(), geoData.getSubstationStart(), geoData.getSubstationEnd(), sub1.getId(), sub2.getId());
+            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
                 List.of(substation1Coordinate, substation2Coordinate));
         }
 
-        boolean reverse = sub2.getId().equals(geoData.getSubstationStart());
         return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
             geoData.getSubstationStart(),
+            geoData.getSubstationEnd(),
             addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, reverse));
     }
 
-    private List<Coordinate> addCoordinates(Coordinate prepend, List<Coordinate> list, Coordinate append, boolean reverse) {
+    private List<Coordinate> addCoordinates(Coordinate substationStart, List<Coordinate> list, Coordinate substationEnd, boolean reverse) {
         List<Coordinate> res = new ArrayList<>(list.size() + 2);
-        res.add(prepend);
+        // we build the line as geoSubStart, [coordinates], geoSubEnd
+        res.add(reverse ? substationEnd : substationStart);
         res.addAll(list);
-        res.add(append);
-        if (reverse) {
+        res.add(reverse ? substationEnd : substationStart);
+        if (reverse) { // so he have the same direction as the network
             Collections.reverse(res);
         }
         return res;

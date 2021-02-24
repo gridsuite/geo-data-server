@@ -41,9 +41,10 @@ public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
                 .side1(false)
                 .id("lineID")
                 .substationStart("sub")
+                .substationEnd("way")
                 .coordinates(coordinateEntities);
 
-        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart=sub, coordinates=[CoordinateEntity(lat=11.0, lon=12.0), CoordinateEntity(lat=13.0, lon=14.1)])", lineEntityBuilder.toString());
+        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, coordinates=[CoordinateEntity(lat=11.0, lon=12.0), CoordinateEntity(lat=13.0, lon=14.1)])", lineEntityBuilder.toString());
 
         repository.save(lineEntityBuilder.build());
 
@@ -54,13 +55,15 @@ public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
         assertEquals("FR", lines.get(0).getCountry());
         assertEquals("BE", lines.get(0).getOtherCountry());
         assertEquals("sub", lines.get(0).getSubstationStart());
+        assertEquals("way", lines.get(0).getSubstationEnd());
         assertFalse(lines.get(0).isSide1());
         assertEquals(2, lines.get(0).getCoordinates().size());
-        LineEntity le = LineEntity.create(new LineGeoData("id", Country.AE, Country.AG, "Samy", Collections.emptyList()), true);
+        LineEntity le = LineEntity.create(new LineGeoData("id", Country.AE, Country.AG, "Samy", "Scooby", Collections.emptyList()), true);
         assertEquals("id", le.getId());
         assertEquals("AE", le.getCountry());
         assertEquals("AG", le.getOtherCountry());
         assertEquals("Samy", le.getSubstationStart());
+        assertEquals("Scooby", le.getSubstationEnd());
         assertTrue(le.isSide1());
 
     }

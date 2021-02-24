@@ -86,15 +86,26 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
                 .country("FR")
                 .otherCountry("FR")
                 .substationStart("P2")
+                .substationEnd("P3")
                 .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
                 .build());
 
         lineEntities.add(LineEntity.builder()
-            .id("NHV3_NHV2")
+            .id("NHV2_NHV3_inverted")
             .country("FR")
             .otherCountry("FR")
-            .substationStart("P3")
-            .coordinates(Arrays.asList(new CoordinateEntity(2, 7), new CoordinateEntity(5, 6), new CoordinateEntity(3, 1)))
+            .substationStart("P2")
+            .substationEnd("P3")
+            .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
+            .build());
+
+        lineEntities.add(LineEntity.builder()
+            .id("WRONG_CONFIG")
+            .country("FR")
+            .otherCountry("FR")
+            .substationStart("OOUPS")
+            .substationEnd("P3")
+            .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
             .build());
 
         lineRepository.saveAll(lineEntities);
@@ -118,13 +129,16 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(List.of(Country.FR)));
 
-        assertEquals(10, linesGeoData.size());
+        assertEquals(11, linesGeoData.size());
         assertEquals(2, getFromList(linesGeoData, "NHV1_NHV2_1").getCoordinates().size()); // line with no coordinate, so [substation1, substation2]
         List<Coordinate> lineNHV2 = getFromList(linesGeoData, "NHV2_NHV3").getCoordinates();
-        List<Coordinate> lineNHV3 = new ArrayList<>(getFromList(linesGeoData, "NHV3_NHV2").getCoordinates());
-        Collections.reverse(lineNHV2);
+        List<Coordinate> lineNHV3 = new ArrayList<>(getFromList(linesGeoData, "NHV2_NHV3_inverted").getCoordinates());
+        Collections.reverse(lineNHV3);
         assertEquals(lineNHV2, lineNHV3); // should be the same path
         assertEquals(5, lineNHV2.size()); // line with 3 coordinate, so [substation1, c1, c2, c3, substation2]
+
+        List<Coordinate> wrong = getFromList(linesGeoData, "WRONG_CONFIG").getCoordinates();
+        assertEquals(2, wrong.size()); // wrong substation origin/end, so only (sub1, sub2)
 
         List<SubstationGeoData> substationsGeoData2 = geoDataService.getSubstations(network, new HashSet<>(ImmutableList.of(Country.FR, Country.BE)));
 
@@ -188,7 +202,23 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
                 .add();
 
         network.newLine()
-            .setId("NHV3_NHV2")
+            .setId("NHV2_NHV3_inverted")
+            .setVoltageLevel1(vlhv3.getId())
+            .setBus1(nhv3.getId())
+            .setConnectableBus1(nhv3.getId())
+            .setVoltageLevel2("VLHV2")
+            .setBus2("NHV2")
+            .setConnectableBus2("NHV2")
+            .setR(3.0)
+            .setX(33.0)
+            .setG1(0.0)
+            .setB1(386E-6 / 2)
+            .setG2(0.0)
+            .setB2(386E-6 / 2)
+            .add();
+
+        network.newLine()
+            .setId("WRONG_CONFIG")
             .setVoltageLevel1(vlhv3.getId())
             .setBus1(nhv3.getId())
             .setConnectableBus1(nhv3.getId())

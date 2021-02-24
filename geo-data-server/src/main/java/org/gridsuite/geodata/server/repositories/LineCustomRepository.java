@@ -35,12 +35,14 @@ public class LineCustomRepository {
         Country country = Country.valueOf(row.getString("country"));
         Country otherCountry = Country.valueOf(row.getString("otherCountry"));
         String substationStart = row.getString("substationStart");
+        String substationEnd = row.getString("substationEnd");
         List<Coordinate> coordinates = row.getList("coordinates", Coordinate.class);
         return LineGeoData.builder()
                 .id(id)
                 .country1(side1 ? country : otherCountry)
                 .country2(side1 ? otherCountry : country)
                 .substationStart(substationStart)
+                .substationEnd(substationEnd)
                 .coordinates(coordinates)
                 .build();
     }
