@@ -250,20 +250,22 @@ public class GeoDataService {
         if (geoData == null || geoData.getCoordinates().isEmpty() || (geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty())) {
             return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
                 List.of(substation1Coordinate, substation2Coordinate));
-        }
-        boolean reverse = false;
-        if (emptyOrEquals(geoData.getSubstationStart(),  sub2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub1.getId())) {
-            reverse = true;
-        } else if (!(emptyOrEquals(geoData.getSubstationStart(), sub1.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub2.getId()))) {
-            LOGGER.error("line {} has different origin end in geographical data ({}, {}) and network data ({}, {})", line.getId(), geoData.getSubstationStart(), geoData.getSubstationEnd(), sub1.getId(), sub2.getId());
-            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
-                List.of(substation1Coordinate, substation2Coordinate));
+        } else if (emptyOrEquals(geoData.getSubstationStart(),  sub2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub1.getId())) {
+            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
+                geoData.getSubstationStart(),
+                geoData.getSubstationEnd(),
+                addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, true));
+        } else if (emptyOrEquals(geoData.getSubstationStart(), sub1.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub2.getId())) {
+            return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
+                geoData.getSubstationStart(),
+                geoData.getSubstationEnd(),
+                addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, false));
         }
 
-        return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
-            geoData.getSubstationStart(),
-            geoData.getSubstationEnd(),
-            addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, reverse));
+        LOGGER.error("line {} has different substations set in geographical data ({}, {}) and network data ({}, {})", line.getId(), geoData.getSubstationStart(), geoData.getSubstationEnd(), sub1.getId(), sub2.getId());
+        return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
+            List.of(substation1Coordinate, substation2Coordinate));
+
     }
 
     private List<Coordinate> addCoordinates(Coordinate substationStart, List<Coordinate> list, Coordinate substationEnd, boolean reverse) {
