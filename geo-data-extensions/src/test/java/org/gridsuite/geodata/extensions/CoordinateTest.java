@@ -8,8 +8,7 @@ package org.gridsuite.geodata.extensions;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.*;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -35,5 +34,18 @@ public class CoordinateTest {
         coordinate3.setLon(2);
         assertEquals(1, coordinate3.getLat(), 0);
         assertEquals(2, coordinate3.getLon(), 0);
+    }
+
+    @Test
+    public void testTestEquals() {
+        Coordinate oneTwo = new Coordinate(1, 2);
+        Coordinate oneTwoBis = new Coordinate(1, 2);
+        Coordinate oneOne = new Coordinate(1, 1);
+        Coordinate twoTwo = new Coordinate(2, 2);
+        assertEquals(oneTwo, oneTwo);
+        assertEquals(oneTwo, oneTwoBis);
+        assertNotEquals(oneTwo, twoTwo);
+        assertNotEquals(oneTwo, oneOne);
+        assertNotEquals(oneTwo, null);
     }
 }

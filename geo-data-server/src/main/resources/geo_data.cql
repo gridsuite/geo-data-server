@@ -15,6 +15,8 @@ CREATE TABLE geo_data.lines (
     id text,
     side1 boolean,
     otherCountry text,
+    substationStart text,
+    substationEnd text,
     coordinates frozen<list<geo_data.coordinate>>,
     PRIMARY KEY (country, id)
 );

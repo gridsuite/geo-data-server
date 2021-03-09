@@ -103,6 +103,8 @@ public class GeoDataControllerTest {
                         LineGeoData.builder()
                                 .country1(Country.FR)
                                 .country2(Country.BE)
+                                .substationStart("subFR")
+                                .substationEnd("subBE")
                                 .coordinates(new ArrayList<>())
                                 .build()))))
                 .andExpect(status().isOk());

@@ -23,7 +23,7 @@ public class LineGeoDataTest {
 
     @Test
     public void test() {
-        LineGeoData lineGeoData = new LineGeoData("l", Country.FR, Country.FR, new ArrayList<>());
+        LineGeoData lineGeoData = new LineGeoData("l", Country.FR, Country.FR, "sub1", "sub2", new ArrayList<>());
 
         assertEquals("l", lineGeoData.getId());
         assertEquals(Country.FR, lineGeoData.getCountry1());
@@ -34,11 +34,13 @@ public class LineGeoDataTest {
         lineGeoDataBuilder.id("testId");
         lineGeoDataBuilder.country1(Country.FR);
         lineGeoDataBuilder.country2(Country.FR);
+        lineGeoDataBuilder.substationStart("sub1");
+        lineGeoDataBuilder.substationEnd("sub2");
         lineGeoDataBuilder.coordinates(Arrays.asList(new Coordinate(1, 2), new Coordinate(3, 4)));
 
-        assertEquals("LineGeoData.LineGeoDataBuilder(id=testId, country1=FR, country2=FR, coordinates=[Coordinate(lat=1.0, lon=2.0), Coordinate(lat=3.0, lon=4.0)])",
+        assertEquals("LineGeoData.LineGeoDataBuilder(id=testId, country1=FR, country2=FR, substationStart=sub1, substationEnd=sub2, coordinates=[Coordinate(lat=1.0, lon=2.0), Coordinate(lat=3.0, lon=4.0)])",
                 lineGeoDataBuilder.toString());
-        assertEquals("LineGeoData(id=testId, country1=FR, country2=FR, coordinates=[Coordinate(lat=1.0, lon=2.0), Coordinate(lat=3.0, lon=4.0)])", lineGeoDataBuilder.build().toString());
+        assertEquals("LineGeoData(id=testId, country1=FR, country2=FR, substationStart=sub1, substationEnd=sub2, coordinates=[Coordinate(lat=1.0, lon=2.0), Coordinate(lat=3.0, lon=4.0)])", lineGeoDataBuilder.build().toString());
 
     }
 }

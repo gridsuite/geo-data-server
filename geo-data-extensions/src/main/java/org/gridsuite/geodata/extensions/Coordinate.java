@@ -16,6 +16,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Coordinate {
 
     private  double lat;
@@ -26,4 +27,5 @@ public class Coordinate {
         this.lon = coordinate.getLon();
         this.lat = coordinate.getLat();
     }
+
 }
