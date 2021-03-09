@@ -273,7 +273,7 @@ public class GeoDataService {
         // we build the line as geoSubStart, [coordinates], geoSubEnd
         res.add(reverse ? substationEnd : substationStart);
         res.addAll(list);
-        res.add(reverse ? substationEnd : substationStart);
+        res.add(reverse ? substationStart : substationEnd);
         if (reverse) { // so he have the same direction as the network
             Collections.reverse(res);
         }
