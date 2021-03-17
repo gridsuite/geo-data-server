@@ -6,21 +6,28 @@
  */
 package org.gridsuite.geodata.server;
 
-import com.datastax.driver.core.*;
-import com.powsybl.commons.PowsyblException;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.datastax.oss.driver.api.core.type.UserDefinedType;
+import com.datastax.oss.driver.api.core.type.codec.MappingCodec;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
+import com.datastax.oss.driver.api.core.type.codec.registry.MutableCodecRegistry;
+import com.datastax.oss.driver.api.core.type.reflect.GenericType;
+import com.datastax.oss.driver.internal.core.type.codec.registry.DefaultCodecRegistry;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
-import org.springframework.data.cassandra.config.CassandraClusterFactoryBean;
+import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
+import org.springframework.data.cassandra.config.SessionFactoryFactoryBean;
+import org.springframework.data.cassandra.core.CassandraAdminTemplate;
+import org.springframework.data.cassandra.core.convert.CassandraConverter;
+import org.springframework.data.cassandra.core.convert.MappingCassandraConverter;
 import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
-import org.springframework.data.cassandra.core.mapping.SimpleUserTypeResolver;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -29,84 +36,82 @@ import java.nio.ByteBuffer;
 @PropertySource(value = {"classpath:cassandra.properties"})
 @PropertySource(value = {"file:/config/cassandra.properties"}, ignoreResourceNotFound = true)
 @EnableCassandraRepositories(basePackageClasses = LineRepository.class)
-public class CassandraConfig extends AbstractCassandraConfiguration {
+public class CassandraConfig {
 
-    @Override
-    protected String getKeyspaceName() {
-        return CassandraConstants.KEYSPACE_GEO_DATA;
+    @Bean
+    public CqlSessionFactoryBean session(Environment env) {
+
+        CqlSessionFactoryBean session = new CqlSessionFactoryBean();
+        session.setContactPoints(env.getRequiredProperty("cassandra.contact-points"));
+        session.setPort(Integer.parseInt(env.getRequiredProperty("cassandra.port")));
+        session.setLocalDatacenter("datacenter1");
+        session.setKeyspaceName(CassandraConstants.KEYSPACE_GEO_DATA);
+        return session;
     }
 
     @Bean
-    public CassandraClusterFactoryBean cluster(Environment env) {
-        CassandraClusterFactoryBean clusterFactory = new CassandraClusterFactoryBean();
-        clusterFactory.setContactPoints(env.getRequiredProperty("cassandra.contact-points"));
-        clusterFactory.setPort(Integer.parseInt(env.getRequiredProperty("cassandra.port")));
-
-        CodecRegistry codecRegistry = new CodecRegistry();
-        clusterFactory.setClusterBuilderConfigurer(builder -> {
-            builder.withCodecRegistry(codecRegistry);
-            Cluster cluster = builder.build();
-            KeyspaceMetadata keyspace = cluster.getMetadata().getKeyspace(CassandraConstants.KEYSPACE_GEO_DATA);
-            if (keyspace == null) {
-                throw new PowsyblException("Keyspace '" + CassandraConstants.KEYSPACE_GEO_DATA + "' not found");
-            }
-            UserType coordinateType = keyspace.getUserType("coordinate");
-            TypeCodec<UDTValue> coordinateTypeCodec = codecRegistry.codecFor(coordinateType);
-            CoordinateCodec coordinateCodec = new CoordinateCodec(coordinateTypeCodec, Coordinate.class);
-            codecRegistry.register(coordinateCodec);
-            return builder;
-        });
-        return clusterFactory;
+    public CassandraMappingContext mappingContext() {
+        return new CassandraMappingContext();
     }
 
     @Bean
-    public CassandraMappingContext cassandraMapping(Cluster cluster, Environment env) {
-        CassandraMappingContext mappingContext =  new CassandraMappingContext();
-        mappingContext.setUserTypeResolver(new SimpleUserTypeResolver(cluster, CassandraConstants.KEYSPACE_GEO_DATA));
-        return mappingContext;
+    public CassandraConverter converter(CassandraMappingContext mappingContext) {
+        MappingCassandraConverter mappingCassandraConverter = new MappingCassandraConverter(mappingContext);
+        CodecRegistry codecRegistry = new DefaultCodecRegistry("");
+        mappingCassandraConverter.setCodecRegistry(codecRegistry);
+        return mappingCassandraConverter;
     }
 
-    static class CoordinateCodec extends TypeCodec<Coordinate> {
+    @Bean
+    public SessionFactoryFactoryBean sessionFactory(CqlSession session, CassandraConverter converter) {
+        SessionFactoryFactoryBean sessionFactory = new SessionFactoryFactoryBean();
+        sessionFactory.setSession(session);
+        sessionFactory.setConverter(converter);
 
-        private final TypeCodec<UDTValue> innerCodec;
+        CodecRegistry codecRegistry = session.getContext().getCodecRegistry();
 
-        private final UserType userType;
+        UserDefinedType coordinateUdt =
+                session
+                        .getMetadata()
+                        .getKeyspace(CassandraConstants.KEYSPACE_GEO_DATA)
+                        .flatMap(ks -> ks.getUserDefinedType("coordinate"))
+                        .orElseThrow(IllegalStateException::new);
+        // The "inner" codec that handles the conversions from CQL from/to UdtValue
+        TypeCodec<UdtValue> innerCodec = codecRegistry.codecFor(coordinateUdt);
+        // The mapping codec that will handle the conversions from/to UdtValue and Coordinates
+        CoordinateCodec coordinateCodec = new CoordinateCodec(innerCodec);
+        ((MutableCodecRegistry) codecRegistry).register(coordinateCodec);
 
-        public CoordinateCodec(TypeCodec<UDTValue> innerCodec, Class<Coordinate> javaType) {
-            super(innerCodec.getCqlType(), javaType);
-            this.innerCodec = innerCodec;
-            this.userType = (UserType) innerCodec.getCqlType();
+        return sessionFactory;
+    }
+
+    @Bean
+    public CassandraAdminTemplate cassandraTemplate(CqlSession session, CassandraConverter converter) {
+        return new CassandraAdminTemplate(session, converter);
+    }
+
+    static class CoordinateCodec extends MappingCodec<UdtValue, Coordinate> {
+
+        public CoordinateCodec(TypeCodec<UdtValue> innerCodec) {
+            super(innerCodec, GenericType.of(Coordinate.class));
         }
 
         @Override
-        public ByteBuffer serialize(Coordinate value, ProtocolVersion protocolVersion) {
-            return innerCodec.serialize(toUDTValue(value), protocolVersion);
+        public UserDefinedType getCqlType() {
+            return (UserDefinedType) super.getCqlType();
         }
 
         @Override
-        public Coordinate deserialize(ByteBuffer bytes, ProtocolVersion protocolVersion) {
-            return toCoordinate(innerCodec.deserialize(bytes, protocolVersion));
-        }
-
-        @Override
-        public Coordinate parse(String value) {
-            return value == null || value.isEmpty()  ? null : toCoordinate(innerCodec.parse(value));
-        }
-
-        @Override
-        public String format(Coordinate value) {
-            return value == null ? null : innerCodec.format(toUDTValue(value));
-        }
-
-        protected Coordinate toCoordinate(UDTValue value) {
+        protected Coordinate innerToOuter(UdtValue value) {
             return value == null ? null : new Coordinate(
                     value.getDouble("lat"),
                     value.getDouble("lon")
             );
         }
 
-        protected UDTValue toUDTValue(Coordinate value) {
-            return value == null ? null : userType.newValue()
+        @Override
+        protected UdtValue outerToInner(Coordinate value) {
+            return value == null ? null : getCqlType().newValue()
                     .setDouble("lat", value.getLat())
                     .setDouble("lon", value.getLon());
         }
