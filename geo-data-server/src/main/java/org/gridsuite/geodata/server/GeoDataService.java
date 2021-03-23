@@ -240,13 +240,32 @@ public class GeoDataService {
         return emptyable.isEmpty() || s.equals(emptyable);
     }
 
+    /**
+     * returns the line gps coordinates in the network order with the substations
+     * coordinates added at each extremity.
+     *
+     * returns null when the substations at the end of the line are missing.
+     */
     private LineGeoData getLineGeoDataWithEndSubstations(Map<String, LineGeoData> linesGeoDataDb, Map<String, SubstationGeoData> substationGeoDataDb, Line line) {
         LineGeoData geoData = linesGeoDataDb.get(line.getId());
         Substation sub1 = line.getTerminal1().getVoltageLevel().getSubstation();
         Substation sub2 = line.getTerminal2().getVoltageLevel().getSubstation();
-        Coordinate substation1Coordinate = substationGeoDataDb.get(sub1.getId()).getCoordinate();
-        Coordinate substation2Coordinate = substationGeoDataDb.get(sub2.getId()).getCoordinate();
+        SubstationGeoData substation1GeoData = substationGeoDataDb.get(sub1.getId());
+        SubstationGeoData substation2GeoData = substationGeoDataDb.get(sub2.getId());
 
+        // TODO: we return null here even if we have line data
+        // because the method is called "withEndSubstations"...
+        // We could refactor this in separate methods if we ever have a
+        // need to return the line in the network order without the substations
+        if (substation1GeoData == null || substation2GeoData == null) {
+            LOGGER.error("line {} has substations with unknown gps positions({}={}, {}={})", line.getId(),
+                    sub1.getId(), substation1GeoData,
+                    sub2.getId(), substation2GeoData);
+            return null;
+        }
+
+        Coordinate substation1Coordinate = substation1GeoData.getCoordinate();
+        Coordinate substation2Coordinate = substation2GeoData.getCoordinate();
         if (geoData == null || geoData.getCoordinates().isEmpty() || (geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty())) {
             return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
                 List.of(substation1Coordinate, substation2Coordinate));
@@ -303,7 +322,8 @@ public class GeoDataService {
             lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().getNullableCountry()).filter(Objects::nonNull))
             .collect(Collectors.toSet());
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMap(network, countryAndNextTo);
-        List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line)).collect(Collectors.toList());
+        List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line))
+                .filter(Objects::nonNull).collect(Collectors.toList());
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
