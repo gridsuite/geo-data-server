@@ -150,6 +150,65 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
         assertEquals(1, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
     }
 
+    @Test
+    public void testNonExisting() {
+        Network network = EurostagTutorialExample1Factory.create();
+        Substation notexistsub1 = network.newSubstation()
+                .setId("NOTEXISTSUB1")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+        VoltageLevel notexistvl1 = notexistsub1.newVoltageLevel()
+                .setId("NOTEXISTVL1")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus notexistbus1 = notexistvl1.getBusBreakerView().newBus()
+                .setId("NOTEXISTBUS1")
+                .add();
+
+        Substation notexistsub2 = network.newSubstation()
+                .setId("NOTEXISTSUB2")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+        VoltageLevel notexistvl2 = notexistsub2.newVoltageLevel()
+                .setId("NOTEXISTVL2")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus notexistbus2 = notexistvl2.getBusBreakerView().newBus()
+                .setId("NOTEXISTBUS2")
+                .add();
+
+        Line notexistline = network.newLine()
+                .setId("NOTEXISTLINE1")
+                .setVoltageLevel1(notexistvl1.getId())
+                .setBus1(notexistbus1.getId())
+                .setConnectableBus1(notexistbus1.getId())
+                .setVoltageLevel2(notexistvl2.getId())
+                .setBus2(notexistbus2.getId())
+                .setConnectableBus2(notexistbus2.getId())
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
+        assertFalse("Must not contain nulls", substationsGeoData.stream().anyMatch(Objects::isNull));
+        assertFalse("Must not contain unknown substation " + notexistsub1.getId(),
+                substationsGeoData.stream().anyMatch(s -> notexistsub1.getId().equals(s.getId())));
+        assertFalse("Must not contain unknown substation " + notexistsub2.getId(),
+                substationsGeoData.stream().anyMatch(s -> notexistsub2.getId().equals(s.getId())));
+
+        List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(Collections.singletonList(Country.FR)));
+        assertFalse("Must not contain nulls", linesGeoData.stream().anyMatch(Objects::isNull));
+        assertFalse("Must not contain unknown lines " + notexistline.getId(),
+                linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())));
+    }
+
     private Network createGeoDataNetwork() {
         Network network = EurostagTutorialExample1Factory.create();
 
