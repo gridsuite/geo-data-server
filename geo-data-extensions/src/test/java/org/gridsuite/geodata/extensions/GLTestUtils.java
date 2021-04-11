@@ -26,7 +26,7 @@ public final class GLTestUtils {
     }
 
     public static Network getNetwork() {
-        Network network = NetworkFactory.create("Network", "test");
+        Network network = Network.create("Network", "test");
         network.setCaseDate(DateTime.parse("2018-01-01T00:30:00.000+01:00"));
         Substation substation1 = network.newSubstation()
                 .setId("Substation1")
