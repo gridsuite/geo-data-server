@@ -42,7 +42,7 @@ public class EmbeddedCassandraFactoryConfig {
     @Bean
     CassandraConnection cassandraConnection(Cassandra cassandra) {
         CassandraConnection cassandraConnection = new DefaultCassandraConnectionFactory().create(cassandra);
-        CqlDataSet.ofClasspaths("create_keyspace.cql", "geo_data.cql").forEachStatement(cassandraConnection::execute);
+        CqlDataSet.ofClasspaths("create_keyspace.cql").add(CqlDataSet.ofStrings("USE geo_data;")).add(CqlDataSet.ofClasspaths("geo_data.cql")).forEachStatement(cassandraConnection::execute);
         return cassandraConnection;
     }
 

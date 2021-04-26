@@ -10,6 +10,7 @@ import com.datastax.driver.core.*;
 import com.powsybl.commons.PowsyblException;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.repositories.LineRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -31,9 +32,12 @@ import java.nio.ByteBuffer;
 @EnableCassandraRepositories(basePackageClasses = LineRepository.class)
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
+    @Value("${cassandra-keyspace:geo_data}")
+    private String keyspaceName;
+
     @Override
     protected String getKeyspaceName() {
-        return CassandraConstants.KEYSPACE_GEO_DATA;
+        return keyspaceName;
     }
 
     @Bean
@@ -46,13 +50,13 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
         clusterFactory.setClusterBuilderConfigurer(builder -> {
             builder.withCodecRegistry(codecRegistry);
             Cluster cluster = builder.build();
-            KeyspaceMetadata keyspace = cluster.getMetadata().getKeyspace(CassandraConstants.KEYSPACE_GEO_DATA);
+            KeyspaceMetadata keyspace = cluster.getMetadata().getKeyspace(getKeyspaceName());
             if (keyspace == null) {
-                throw new PowsyblException("Keyspace '" + CassandraConstants.KEYSPACE_GEO_DATA + "' not found");
+                throw new PowsyblException("Keyspace '" + getKeyspaceName() + "' not found");
             }
-            UserType coordinateType = keyspace.getUserType("coordinate");
+            var coordinateType = keyspace.getUserType("coordinate");
             TypeCodec<UDTValue> coordinateTypeCodec = codecRegistry.codecFor(coordinateType);
-            CoordinateCodec coordinateCodec = new CoordinateCodec(coordinateTypeCodec, Coordinate.class);
+            var coordinateCodec = new CoordinateCodec(coordinateTypeCodec, Coordinate.class);
             codecRegistry.register(coordinateCodec);
             return builder;
         });
@@ -62,7 +66,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
     @Bean
     public CassandraMappingContext cassandraMapping(Cluster cluster, Environment env) {
         CassandraMappingContext mappingContext =  new CassandraMappingContext();
-        mappingContext.setUserTypeResolver(new SimpleUserTypeResolver(cluster, CassandraConstants.KEYSPACE_GEO_DATA));
+        mappingContext.setUserTypeResolver(new SimpleUserTypeResolver(cluster, getKeyspaceName()));
         return mappingContext;
     }
 

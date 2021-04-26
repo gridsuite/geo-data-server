@@ -1,3 +1,3 @@
-TRUNCATE geo_data.substations;
+TRUNCATE substations;
 
-TRUNCATE geo_data.lines;
+TRUNCATE lines;
