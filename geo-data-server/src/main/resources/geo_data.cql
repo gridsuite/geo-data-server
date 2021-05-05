@@ -1,22 +1,22 @@
-CREATE TYPE geo_data.coordinate (
+CREATE TYPE coordinate (
     lat double,
     lon double,
 );
 
-CREATE TABLE geo_data.substations (
+CREATE TABLE substations (
     country text,
     id text,
-    coordinate frozen<geo_data.coordinate>,
+    coordinate frozen<coordinate>,
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE geo_data.lines (
+CREATE TABLE lines (
     country text,
     id text,
     side1 boolean,
     otherCountry text,
     substationStart text,
     substationEnd text,
-    coordinates frozen<list<geo_data.coordinate>>,
+    coordinates frozen<list<coordinate>>,
     PRIMARY KEY (country, id)
 );
