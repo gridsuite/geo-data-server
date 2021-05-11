@@ -1,1 +1,1 @@
-CREATE KEYSPACE "%s" WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':1};
+CREATE KEYSPACE "geo_data" WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':1};
