@@ -6,11 +6,8 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import lombok.*;
 import org.gridsuite.geodata.extensions.Coordinate;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
 import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
 import java.util.List;
@@ -29,6 +26,11 @@ public class CoordinateEntity {
     private double lat;
 
     private double lon;
+
+    public CoordinateEntity(Coordinate coordinate) {
+        this.lat = coordinate.getLat();
+        this.lon = coordinate.getLon();
+    }
 
     static List<CoordinateEntity> create(List<Coordinate> coordinates) {
         return coordinates.stream()

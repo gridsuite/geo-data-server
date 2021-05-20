@@ -9,8 +9,7 @@ package org.gridsuite.geodata.server.repositories;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import lombok.*;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
-import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.*;
 
 import java.util.List;
 
@@ -52,5 +51,15 @@ public class LineEntity {
                 .substationEnd(l.getSubstationEnd())
                 .coordinates(CoordinateEntity.create(l.getCoordinates()))
                 .build();
+    }
+
+    public LineEntity(LineGeoData l, boolean side1) {
+        this.country = side1 ? l.getCountry1().toString() : l.getCountry2().toString();
+        this.otherCountry = side1 ? l.getCountry2().toString() : l.getCountry1().toString();
+        this.side1 = side1;
+        this.id = l.getId();
+        this.substationStart = l.getSubstationStart();
+        this.substationEnd = l.getSubstationStart();
+        this.coordinates = CoordinateEntity.create(l.getCoordinates());
     }
 }

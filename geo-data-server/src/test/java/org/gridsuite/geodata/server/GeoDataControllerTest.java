@@ -6,6 +6,7 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
@@ -54,6 +55,9 @@ public class GeoDataControllerTest {
 
     @MockBean
     private CassandraConfig cassandraConfig;
+
+    @MockBean
+    private CqlSession cqlSession;
 
     @MockBean
     private NetworkStoreService service;

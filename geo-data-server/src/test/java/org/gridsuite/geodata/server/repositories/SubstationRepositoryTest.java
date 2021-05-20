@@ -6,7 +6,9 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import org.gridsuite.geodata.server.AbstractEmbeddedCassandraSetup;
+import org.gridsuite.geodata.server.CassandraConfig;
 import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.junit.Test;
@@ -31,6 +33,12 @@ public class SubstationRepositoryTest extends AbstractEmbeddedCassandraSetup {
 
     @Autowired
     private SubstationRepository repository;
+
+    @Autowired
+    private CassandraConfig cassandraConfig;
+
+    @Autowired
+    private CqlSession cqlSession;
 
     @Test
     public void test() {
