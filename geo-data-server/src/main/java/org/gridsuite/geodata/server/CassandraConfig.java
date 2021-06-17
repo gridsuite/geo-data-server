@@ -7,13 +7,6 @@
 package org.gridsuite.geodata.server;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.data.UdtValue;
-import com.datastax.oss.driver.api.core.type.UserDefinedType;
-import com.datastax.oss.driver.api.core.type.codec.MappingCodec;
-import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
-import com.datastax.oss.driver.api.core.type.codec.registry.MutableCodecRegistry;
-import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -58,46 +51,6 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
         var sessionFactory = new SessionFactoryFactoryBean();
         sessionFactory.setSession(session);
         sessionFactory.setConverter(converter);
-
-        var codecRegistry = session.getContext().getCodecRegistry();
-
-        UserDefinedType coordinateUdt =
-                session
-                        .getMetadata()
-                        .getKeyspace(getKeyspaceName())
-                        .flatMap(ks -> ks.getUserDefinedType("coordinate"))
-                        .orElseThrow(IllegalStateException::new);
-        // The "inner" codec that handles the conversions from CQL from/to UdtValue
-        TypeCodec<UdtValue> innerCodec = codecRegistry.codecFor(coordinateUdt);
-        // The mapping codec that will handle the conversions from/to UdtValue and Coordinates
-        var coordinateCodec = new CoordinateCodec(innerCodec);
-        ((MutableCodecRegistry) codecRegistry).register(coordinateCodec);
         return sessionFactory;
-    }
-
-    static class CoordinateCodec extends MappingCodec<UdtValue, Coordinate> {
-
-        public CoordinateCodec(TypeCodec<UdtValue> innerCodec) {
-            super(innerCodec, GenericType.of(Coordinate.class));
-        }
-
-        @Override
-        public UserDefinedType getCqlType() {
-            return (UserDefinedType) super.getCqlType();
-        }
-
-        @Override
-        protected Coordinate innerToOuter(UdtValue value) {
-            return value == null ? null : new Coordinate(
-                    value.getDouble("lat"),
-                    value.getDouble("lon"));
-        }
-
-        @Override
-        protected UdtValue outerToInner(Coordinate value) {
-            return value == null ? null : getCqlType().newValue()
-                    .setDouble("lat", value.getLat())
-                    .setDouble("lon", value.getLon());
-        }
     }
 }

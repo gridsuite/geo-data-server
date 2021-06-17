@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  */
 @UserDefinedType("coordinate")
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Builder
 @ToString

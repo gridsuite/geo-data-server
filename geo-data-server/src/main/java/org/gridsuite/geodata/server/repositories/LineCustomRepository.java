@@ -9,6 +9,7 @@ package org.gridsuite.geodata.server.repositories;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.data.UdtValue;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import com.powsybl.iidm.network.Country;
@@ -36,7 +37,8 @@ public class LineCustomRepository {
         Country otherCountry = Country.valueOf(row.getString("otherCountry"));
         String substationStart = row.getString("substationStart");
         String substationEnd = row.getString("substationEnd");
-        List<Coordinate> coordinates = row.getList("coordinates", Coordinate.class);
+        List<Coordinate> coordinates = row.getList("coordinates", UdtValue.class).stream().map(udtValue ->
+                new Coordinate(udtValue.getDouble("lat"), udtValue.getDouble("lon"))).collect(Collectors.toList());
         return LineGeoData.builder()
                 .id(id)
                 .country1(side1 ? country : otherCountry)
