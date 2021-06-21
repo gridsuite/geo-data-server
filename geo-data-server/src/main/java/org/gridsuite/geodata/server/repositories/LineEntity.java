@@ -52,14 +52,4 @@ public class LineEntity {
                 .coordinates(CoordinateEntity.create(l.getCoordinates()))
                 .build();
     }
-
-    public LineEntity(LineGeoData l, boolean side1) {
-        this.country = side1 ? l.getCountry1().toString() : l.getCountry2().toString();
-        this.otherCountry = side1 ? l.getCountry2().toString() : l.getCountry1().toString();
-        this.side1 = side1;
-        this.id = l.getId();
-        this.substationStart = l.getSubstationStart();
-        this.substationEnd = l.getSubstationStart();
-        this.coordinates = CoordinateEntity.create(l.getCoordinates());
-    }
 }

@@ -28,11 +28,6 @@ public class CoordinateEntity {
 
     private double lon;
 
-    public CoordinateEntity(Coordinate coordinate) {
-        this.lat = coordinate.getLat();
-        this.lon = coordinate.getLon();
-    }
-
     static List<CoordinateEntity> create(List<Coordinate> coordinates) {
         return coordinates.stream()
                 .map(p -> CoordinateEntity.builder()
