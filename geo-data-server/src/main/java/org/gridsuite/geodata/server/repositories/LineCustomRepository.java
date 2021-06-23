@@ -6,9 +6,10 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.data.UdtValue;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import com.powsybl.iidm.network.Country;
@@ -27,16 +28,17 @@ import java.util.stream.Collectors;
 public class LineCustomRepository {
 
     @Autowired
-    private Session session;
+    private CqlSession session;
 
     private static LineGeoData rowToLineGeoData(Row row) {
         String id = row.getString("id");
-        boolean side1 = row.getBool("side1");
+        boolean side1 = row.getBoolean("side1");
         Country country = Country.valueOf(row.getString("country"));
         Country otherCountry = Country.valueOf(row.getString("otherCountry"));
         String substationStart = row.getString("substationStart");
         String substationEnd = row.getString("substationEnd");
-        List<Coordinate> coordinates = row.getList("coordinates", Coordinate.class);
+        List<Coordinate> coordinates = row.getList("coordinates", UdtValue.class).stream().map(udtValue ->
+                new Coordinate(udtValue.getDouble("lat"), udtValue.getDouble("lon"))).collect(Collectors.toList());
         return LineGeoData.builder()
                 .id(id)
                 .country1(side1 ? country : otherCountry)

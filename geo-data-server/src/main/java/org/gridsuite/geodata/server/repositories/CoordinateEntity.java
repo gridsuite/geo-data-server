@@ -6,11 +6,8 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import lombok.*;
 import org.gridsuite.geodata.extensions.Coordinate;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
 import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
 import java.util.List;
@@ -21,6 +18,7 @@ import java.util.stream.Collectors;
  */
 @UserDefinedType("coordinate")
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Builder
 @ToString
