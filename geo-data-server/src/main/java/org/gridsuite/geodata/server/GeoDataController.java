@@ -6,15 +6,15 @@
  */
 package org.gridsuite.geodata.server;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = GeoDataController.API_VERSION)
-@Api(value = "Geo data")
+@Tag(name = "Geo data")
 @ComponentScan(basePackageClasses = {GeoDataController.class, GeoDataService.class, NetworkStoreService.class})
 public class GeoDataController {
 
@@ -49,8 +49,8 @@ public class GeoDataController {
     }
 
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get substations geographical data", response = List.class)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data")})
+    @Operation(summary = "Get substations geographical data")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
@@ -60,8 +60,8 @@ public class GeoDataController {
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get lines geographical data", response = List.class)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data")})
+    @Operation(summary = "Get lines geographical data")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,
                                                       @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
@@ -71,15 +71,15 @@ public class GeoDataController {
     }
 
     @PostMapping(value = "/substations")
-    @ApiOperation(value = "Save substations geographical data")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Substations geographical data have been correctly saved")})
+    @Operation(summary = "Save substations geographical data")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data have been correctly saved")})
     public void saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
         geoDataService.saveSubstations(substationGeoData);
     }
 
     @PostMapping(value = "/lines")
-    @ApiOperation(value = "Save lines geographical data")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Lines geographical data have been correctly saved")})
+    @Operation(summary = "Save lines geographical data")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data have been correctly saved")})
     public void saveLines(@RequestBody List<LineGeoData> linesGeoData) {
         geoDataService.saveLines(linesGeoData);
     }
