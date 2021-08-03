@@ -56,7 +56,7 @@
     <properties>
         <java.version>11</java.version>
 
-        <gridsuite-dependencies.version>9</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>10</gridsuite-dependencies.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <springdoc-openapi.version>1.4.8</springdoc-openapi.version>
 
@@ -87,11 +87,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc-openapi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
