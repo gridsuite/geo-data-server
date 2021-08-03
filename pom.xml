@@ -58,7 +58,6 @@
 
         <gridsuite-dependencies.version>10</gridsuite-dependencies.version>
         <commons-lang3.version>3.9</commons-lang3.version>
-        <springdoc-openapi.version>1.4.8</springdoc-openapi.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>
             ../geo-data-distribution/target/site/jacoco-aggregate/jacoco.xml
