@@ -195,9 +195,9 @@ public class GeoDataService {
 
         for (Substation s : substations) {
             for (VoltageLevel vl : s.getVoltageLevels()) {
-                for (Branch<?> branch : vl.getConnectables(Branch.class)) {
-                    Substation s1 = branch.getTerminal1().getVoltageLevel().getSubstation();
-                    Substation s2 = branch.getTerminal2().getVoltageLevel().getSubstation();
+                for (Line line : vl.getConnectables(Line.class)) {
+                    Substation s1 = line.getTerminal1().getVoltageLevel().getSubstation();
+                    Substation s2 = line.getTerminal2().getVoltageLevel().getSubstation();
                     if (s1 != s) {
                         neighbours.get(s.getId()).add(s1.getId());
                     } else if (s2 != s) {
