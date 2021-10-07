@@ -20,6 +20,10 @@
     <name>Geo data server</name>
     <description>Geographical data server</description>
 
+    <properties>
+        <jib.container.environment>SPRING_PROFILES_ACTIVE=default</jib.container.environment>
+    </properties>
+
     <build>
         <pluginManagement>
             <plugins>
