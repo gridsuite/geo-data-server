@@ -196,8 +196,8 @@ public class GeoDataService {
         for (Substation s : substations) {
             for (VoltageLevel vl : s.getVoltageLevels()) {
                 for (Line line : vl.getConnectables(Line.class)) {
-                    Substation s1 = line.getTerminal1().getVoltageLevel().getSubstation();
-                    Substation s2 = line.getTerminal2().getVoltageLevel().getSubstation();
+                    Substation s1 = line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(); // TODO
+                    Substation s2 = line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow(); // TODO
                     if (s1 != s) {
                         neighbours.get(s.getId()).add(s1.getId());
                     } else if (s2 != s) {
@@ -248,8 +248,8 @@ public class GeoDataService {
      */
     private LineGeoData getLineGeoDataWithEndSubstations(Map<String, LineGeoData> linesGeoDataDb, Map<String, SubstationGeoData> substationGeoDataDb, Line line) {
         LineGeoData geoData = linesGeoDataDb.get(line.getId());
-        Substation sub1 = line.getTerminal1().getVoltageLevel().getSubstation();
-        Substation sub2 = line.getTerminal2().getVoltageLevel().getSubstation();
+        Substation sub1 = line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(); // TODO
+        Substation sub2 = line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow(); // TODO
         SubstationGeoData substation1GeoData = substationGeoDataDb.get(sub1.getId());
         SubstationGeoData substation2GeoData = substationGeoDataDb.get(sub2.getId());
 
@@ -314,12 +314,12 @@ public class GeoDataService {
 
         List<Line> lines = network.getLineStream()
                 .filter(line -> countries.isEmpty()
-                        || line.getTerminal1().getVoltageLevel().getSubstation().getCountry().map(countries::contains).isPresent()
-                        || line.getTerminal2().getVoltageLevel().getSubstation().getCountry().map(countries::contains).isPresent())
+                        || line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow().getCountry().map(countries::contains).isPresent() // TODO
+                        || line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow().getCountry().map(countries::contains).isPresent()) // TODO
                 .collect(Collectors.toList());
         // we also want the destination substation (so we add the neighbouring country)
         Set<Country> countryAndNextTo =
-            lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().getNullableCountry()).filter(Objects::nonNull))
+            lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull)) // TODO
             .collect(Collectors.toSet());
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMap(network, countryAndNextTo);
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line))
