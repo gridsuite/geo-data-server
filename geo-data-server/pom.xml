@@ -20,10 +20,6 @@
     <name>Geo data server</name>
     <description>Geographical data server</description>
 
-    <properties>
-        <jib.container.environment>SPRING_PROFILES_ACTIVE=default</jib.container.environment>
-    </properties>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -86,7 +82,7 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-iidm-test</artifactId>
+            <artifactId>powsybl-ws-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.gridsuite</groupId>
@@ -143,6 +139,11 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-iidm-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

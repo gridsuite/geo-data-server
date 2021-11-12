@@ -1,9 +1,6 @@
-server:
-  forward-headers-strategy: framework
-
 spring:
-  profiles:
-    active: default,local
+  application:
+    name: geo-data-server
 
 network-store-server:
    preloading-strategy: COLLECTION
