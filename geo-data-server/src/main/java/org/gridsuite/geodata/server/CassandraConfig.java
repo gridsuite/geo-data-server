@@ -28,7 +28,7 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 @EnableCassandraRepositories(basePackageClasses = LineRepository.class)
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
-    @Value("${cassandra-keyspace:geo_data}")
+    @Value("${powsybl-ws.cassandra.keyspace.prefix:}${cassandra-keyspace:geo_data}")
     private String keyspaceName;
 
     @Override
