@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
+ * @author Jacques Borsenberger <jacques.borsenberger at rte-france.com>
  */
 @Service
 public class GeoDataService {
@@ -42,15 +44,15 @@ public class GeoDataService {
     @Autowired
     private LineRepository lineRepository;
 
-    @Autowired
-    private LineCustomRepository lineCustomRepository;
+    private Set<String> toCountryIds(Collection<Country> countries) {
+        return countries.stream().map(Country::name).collect(Collectors.toSet());
+    }
 
     private Map<String, SubstationGeoData> readSubstationGeoDataFromDb(Set<Country> countries) {
         // read substations from DB
-        // TODO filter by country
         StopWatch stopWatch = StopWatch.createStarted();
 
-        List<SubstationEntity> substationEntities = substationRepository.findAll();
+        List<SubstationEntity> substationEntities = substationRepository.findByCountryIn(toCountryIds(countries));
         Map<String, SubstationGeoData> substationsGeoDataDB = substationEntities.stream()
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
@@ -300,7 +302,8 @@ public class GeoDataService {
 
     }
 
-    List<LineGeoData> getLines(Network network, Set<Country> countries) {
+    @Transactional
+    public List<LineGeoData> getLines(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
@@ -309,17 +312,13 @@ public class GeoDataService {
         StopWatch stopWatch = StopWatch.createStarted();
 
         // read lines from DB
-        // TODO filter by country
-        Map<String, LineGeoData> linesGeoDataDb = lineCustomRepository.getLines();
+        Map<String, LineGeoData> linesGeoDataDb = lineRepository.findByCountryInOrOtherCountryIn(toCountryIds(countries)).stream()
+            .collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
-        List<Line> lines = network.getLineStream()
-                .filter(line -> countries.isEmpty()
-                        || line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow().getCountry().map(countries::contains).isPresent() // TODO
-                        || line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow().getCountry().map(countries::contains).isPresent()) // TODO
-                .collect(Collectors.toList());
+        List<Line> lines = network.getLineStream().collect(Collectors.toList());
         // we also want the destination substation (so we add the neighbouring country)
         Set<Country> countryAndNextTo =
-            lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull)) // TODO
+            lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull))
             .collect(Collectors.toSet());
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMap(network, countryAndNextTo);
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line))
@@ -327,6 +326,18 @@ public class GeoDataService {
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
+    }
+
+    private LineGeoData toDto(LineEntity lineEntity) {
+        return new LineGeoData(lineEntity.getId(), toDtoCountry(lineEntity.getCountry()), toDtoCountry(lineEntity.getOtherCountry()), lineEntity.getSubstationStart(), lineEntity.getSubstationEnd(), toDto(lineEntity.getCoordinates()));
+    }
+
+    private Country toDtoCountry(String country) {
+        return Country.valueOf(country);
+    }
+
+    private List<Coordinate> toDto(List<CoordinateEmbeddable> coordinates) {
+        return coordinates.stream().map(e -> new Coordinate(e.getLat(), e.getLon())).collect(Collectors.toList());
     }
 
     private Map<String, SubstationGeoData> getSubstationMap(Network network, Set<Country> countries) {

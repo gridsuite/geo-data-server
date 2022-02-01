@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 @ContextHierarchy({
     @ContextConfiguration(classes = GeoDataApplication.class)
     })
-public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
+public class GeoDataServiceTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,24 +50,26 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
 
     @Before
     public void setUp() {
+        lineRepository.deleteAll();
+        substationRepository.deleteAll();
         List<SubstationEntity> substationEntities = new ArrayList<>();
 
         substationEntities.add(SubstationEntity.builder()
                 .id("P1")
                 .country("FR")
-                .coordinate(new CoordinateEntity(1, 1))
+                .coordinate(new CoordinateEmbeddable(1, 1))
                 .build());
 
         substationEntities.add(SubstationEntity.builder()
                 .id("P2")
                 .country("FR")
-                .coordinate(new CoordinateEntity(3, 1))
+                .coordinate(new CoordinateEmbeddable(3, 1))
                 .build());
 
         substationEntities.add(SubstationEntity.builder()
                 .id("P3")
                 .country("FR")
-                .coordinate(new CoordinateEntity(2, 7))
+                .coordinate(new CoordinateEmbeddable(2, 7))
                 .build());
 
         substationRepository.saveAll(substationEntities);
@@ -78,7 +80,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
                 .id("NHV2_NHV5")
                 .country("BE")
                 .otherCountry("FR")
-                .coordinates(Arrays.asList(new CoordinateEntity(2, 1), new CoordinateEntity(2.5, 1), new CoordinateEntity(3, 1)))
+                .coordinates(Arrays.asList(new CoordinateEmbeddable(2, 1), new CoordinateEmbeddable(2.5, 1), new CoordinateEmbeddable(3, 1)))
                 .build());
 
         lineEntities.add(LineEntity.builder()
@@ -87,7 +89,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
                 .otherCountry("FR")
                 .substationStart("P2")
                 .substationEnd("P3")
-                .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
+                .coordinates(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7)))
                 .build());
 
         lineEntities.add(LineEntity.builder()
@@ -96,7 +98,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
             .otherCountry("FR")
             .substationStart("P2")
             .substationEnd("P3")
-            .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
+            .coordinates(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7)))
             .build());
 
         lineEntities.add(LineEntity.builder()
@@ -105,7 +107,7 @@ public class GeoDataServiceTest extends AbstractEmbeddedCassandraSetup  {
             .otherCountry("FR")
             .substationStart("OOUPS")
             .substationEnd("P3")
-            .coordinates(Arrays.asList(new CoordinateEntity(3, 1), new CoordinateEntity(5, 6), new CoordinateEntity(2, 7)))
+            .coordinates(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7)))
             .build());
 
         lineRepository.saveAll(lineEntities);

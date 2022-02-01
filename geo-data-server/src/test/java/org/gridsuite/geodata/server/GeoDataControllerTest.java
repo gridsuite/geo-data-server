@@ -6,7 +6,6 @@
  */
 package org.gridsuite.geodata.server;
 
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
@@ -14,7 +13,6 @@ import com.powsybl.network.store.client.NetworkStoreService;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import org.gridsuite.geodata.server.repositories.LineCustomRepository;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationRepository;
 import org.junit.Test;
@@ -54,12 +52,6 @@ public class GeoDataControllerTest {
     private GeoDataService geoDataService;
 
     @MockBean
-    private CassandraConfig cassandraConfig;
-
-    @MockBean
-    private CqlSession cqlSession;
-
-    @MockBean
     private NetworkStoreService service;
 
     @MockBean
@@ -67,9 +59,6 @@ public class GeoDataControllerTest {
 
     @MockBean
     private LineRepository lineRepository;
-
-    @MockBean
-    private LineCustomRepository lineCustomRepository;
 
     @Test
     public void test() throws Exception {

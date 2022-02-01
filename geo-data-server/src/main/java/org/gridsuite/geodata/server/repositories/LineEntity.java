@@ -8,38 +8,54 @@ package org.gridsuite.geodata.server.repositories;
 
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import lombok.*;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.*;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@Table("lines")
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
+@Table(indexes = {@Index(name = "lineEntity_country_index", columnList = "country"),
+    @Index(name = "lineEntity_otherCountry_index", columnList = "otherCountry")})
 public class LineEntity {
 
-    @PrimaryKeyColumn(ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+    @Column
     private String country;
 
-    @PrimaryKeyColumn(ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+    @Id
+    @Column
     private String id;
 
+    @Column
     private boolean side1;
 
+    @Column
     private String otherCountry;
 
+    @Column
     @Builder.Default
     private String substationStart = "";
 
+    @Column
     @Builder.Default
     private String substationEnd = "";
 
-    private List<CoordinateEntity> coordinates;
+    @Column
+    @CollectionTable(foreignKey = @ForeignKey(name = "lineEntity_coordinate_fk"), indexes = @Index(name = "lineEntity_coordinate_id_index", columnList = "line_entity_id"))
+    @ElementCollection
+    private List<CoordinateEmbeddable> coordinates;
 
     public static LineEntity create(LineGeoData l, boolean side1) {
         return LineEntity.builder()
@@ -49,7 +65,7 @@ public class LineEntity {
                 .id(l.getId())
                 .substationStart(l.getSubstationStart())
                 .substationEnd(l.getSubstationEnd())
-                .coordinates(CoordinateEntity.create(l.getCoordinates()))
+                .coordinates(CoordinateEmbeddable.create(l.getCoordinates()))
                 .build();
     }
 }
