@@ -47,9 +47,4 @@ java.io.IOException: Connexion ré-initialisée par le correspondant
     <logger name="org.springframework.boot.test" level="warn"/>
     <logger name="com.datastax.driver.core" level="warn"/>
 
-    <!--
-        suppress forked cassandra stdout output
-    -->
-    <logger name="com.github.nosan.embedded.cassandra.api.Cassandra" level="warn"/>
-
 </configuration>

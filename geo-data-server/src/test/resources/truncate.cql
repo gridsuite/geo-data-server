@@ -1,3 +1,0 @@
-TRUNCATE substations;
-
-TRUNCATE lines;

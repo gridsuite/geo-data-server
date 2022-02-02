@@ -16,6 +16,7 @@ import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class LineEntity {
     private String substationEnd = "";
 
     @Column
+    @OrderColumn
     @CollectionTable(foreignKey = @ForeignKey(name = "lineEntity_coordinate_fk"), indexes = @Index(name = "lineEntity_coordinate_id_index", columnList = "line_entity_id"))
     @ElementCollection
     private List<CoordinateEmbeddable> coordinates;

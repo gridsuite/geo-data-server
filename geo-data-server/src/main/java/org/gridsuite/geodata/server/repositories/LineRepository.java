@@ -19,8 +19,6 @@ import java.util.List;
 @Repository
 public interface LineRepository extends JpaRepository<LineEntity, String> {
 
-    List<LineEntity> findByCountry(String country);
-
     default List<LineEntity> findByCountryInOrOtherCountryIn(Collection<String> countries) {
         return findByCountryInOrOtherCountryIn(countries, countries);
     }

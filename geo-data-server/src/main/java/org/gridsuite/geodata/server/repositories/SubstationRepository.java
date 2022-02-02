@@ -18,7 +18,5 @@ import java.util.List;
 @Repository
 public interface SubstationRepository extends JpaRepository<SubstationEntity, String> {
 
-    List<SubstationEntity> findByCountry(String country);
-
     List<SubstationEntity> findByCountryIn(Collection<String> country);
 }
