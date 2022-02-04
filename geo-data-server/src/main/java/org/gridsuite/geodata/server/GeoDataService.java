@@ -52,7 +52,8 @@ public class GeoDataService {
         // read substations from DB
         StopWatch stopWatch = StopWatch.createStarted();
 
-        List<SubstationEntity> substationEntities = substationRepository.findByCountryIn(toCountryIds(countries));
+        List<SubstationEntity> substationEntities = countries.isEmpty() ? substationRepository.findAll() :
+            substationRepository.findByCountryIn(toCountryIds(countries));
         Map<String, SubstationGeoData> substationsGeoDataDB = substationEntities.stream()
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
@@ -302,7 +303,7 @@ public class GeoDataService {
 
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<LineGeoData> getLines(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
@@ -310,10 +311,11 @@ public class GeoDataService {
         Objects.requireNonNull(countries);
 
         StopWatch stopWatch = StopWatch.createStarted();
+        Set<String> lineIds = new TreeSet<>();
 
+        network.getLines().forEach(l -> lineIds.add(l.getId()));
         // read lines from DB
-        Map<String, LineGeoData> linesGeoDataDb = lineRepository.findByCountryInOrOtherCountryIn(toCountryIds(countries)).stream()
-            .collect(Collectors.toMap(LineEntity::getId, this::toDto));
+        Map<String, LineGeoData> linesGeoDataDb  = lineRepository.findAllById(lineIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
         List<Line> lines = network.getLineStream().collect(Collectors.toList());
         // we also want the destination substation (so we add the neighbouring country)
@@ -329,7 +331,10 @@ public class GeoDataService {
     }
 
     private LineGeoData toDto(LineEntity lineEntity) {
-        return new LineGeoData(lineEntity.getId(), toDtoCountry(lineEntity.getCountry()), toDtoCountry(lineEntity.getOtherCountry()), lineEntity.getSubstationStart(), lineEntity.getSubstationEnd(), toDto(lineEntity.getCoordinates()));
+        return new LineGeoData(lineEntity.getId(), toDtoCountry(lineEntity.getCountry()),
+            toDtoCountry(lineEntity.getOtherCountry()), lineEntity.getSubstationStart(), lineEntity.getSubstationEnd(),
+            toDto(lineEntity.getCoordinates())
+        );
     }
 
     private Country toDtoCountry(String country) {

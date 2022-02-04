@@ -13,6 +13,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.Index;
@@ -56,7 +57,7 @@ public class LineEntity {
     @Column
     @OrderColumn
     @CollectionTable(foreignKey = @ForeignKey(name = "lineEntity_coordinate_fk"), indexes = @Index(name = "lineEntity_coordinate_id_index", columnList = "line_entity_id"))
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<CoordinateEmbeddable> coordinates;
 
     public static LineEntity create(LineGeoData l, boolean side1) {
