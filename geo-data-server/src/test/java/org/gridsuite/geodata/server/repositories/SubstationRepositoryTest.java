@@ -6,9 +6,9 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
-import org.gridsuite.geodata.server.AbstractEmbeddedCassandraSetup;
 import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,33 +27,38 @@ import static org.junit.Assert.assertEquals;
 @ContextHierarchy({
     @ContextConfiguration(classes = {GeoDataApplication.class})
     })
-public class SubstationRepositoryTest extends AbstractEmbeddedCassandraSetup {
+public class SubstationRepositoryTest {
 
     @Autowired
     private SubstationRepository repository;
+
+    @Before
+    public void setUp() {
+        repository.deleteAll();
+    }
 
     @Test
     public void test() {
         SubstationEntity.SubstationEntityBuilder substationEntityBuilder = SubstationEntity.builder()
                 .country("FR")
                 .id("ID")
-                .coordinate(CoordinateEntity.builder().lat(3).lon(2).build());
+                .coordinate(CoordinateEmbeddable.builder().lat(3).lon(2).build());
 
         SubstationEntity substationEntity = substationEntityBuilder.build();
 
-        assertEquals("SubstationEntity.SubstationEntityBuilder(country=FR, id=ID, coordinate=CoordinateEntity(lat=3.0, lon=2.0))", substationEntityBuilder.toString());
-        assertEquals("SubstationEntity(country=FR, id=ID, coordinate=CoordinateEntity(lat=3.0, lon=2.0))", substationEntity.toString());
+        assertEquals("SubstationEntity.SubstationEntityBuilder(country=FR, id=ID, coordinate=CoordinateEmbeddable(lat=3.0, lon=2.0))", substationEntityBuilder.toString());
+        assertEquals("SubstationEntity(country=FR, id=ID, coordinate=CoordinateEmbeddable(lat=3.0, lon=2.0))", substationEntity.toString());
 
         SubstationEntity substationEntity2 = SubstationEntity.builder()
                 .country("FR")
                 .id("ID2")
-                .coordinate(CoordinateEntity.builder().lat(4).lon(5).build())
+                .coordinate(CoordinateEmbeddable.builder().lat(4).lon(5).build())
                 .build();
 
         SubstationEntity substationEntity3 = SubstationEntity.builder()
                 .country("FR")
                 .id("ID3")
-                .coordinate(CoordinateEntity.builder().lat(6).lon(7).build())
+                .coordinate(CoordinateEmbeddable.builder().lat(6).lon(7).build())
                 .build();
 
         repository.save(substationEntity);

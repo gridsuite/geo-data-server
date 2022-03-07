@@ -8,29 +8,32 @@ package org.gridsuite.geodata.server.repositories;
 
 import lombok.*;
 import org.gridsuite.geodata.extensions.Coordinate;
-import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@UserDefinedType("coordinate")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
 @ToString
-public class CoordinateEntity {
+@Embeddable
+public class CoordinateEmbeddable {
 
+    @Column(name = "latitude")
     private double lat;
 
+    @Column(name = "longitude")
     private double lon;
 
-    static List<CoordinateEntity> create(List<Coordinate> coordinates) {
+    static List<CoordinateEmbeddable> create(List<Coordinate> coordinates) {
         return coordinates.stream()
-                .map(p -> CoordinateEntity.builder()
+                .map(p -> CoordinateEmbeddable.builder()
                         .lat(p.getLat())
                         .lon(p.getLon())
                         .build())

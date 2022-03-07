@@ -6,15 +6,11 @@
 
 ### Run integration tests
 
-To run the integration tests, a cassandra distribution is downloaded automatically once for all the projects at the first execution for your user. It is stored in $HOME/.embedded-cassandra . For this first execution, you need http internet access, and if you are a on a restricted network requiring a proxy, you need to set the proxy details. In addition to the standard java system properties -DproxyHost, -DproxyPort, we use -DproxyUser and -DproxyPassword for authenticated proxies. In IDEs, set them in the tests system properties (usually in the "Edit run configuration" menu). For maven CLI, either set them in MAVEN_OPTS or directly on the command line:
+Please read [liquibase usage](https://github.com/powsybl/powsybl-parent/#liquibase-usage) for instructions to automatically generate changesets.
+After you generated a changeset do not forget to add it to git and in src/resource/db/changelog/db.changelog-master.yml
 
-```bash
-$ export MAVEN_OPTS="-DproxyHost=proxy.com -DproxyPort=8080 -DproxyUser=user -DproxyPassword=XXXX"
-$ mvn verify
+
+The old way to automatically generate the sql schema file (directly using hibernate) can still be used for debugging. Use the following command:
 ```
-
-OR
-
-```bash
-$ mvn verify -DproxyHost=proxy.com -DproxyPort=8080 -DproxyUser=user -DproxyPassword=XXXX
+mvn package -DskipTests && rm -f src/main/resources/geoData.sql && java  -jar target/gridsuite-geo-data-server-1.0.0-SNAPSHOT-exec.jar --spring.jpa.properties.javax.persistence.schema-generation.scripts.action=create 
 ```

@@ -6,6 +6,7 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import lombok.NoArgsConstructor;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
@@ -13,33 +14,41 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
-import org.springframework.data.cassandra.core.mapping.Table;
+
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@Table("substations")
+@Table(indexes = {@Index(name = "substationEntity_country_index", columnList = "country")})
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Builder
 @ToString
+@Entity
 public class SubstationEntity {
 
-    @PrimaryKeyColumn(ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+    @Column
     private String country;
 
-    @PrimaryKeyColumn(ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+    @Id
+    @Column
     private String id;
 
-    private CoordinateEntity coordinate;
+    @Embedded
+    private CoordinateEmbeddable coordinate;
 
     public static SubstationEntity create(SubstationGeoData s) {
         return SubstationEntity.builder()
                 .country(s.getCountry().toString())
                 .id(s.getId())
-                .coordinate(CoordinateEntity.builder()
+                .coordinate(CoordinateEmbeddable.builder()
                         .lat(s.getCoordinate().getLat())
                         .lon(s.getCoordinate().getLon())
                         .build())
