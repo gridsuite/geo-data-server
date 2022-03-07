@@ -7,11 +7,14 @@
 package org.gridsuite.geodata.server.repositories;
 
 import com.powsybl.iidm.network.Country;
-import org.gridsuite.geodata.server.AbstractEmbeddedCassandraSetup;
+import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.LineGeoData;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -24,16 +27,24 @@ import static org.junit.Assert.*;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @RunWith(SpringRunner.class)
-public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
+@ContextHierarchy({
+    @ContextConfiguration(classes = {GeoDataApplication.class})
+})
+public class LineRepositoryTest {
 
     @Autowired
     private LineRepository repository;
 
+    @Before
+    public void setUp() {
+        repository.deleteAll();
+    }
+
     @Test
     public void test() {
-        List<CoordinateEntity> coordinateEntities = new ArrayList<>();
-        coordinateEntities.add(CoordinateEntity.builder().lat(11).lon(12).build());
-        coordinateEntities.add(CoordinateEntity.builder().lat(13).lon(14.1).build());
+        List<CoordinateEmbeddable> coordinateEntities = new ArrayList<>();
+        coordinateEntities.add(CoordinateEmbeddable.builder().lat(11).lon(12).build());
+        coordinateEntities.add(CoordinateEmbeddable.builder().lat(13).lon(14.1).build());
 
         LineEntity.LineEntityBuilder lineEntityBuilder = LineEntity.builder();
         lineEntityBuilder.country("FR")
@@ -44,7 +55,7 @@ public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
                 .substationEnd("way")
                 .coordinates(coordinateEntities);
 
-        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, coordinates=[CoordinateEntity(lat=11.0, lon=12.0), CoordinateEntity(lat=13.0, lon=14.1)])", lineEntityBuilder.toString());
+        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, coordinates=[CoordinateEmbeddable(lat=11.0, lon=12.0), CoordinateEmbeddable(lat=13.0, lon=14.1)])", lineEntityBuilder.toString());
 
         repository.save(lineEntityBuilder.build());
         List<LineEntity> lines = repository.findAll();
@@ -56,7 +67,6 @@ public class LineRepositoryTest extends AbstractEmbeddedCassandraSetup {
         assertEquals("sub", lines.get(0).getSubstationStart());
         assertEquals("way", lines.get(0).getSubstationEnd());
         assertFalse(lines.get(0).isSide1());
-        assertEquals(2, lines.get(0).getCoordinates().size());
         LineEntity le = LineEntity.create(new LineGeoData("id", Country.AE, Country.AG, "Samy", "Scooby", Collections.emptyList()), true);
         assertEquals("id", le.getId());
         assertEquals("AE", le.getCountry());

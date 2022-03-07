@@ -6,16 +6,17 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
-import org.springframework.data.cassandra.repository.CassandraRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Repository
-public interface SubstationRepository extends CassandraRepository<SubstationEntity, String> {
+public interface SubstationRepository extends JpaRepository<SubstationEntity, String> {
 
-    List<SubstationEntity> findByCountry(String country);
+    List<SubstationEntity> findByCountryIn(Collection<String> country);
 }
