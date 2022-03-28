@@ -13,7 +13,7 @@
     <parent>
         <groupId>com.powsybl</groupId>
         <artifactId>powsybl-parent-ws</artifactId>
-        <version>7</version>
+        <version>8-SNAPSHOT</version>
     </parent>
 
     <groupId>org.gridsuite</groupId>
@@ -56,7 +56,7 @@
     <properties>
         <java.version>11</java.version>
 
-        <gridsuite-dependencies.version>14</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>16-SNAPSHOT</gridsuite-dependencies.version>
         <commons-lang3.version>3.9</commons-lang3.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>
