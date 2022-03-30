@@ -23,6 +23,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.google.common.io.ByteStreams;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
@@ -59,6 +65,17 @@ public class GeoDataControllerTest {
 
     @MockBean
     private LineRepository lineRepository;
+
+    private static final String OPEN_SUBSTATIONS = "/open_substations.json";
+    private static final String OPEN_LINES = "/open_lines.json";
+
+    public String toString(String resourceName) {
+        try {
+            return new String(ByteStreams.toByteArray(Objects.requireNonNull(getClass().getResourceAsStream(resourceName))), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     @Test
     public void test() throws Exception {
@@ -100,6 +117,16 @@ public class GeoDataControllerTest {
                                 .substationEnd("subBE")
                                 .coordinates(new ArrayList<>())
                                 .build()))))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/" + VERSION + "/substations")
+                .contentType(APPLICATION_JSON)
+                .content(toString(OPEN_SUBSTATIONS)))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/" + VERSION + "/lines")
+                .contentType(APPLICATION_JSON)
+                .content(toString(OPEN_LINES)))
                 .andExpect(status().isOk());
     }
 }
