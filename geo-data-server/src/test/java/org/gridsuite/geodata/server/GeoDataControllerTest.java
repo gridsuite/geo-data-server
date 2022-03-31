@@ -66,8 +66,8 @@ public class GeoDataControllerTest {
     @MockBean
     private LineRepository lineRepository;
 
-    private static final String OPEN_SUBSTATIONS = "/open_substations.json";
-    private static final String OPEN_LINES = "/open_lines.json";
+    private static final String GEO_DATA_SUBSTATIONS = "/geo_data_substations.json";
+    private static final String GEO_DATA_LINES = "/geo_data_lines.json";
 
     public String toString(String resourceName) {
         try {
@@ -121,12 +121,12 @@ public class GeoDataControllerTest {
 
         mvc.perform(post("/" + VERSION + "/substations")
                 .contentType(APPLICATION_JSON)
-                .content(toString(OPEN_SUBSTATIONS)))
+                .content(toString(GEO_DATA_SUBSTATIONS)))
                 .andExpect(status().isOk());
 
         mvc.perform(post("/" + VERSION + "/lines")
                 .contentType(APPLICATION_JSON)
-                .content(toString(OPEN_LINES)))
+                .content(toString(GEO_DATA_LINES)))
                 .andExpect(status().isOk());
     }
 }
