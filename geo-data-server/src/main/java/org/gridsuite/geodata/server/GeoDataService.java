@@ -339,7 +339,7 @@ public class GeoDataService {
         return lineGeoData;
     }
 
-    private LineGeoData toDto(LineEntity lineEntity) {
+    public LineGeoData toDto(LineEntity lineEntity) {
         try {
             return new LineGeoData(lineEntity.getId(), toDtoCountry(lineEntity.getCountry()),
                 toDtoCountry(lineEntity.getOtherCountry()), lineEntity.getSubstationStart(), lineEntity.getSubstationEnd(),

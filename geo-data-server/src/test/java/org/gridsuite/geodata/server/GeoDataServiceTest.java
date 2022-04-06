@@ -212,6 +212,17 @@ public class GeoDataServiceTest {
                 linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())));
     }
 
+    @Test
+    public void testLineCoordinatesError() {
+        assertNull(geoDataService.toDto(LineEntity.create(LineGeoData.builder()
+            .id("idLine")
+            .country1(Country.FR)
+            .country2(Country.BE)
+            .substationStart("substation1")
+            .substationEnd("substation2")
+            .build(), true, "coordinates_error")));
+    }
+
     private Network createGeoDataNetwork() {
         Network network = EurostagTutorialExample1Factory.create();
 
