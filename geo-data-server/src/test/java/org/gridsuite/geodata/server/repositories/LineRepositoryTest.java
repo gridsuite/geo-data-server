@@ -6,7 +6,10 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
+import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.junit.Before;
@@ -33,6 +36,9 @@ import static org.junit.Assert.*;
 public class LineRepositoryTest {
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private LineRepository repository;
 
     @Before
@@ -41,10 +47,10 @@ public class LineRepositoryTest {
     }
 
     @Test
-    public void test() {
-        List<CoordinateEmbeddable> coordinateEntities = new ArrayList<>();
-        coordinateEntities.add(CoordinateEmbeddable.builder().lat(11).lon(12).build());
-        coordinateEntities.add(CoordinateEmbeddable.builder().lat(13).lon(14.1).build());
+    public void test() throws JsonProcessingException {
+        List<Coordinate> coordinateEntities = new ArrayList<>();
+        coordinateEntities.add(Coordinate.builder().lat(11).lon(12).build());
+        coordinateEntities.add(Coordinate.builder().lat(13).lon(14.1).build());
 
         LineEntity.LineEntityBuilder lineEntityBuilder = LineEntity.builder();
         lineEntityBuilder.country("FR")
@@ -53,9 +59,9 @@ public class LineRepositoryTest {
                 .id("lineID")
                 .substationStart("sub")
                 .substationEnd("way")
-                .coordinates(coordinateEntities);
+                .coordinates(objectMapper.writeValueAsString(coordinateEntities));
 
-        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, coordinates=[CoordinateEmbeddable(lat=11.0, lon=12.0), CoordinateEmbeddable(lat=13.0, lon=14.1)])", lineEntityBuilder.toString());
+        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, coordinates=[{\"lat\":11.0,\"lon\":12.0},{\"lat\":13.0,\"lon\":14.1}])", lineEntityBuilder.toString());
 
         repository.save(lineEntityBuilder.build());
         List<LineEntity> lines = repository.findAll();
@@ -67,7 +73,7 @@ public class LineRepositoryTest {
         assertEquals("sub", lines.get(0).getSubstationStart());
         assertEquals("way", lines.get(0).getSubstationEnd());
         assertFalse(lines.get(0).isSide1());
-        LineEntity le = LineEntity.create(new LineGeoData("id", Country.AE, Country.AG, "Samy", "Scooby", Collections.emptyList()), true);
+        LineEntity le = LineEntity.create(new LineGeoData("id", Country.AE, Country.AG, "Samy", "Scooby", Collections.emptyList()), true, null);
         assertEquals("id", le.getId());
         assertEquals("AE", le.getCountry());
         assertEquals("AG", le.getOtherCountry());

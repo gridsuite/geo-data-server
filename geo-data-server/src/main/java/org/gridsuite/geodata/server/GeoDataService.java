@@ -6,6 +6,8 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.extensions.SubstationPosition;
 import org.gridsuite.geodata.server.dto.LineGeoData;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Value("${network-geo-data.iterations:5}")
     private int maxIterations;
@@ -227,16 +231,21 @@ public class GeoDataService {
     void saveLines(List<LineGeoData> linesGeoData) {
         LOGGER.info("Saving {} lines geo data", linesGeoData.size());
 
-        List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
-        for (LineGeoData l : linesGeoData) {
-            if (l.getCountry1() == l.getCountry2())  {
-                linesEntities.add(LineEntity.create(l, true));
-            } else {
-                linesEntities.add(LineEntity.create(l, true));
-                linesEntities.add(LineEntity.create(l, false));
+        try {
+            List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
+            for (LineGeoData l : linesGeoData) {
+                String coords = mapper.writeValueAsString(l.getCoordinates());
+                if (l.getCountry1() == l.getCountry2()) {
+                    linesEntities.add(LineEntity.create(l, true, coords));
+                } else {
+                    linesEntities.add(LineEntity.create(l, true, coords));
+                    linesEntities.add(LineEntity.create(l, false, coords));
+                }
             }
+            lineRepository.saveAll(linesEntities);
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Error saving lines");
         }
-        lineRepository.saveAll(linesEntities);
     }
 
     boolean emptyOrEquals(String emptyable, String s) {
@@ -311,38 +320,43 @@ public class GeoDataService {
         Objects.requireNonNull(countries);
 
         StopWatch stopWatch = StopWatch.createStarted();
-        Set<String> lineIds = new TreeSet<>();
-
-        network.getLines().forEach(l -> lineIds.add(l.getId()));
-        // read lines from DB
-        Map<String, LineGeoData> linesGeoDataDb  = lineRepository.findAllById(lineIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
         List<Line> lines = network.getLineStream().collect(Collectors.toList());
+
+        // read lines from DB
+        Set<String> lineIds = lines.stream().map(Line::getId).collect(Collectors.toSet());
+        Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(lineIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
+
         // we also want the destination substation (so we add the neighbouring country)
         Set<Country> countryAndNextTo =
             lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull))
-            .collect(Collectors.toSet());
+                .collect(Collectors.toSet());
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMap(network, countryAndNextTo);
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line))
-                .filter(Objects::nonNull).collect(Collectors.toList());
-        LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
+            .filter(Objects::nonNull).collect(Collectors.toList());
+        LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
     }
 
     private LineGeoData toDto(LineEntity lineEntity) {
-        return new LineGeoData(lineEntity.getId(), toDtoCountry(lineEntity.getCountry()),
-            toDtoCountry(lineEntity.getOtherCountry()), lineEntity.getSubstationStart(), lineEntity.getSubstationEnd(),
-            toDto(lineEntity.getCoordinates())
-        );
+        try {
+            return new LineGeoData(lineEntity.getId(), toDtoCountry(lineEntity.getCountry()),
+                toDtoCountry(lineEntity.getOtherCountry()), lineEntity.getSubstationStart(), lineEntity.getSubstationEnd(),
+                toDto(lineEntity.getCoordinates())
+            );
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Error processing line coordinates");
+            return null;
+        }
     }
 
     private Country toDtoCountry(String country) {
         return Country.valueOf(country);
     }
 
-    private List<Coordinate> toDto(List<CoordinateEmbeddable> coordinates) {
-        return coordinates.stream().map(e -> new Coordinate(e.getLat(), e.getLon())).collect(Collectors.toList());
+    private List<Coordinate> toDto(String coordinates) throws JsonProcessingException {
+        return mapper.readValue(coordinates, List.class);
     }
 
     private Map<String, SubstationGeoData> getSubstationMap(Network network, Set<Country> countries) {
