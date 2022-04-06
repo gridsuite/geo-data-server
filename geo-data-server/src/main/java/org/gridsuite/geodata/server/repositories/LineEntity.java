@@ -22,7 +22,6 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Builder
 @Table(indexes = {@Index(name = "lineEntity_country_index", columnList = "country"),
     @Index(name = "lineEntity_otherCountry_index", columnList = "otherCountry")})

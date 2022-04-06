@@ -55,9 +55,6 @@ public class GeoDataControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    private GeoDataService geoDataService;
-
-    @MockBean
     private NetworkStoreService service;
 
     @MockBean
