@@ -244,7 +244,7 @@ public class GeoDataService {
             }
             lineRepository.saveAll(linesEntities);
         } catch (JsonProcessingException e) {
-            LOGGER.error("Error saving lines");
+            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
         }
     }
 
@@ -346,8 +346,7 @@ public class GeoDataService {
                 toDto(lineEntity.getCoordinates())
             );
         } catch (JsonProcessingException e) {
-            LOGGER.error("Error processing line coordinates");
-            return null;
+            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
         }
     }
 

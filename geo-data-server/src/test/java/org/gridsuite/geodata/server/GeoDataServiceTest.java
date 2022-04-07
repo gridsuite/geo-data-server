@@ -214,13 +214,14 @@ public class GeoDataServiceTest {
 
     @Test
     public void testLineCoordinatesError() {
-        assertNull(geoDataService.toDto(LineEntity.create(LineGeoData.builder()
-            .id("idLine")
-            .country1(Country.FR)
-            .country2(Country.BE)
-            .substationStart("substation1")
-            .substationEnd("substation2")
-            .build(), true, "coordinates_error")));
+        assertThrows(GeoDataException.class, () ->
+            geoDataService.toDto(LineEntity.create(LineGeoData.builder()
+                .id("idLine")
+                .country1(Country.FR)
+                .country2(Country.BE)
+                .substationStart("substation1")
+                .substationEnd("substation2")
+                .build(), true, "coordinates_error")));
     }
 
     private Network createGeoDataNetwork() {

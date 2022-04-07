@@ -73,14 +73,16 @@ public class GeoDataController {
     @PostMapping(value = "/substations")
     @Operation(summary = "Save substations geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data have been correctly saved")})
-    public void saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
+    public ResponseEntity<Void> saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
         geoDataService.saveSubstations(substationGeoData);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/lines")
     @Operation(summary = "Save lines geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data have been correctly saved")})
-    public void saveLines(@RequestBody List<LineGeoData> linesGeoData) {
+    public ResponseEntity<Void> saveLines(@RequestBody List<LineGeoData> linesGeoData) {
         geoDataService.saveLines(linesGeoData);
+        return ResponseEntity.ok().build();
     }
 }
