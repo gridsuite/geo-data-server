@@ -129,7 +129,7 @@ public class GeoDataControllerTest {
     }
 
     @Test
-    public void testError() throws Exception {
+    public void testGetLinesError() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
 
         given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
