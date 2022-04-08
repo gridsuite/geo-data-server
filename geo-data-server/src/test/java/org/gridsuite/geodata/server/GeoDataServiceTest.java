@@ -6,6 +6,7 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import org.gridsuite.geodata.extensions.Coordinate;
@@ -49,7 +50,7 @@ public class GeoDataServiceTest {
     GeoDataService geoDataService;
 
     @Before
-    public void setUp() {
+    public void setUp() throws JsonProcessingException {
         lineRepository.deleteAll();
         substationRepository.deleteAll();
         List<SubstationEntity> substationEntities = new ArrayList<>();
@@ -80,7 +81,7 @@ public class GeoDataServiceTest {
                 .id("NHV2_NHV5")
                 .country("BE")
                 .otherCountry("FR")
-                .coordinates(Arrays.asList(new CoordinateEmbeddable(2, 1), new CoordinateEmbeddable(2.5, 1), new CoordinateEmbeddable(3, 1)))
+                .coordinates(objectMapper.writeValueAsString(Arrays.asList(new CoordinateEmbeddable(2, 1), new CoordinateEmbeddable(2.5, 1), new CoordinateEmbeddable(3, 1))))
                 .build());
 
         lineEntities.add(LineEntity.builder()
@@ -89,7 +90,7 @@ public class GeoDataServiceTest {
                 .otherCountry("FR")
                 .substationStart("P2")
                 .substationEnd("P3")
-                .coordinates(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7)))
+                .coordinates(objectMapper.writeValueAsString(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7))))
                 .build());
 
         lineEntities.add(LineEntity.builder()
@@ -98,7 +99,7 @@ public class GeoDataServiceTest {
             .otherCountry("FR")
             .substationStart("P2")
             .substationEnd("P3")
-            .coordinates(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7)))
+            .coordinates(objectMapper.writeValueAsString(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7))))
             .build());
 
         lineEntities.add(LineEntity.builder()
@@ -107,7 +108,7 @@ public class GeoDataServiceTest {
             .otherCountry("FR")
             .substationStart("OOUPS")
             .substationEnd("P3")
-            .coordinates(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7)))
+            .coordinates(objectMapper.writeValueAsString(Arrays.asList(new CoordinateEmbeddable(3, 1), new CoordinateEmbeddable(5, 6), new CoordinateEmbeddable(2, 7))))
             .build());
 
         lineRepository.saveAll(lineEntities);
@@ -209,6 +210,20 @@ public class GeoDataServiceTest {
         assertFalse("Must not contain nulls", linesGeoData.stream().anyMatch(Objects::isNull));
         assertFalse("Must not contain unknown lines " + notexistline.getId(),
                 linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())));
+    }
+
+    @Test
+    public void testLineCoordinatesError() {
+        LineEntity lineEntity = LineEntity.create(LineGeoData.builder()
+                .id("idLine")
+                .country1(Country.FR)
+                .country2(Country.BE)
+                .substationStart("substation1")
+                .substationEnd("substation2")
+                .build(), true, "coordinates_error");
+
+        assertThrows(GeoDataException.class, () ->
+            geoDataService.toDto(lineEntity));
     }
 
     private Network createGeoDataNetwork() {
