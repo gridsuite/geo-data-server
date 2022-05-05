@@ -9,7 +9,7 @@ package org.gridsuite.geodata.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import org.gridsuite.geodata.extensions.Coordinate;
+import com.powsybl.iidm.network.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -127,8 +127,8 @@ public class GeoDataServiceTest {
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
         assertEquals(4, substationsGeoData.size());
-        assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
-        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
+        assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(List.of(Country.FR)));
 
@@ -146,11 +146,11 @@ public class GeoDataServiceTest {
         List<SubstationGeoData> substationsGeoData2 = geoDataService.getSubstations(network, new HashSet<>(ImmutableList.of(Country.FR, Country.BE)));
 
         assertEquals(5, substationsGeoData2.size());
-        assertEquals(2, substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
-        assertEquals(3, substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
+        assertEquals(2, substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(3, substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
 
-        assertEquals(2, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
-        assertEquals(1, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
+        assertEquals(2, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(1, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
     }
 
     @Test

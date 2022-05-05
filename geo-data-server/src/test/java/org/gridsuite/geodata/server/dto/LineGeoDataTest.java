@@ -6,7 +6,7 @@
  */
 package org.gridsuite.geodata.server.dto;
 
-import org.gridsuite.geodata.extensions.Coordinate;
+import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.Country;
 import org.junit.Test;
 
