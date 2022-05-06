@@ -71,8 +71,8 @@ public class SubstationRepositoryTest {
 
         SubstationGeoData substationGeoData = substations.get(0).toGeoData();
 
-        assertEquals(3, substationGeoData.getCoordinate().getLat(), 0);
-        assertEquals(2, substationGeoData.getCoordinate().getLon(), 0);
+        assertEquals(3, substationGeoData.getCoordinate().getLatitude(), 0);
+        assertEquals(2, substationGeoData.getCoordinate().getLongitude(), 0);
 
         assertEquals("FR", substations.get(0).getCountry());
         assertEquals("ID", substations.get(0).getId());

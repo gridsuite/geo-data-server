@@ -7,7 +7,7 @@
 package org.gridsuite.geodata.server.repositories;
 
 import lombok.NoArgsConstructor;
-import org.gridsuite.geodata.extensions.Coordinate;
+import com.powsybl.iidm.network.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import lombok.AllArgsConstructor;
@@ -49,8 +49,8 @@ public class SubstationEntity {
                 .country(s.getCountry().toString())
                 .id(s.getId())
                 .coordinate(CoordinateEmbeddable.builder()
-                        .lat(s.getCoordinate().getLat())
-                        .lon(s.getCoordinate().getLon())
+                        .lat(s.getCoordinate().getLatitude())
+                        .lon(s.getCoordinate().getLongitude())
                         .build())
                 .build();
     }

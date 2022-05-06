@@ -50,7 +50,6 @@
     <modules>
         <module>geo-data-distribution</module>
         <module>geo-data-server</module>
-        <module>geo-data-extensions</module>
     </modules>
 
     <properties>
