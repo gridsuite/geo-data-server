@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.extensions.SubstationPosition;
+import org.gridsuite.geodata.server.dto.DefaultSubstationGeoDataByCountry;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -22,6 +23,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +41,8 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
+    private static DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Value("${network-geo-data.iterations:5}")
@@ -50,6 +56,18 @@ public class GeoDataService {
 
     private Set<String> toCountryIds(Collection<Country> countries) {
         return countries.stream().map(Country::name).collect(Collectors.toSet());
+    }
+
+    @PostConstruct
+    public void init() {
+        defaultSubstationsGeoData = new DefaultSubstationGeoDataByCountry();
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("config/substationGeoDataByCountry.json").getFile());
+            defaultSubstationsGeoData = mapper.readValue(file, DefaultSubstationGeoDataByCountry.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Map<String, SubstationGeoData> readSubstationGeoDataFromDb(Set<Country> countries) {
@@ -98,6 +116,15 @@ public class GeoDataService {
         long accuracyFactor = Math.round(100 * (double) substationsGeoData.size() / (substationsToCalculate.size() + substationsGeoData.size()));
         if (accuracyFactor < 75) {
             LOGGER.warn("Accuracy factor is less than 75% !");
+        }
+
+        DefaultSubstationGeoDataByCountry defaultSubstations = new DefaultSubstationGeoDataByCountry();
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("config/substationGeoDataByCountry.json").getFile());
+            defaultSubstations = mapper.readValue(file, DefaultSubstationGeoDataByCountry.class);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         calculateMissingGeoData(network, substations, substationsGeoData, substationsToCalculate);
@@ -168,6 +195,12 @@ public class GeoDataService {
         }
     }
 
+    private static Coordinate getAverageCoordinate(List<SubstationGeoData> neighboursGeoData) {
+        double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLat()).average().orElseThrow(IllegalStateException::new);
+        double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLon()).average().orElseThrow(IllegalStateException::new);
+        return new Coordinate(lat, lon);
+    }
+
     private static SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
                                                               Map<String, SubstationGeoData> substationsGeoData) {
         // get neighbours geo data
@@ -178,14 +211,24 @@ public class GeoDataService {
         Coordinate coordinate = null;
         if (neighboursGeoData.size() > 1) {
             // centroid calculation
-            double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLat()).average().orElseThrow(IllegalStateException::new);
-            double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLon()).average().orElseThrow(IllegalStateException::new);
-            coordinate = new Coordinate(lat, lon);
+            if (neighboursGeoData.stream().noneMatch(n -> Objects.equals(n.getCountry(), substation.getNullableCountry()))) {
+                if (defaultSubstationsGeoData.get(substation.getNullableCountry().name()) != null) {
+                    neighboursGeoData.clear();
+                    neighboursGeoData.add(defaultSubstationsGeoData.get(substation.getNullableCountry().name()));
+                }
+            }
+            coordinate = getAverageCoordinate(neighboursGeoData);
         } else if (neighboursGeoData.size() == 1 && step == Step.TWO) {
             // centroid calculation
-            double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
-            double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
-            coordinate = new Coordinate(lat, lon);
+            if (!Objects.equals(neighboursGeoData.get(0).getCountry(), substation.getNullableCountry()) && defaultSubstationsGeoData.get(substation.getNullableCountry().name()) != null) {
+                neighboursGeoData.clear();
+                neighboursGeoData.add(defaultSubstationsGeoData.get(substation.getNullableCountry().name()));
+                coordinate = getAverageCoordinate(neighboursGeoData);
+            } else {
+                double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
+                double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
+                coordinate = new Coordinate(lat, lon);
+            }
         }
 
         Country country = substation.getCountry().orElse(null);
