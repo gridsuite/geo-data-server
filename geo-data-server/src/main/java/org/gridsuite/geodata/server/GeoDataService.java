@@ -199,27 +199,31 @@ public class GeoDataService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+        String substationCountry = substation.getNullableCountry() != null ? substation.getNullableCountry().name() : null;
         Coordinate coordinate = null;
         if (neighboursGeoData.size() > 1) {
             // centroid calculation
-            if (neighboursGeoData.stream().noneMatch(n -> Objects.equals(n.getCountry(), substation.getNullableCountry()))) {
-                if (defaultSubstationsGeoData.get(substation.getNullableCountry().name()) != null) {
-                    neighboursGeoData.clear();
-                    neighboursGeoData.add(defaultSubstationsGeoData.get(substation.getNullableCountry().name()));
-                }
+            // if no neighbour found in the same country, locate the substation to a default position in its country
+            if (neighboursGeoData.stream().noneMatch(n -> Objects.equals(n.getCountry(), substation.getNullableCountry())) &&
+                    defaultSubstationsGeoData.get(substationCountry) != null) {
+                neighboursGeoData = Collections.singletonList(defaultSubstationsGeoData.get(substationCountry));
             }
             coordinate = getAverageCoordinate(neighboursGeoData);
         } else if (neighboursGeoData.size() == 1 && step == Step.TWO) {
             // centroid calculation
-            if (!Objects.equals(neighboursGeoData.get(0).getCountry(), substation.getNullableCountry()) && defaultSubstationsGeoData.get(substation.getNullableCountry().name()) != null) {
-                neighboursGeoData.clear();
-                neighboursGeoData.add(defaultSubstationsGeoData.get(substation.getNullableCountry().name()));
+            // if neighbour not in the same country, locate the substation to a default position in its country
+            if (!Objects.equals(neighboursGeoData.get(0).getCountry(), substation.getNullableCountry()) && defaultSubstationsGeoData.get(substationCountry) != null) {
+                neighboursGeoData = Collections.singletonList(defaultSubstationsGeoData.get(substationCountry));
                 coordinate = getAverageCoordinate(neighboursGeoData);
             } else {
                 double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
                 double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
                 coordinate = new Coordinate(lat, lon);
             }
+        } else if (neighboursGeoData.size() == 0 && step == Step.TWO && defaultSubstationsGeoData.get(substationCountry) != null) {
+            // if still no neighbour found at step TWO, try to locate the substation to a default position in its country
+            neighboursGeoData = Collections.singletonList(defaultSubstationsGeoData.get(substationCountry));
+            coordinate = getAverageCoordinate(neighboursGeoData);
         }
 
         Country country = substation.getCountry().orElse(null);
