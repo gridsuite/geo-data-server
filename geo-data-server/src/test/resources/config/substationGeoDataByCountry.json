@@ -1,0 +1,12 @@
+{
+  "substationsGeoDataByCountry" : {
+    "BE": {
+      "id": "BE",
+      "country": "BE",
+      "coordinate": {
+        "lat": 4,
+        "lon": 8
+      }
+    }
+  }
+}
