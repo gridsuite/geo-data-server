@@ -41,7 +41,7 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
-    private static DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
+    private DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -66,7 +66,7 @@ public class GeoDataService {
             File file = new File(classLoader.getResource("config/substationGeoDataByCountry.json").getFile());
             defaultSubstationsGeoData = mapper.readValue(file, DefaultSubstationGeoDataByCountry.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("No default geo data by country found for substation");
         }
     }
 
@@ -116,15 +116,6 @@ public class GeoDataService {
         long accuracyFactor = Math.round(100 * (double) substationsGeoData.size() / (substationsToCalculate.size() + substationsGeoData.size()));
         if (accuracyFactor < 75) {
             LOGGER.warn("Accuracy factor is less than 75% !");
-        }
-
-        DefaultSubstationGeoDataByCountry defaultSubstations = new DefaultSubstationGeoDataByCountry();
-        try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("config/substationGeoDataByCountry.json").getFile());
-            defaultSubstations = mapper.readValue(file, DefaultSubstationGeoDataByCountry.class);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         calculateMissingGeoData(network, substations, substationsGeoData, substationsToCalculate);
@@ -201,7 +192,7 @@ public class GeoDataService {
         return new Coordinate(lat, lon);
     }
 
-    private static SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
+    private SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
                                                               Map<String, SubstationGeoData> substationsGeoData) {
         // get neighbours geo data
         List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationsGeoData::get)
