@@ -132,7 +132,7 @@ public class GeoDataServiceTest {
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(List.of(Country.FR)));
 
-        assertEquals(12, linesGeoData.size());
+        assertEquals(13, linesGeoData.size());
         assertEquals(2, getFromList(linesGeoData, "NHV1_NHV2_1").getCoordinates().size()); // line with no coordinate, so [substation1, substation2]
         List<Coordinate> lineNHV2 = getFromList(linesGeoData, "NHV2_NHV3").getCoordinates();
         List<Coordinate> lineNHV3 = new ArrayList<>(getFromList(linesGeoData, "NHV2_NHV3_inverted").getCoordinates());
@@ -167,6 +167,15 @@ public class GeoDataServiceTest {
         SubstationGeoData p7 = substationsGeoData4.stream().filter(s -> s.getId().equals("P7")).collect(Collectors.toList()).get(0);
         assertEquals(0.002, Math.abs(p6.getCoordinate().getLat()) - p7.getCoordinate().getLat(), 0.0001);
         assertEquals(0.007, Math.abs(p6.getCoordinate().getLon()) - p7.getCoordinate().getLon(), 0.0001);
+
+        List<SubstationGeoData> substationsGeoData5 = geoDataService.getSubstations(network, new HashSet<>(ImmutableList.of(Country.DE, Country.BE)));
+
+        assertEquals(3, substationsGeoData5.size());
+
+        assertEquals(4, substationsGeoData5.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
+        assertEquals(8, substationsGeoData5.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
+        assertEquals(8, substationsGeoData5.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0.002);
+        assertEquals(12, substationsGeoData5.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0.007);
     }
 
     @Test
@@ -477,6 +486,22 @@ public class GeoDataServiceTest {
                 .setVoltageLevel2(vlhv7.getId())
                 .setBus2(nhv7.getId())
                 .setConnectableBus2(nhv7.getId())
+                .setR(6.0)
+                .setX(66.0)
+                .setG1(0.0)
+                .setB1(284E-6 / 2)
+                .setG2(0.0)
+                .setB2(288E-6 / 2)
+                .add();
+
+        network.newLine()
+                .setId("NHV5_NHV6")
+                .setVoltageLevel1("VLHV5")
+                .setBus1("NHV5")
+                .setConnectableBus1("NHV5")
+                .setVoltageLevel2(vlhv6.getId())
+                .setBus2(nhv6.getId())
+                .setConnectableBus2(nhv6.getId())
                 .setR(6.0)
                 .setX(66.0)
                 .setG1(0.0)

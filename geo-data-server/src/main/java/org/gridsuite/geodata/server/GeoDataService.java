@@ -220,7 +220,7 @@ public class GeoDataService {
                 double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
                 coordinate = new Coordinate(lat, lon);
             }
-        } else if (neighboursGeoData.size() == 0 && step == Step.TWO && defaultSubstationsGeoData.get(substationCountry) != null) {
+        } else if (neighboursGeoData.isEmpty() && step == Step.TWO && defaultSubstationsGeoData.get(substationCountry) != null) {
             // if still no neighbour found at step TWO, try to locate the substation to a default position in its country
             neighboursGeoData = Collections.singletonList(defaultSubstationsGeoData.get(substationCountry));
             coordinate = getAverageCoordinate(neighboursGeoData);
