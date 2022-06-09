@@ -45,7 +45,7 @@ public class GeoDataService {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${network-geo-data.iterations:5}")
+    @Value("${network-geo-data.iterations:50}")
     private int maxIterations;
 
     @Autowired
