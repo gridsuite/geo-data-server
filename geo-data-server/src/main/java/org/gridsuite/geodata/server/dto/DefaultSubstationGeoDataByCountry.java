@@ -6,7 +6,6 @@
  */
 package org.gridsuite.geodata.server.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +16,6 @@ import java.util.Map;
  */
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class DefaultSubstationGeoDataByCountry {
     Map<String, SubstationGeoData> substationsGeoDataByCountry;
 
