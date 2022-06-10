@@ -104,7 +104,7 @@ public class GeoDataService {
         Set<String> substationsToCalculate = new HashSet<>();
         for (Substation substation : substations) {
             SubstationGeoData substationGeoData = substationsGeoDataDb.get(substation.getId());
-            if (substationGeoData != null && (substation.getCountry().isEmpty() || substation.getCountry().get().name().equals(substationGeoData.getCountry().name()))) {
+            if (substationGeoData != null && (substation.getNullableCountry() == null || substation.getNullableCountry().name().equals(substationGeoData.getCountry().name()))) {
                 substationsGeoData.put(substation.getId(), substationGeoData);
             } else {
                 substationsToCalculate.add(substation.getId());
