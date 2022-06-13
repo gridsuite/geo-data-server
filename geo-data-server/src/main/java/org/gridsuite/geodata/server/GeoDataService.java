@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.extensions.SubstationPosition;
-import org.gridsuite.geodata.server.dto.DefaultSubstationGeoDataByCountry;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -23,9 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -41,8 +37,6 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
-    private DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
-
     private ObjectMapper mapper = new ObjectMapper();
 
     @Value("${network-geo-data.iterations:50}")
@@ -54,20 +48,11 @@ public class GeoDataService {
     @Autowired
     private LineRepository lineRepository;
 
+    @Autowired
+    private DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
+
     private Set<String> toCountryIds(Collection<Country> countries) {
         return countries.stream().map(Country::name).collect(Collectors.toSet());
-    }
-
-    @PostConstruct
-    public void init() {
-        defaultSubstationsGeoData = new DefaultSubstationGeoDataByCountry();
-        try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("config/substationGeoDataByCountry.json").getFile());
-            defaultSubstationsGeoData = mapper.readValue(file, DefaultSubstationGeoDataByCountry.class);
-        } catch (IOException e) {
-            LOGGER.warn("No default geo data by country found for substation");
-        }
     }
 
     private Map<String, SubstationGeoData> readSubstationGeoDataFromDb(Set<Country> countries) {

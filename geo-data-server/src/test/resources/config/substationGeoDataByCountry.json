@@ -1,20 +1,18 @@
 {
-  "substationsGeoDataByCountry" : {
-    "BE": {
-      "id": "BE",
-      "country": "BE",
-      "coordinate": {
-        "lat": 4,
-        "lon": 8
-      }
-    },
-    "DE": {
-      "id": "DE",
-      "country": "DE",
-      "coordinate": {
-        "lat": 8,
-        "lon": 12
-      }
+  "BE": {
+    "id": "BE",
+    "country": "BE",
+    "coordinate": {
+      "lat": 4,
+      "lon": 8
+    }
+  },
+  "DE": {
+    "id": "DE",
+    "country": "DE",
+    "coordinate": {
+      "lat": 8,
+      "lon": 12
     }
   }
 }
