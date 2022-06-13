@@ -9,13 +9,12 @@ package org.gridsuite.geodata.server;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +23,7 @@ import java.util.Map;
  */
 @Service
 public class DefaultSubstationGeoDataByCountry {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSubstationGeoDataByCountry.class);
-
-    Map<String, SubstationGeoData> substationsGeoDataByCountry;
+    private Map<String, SubstationGeoData> substationsGeoDataByCountry;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -35,11 +32,11 @@ public class DefaultSubstationGeoDataByCountry {
         substationsGeoDataByCountry = new HashMap<>();
         try {
             ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("config/substationGeoDataByCountry.json").getFile());
-            substationsGeoDataByCountry = mapper.readValue(file, new TypeReference<HashMap<String, SubstationGeoData>>() {
+            InputStream configStream = classLoader.getResourceAsStream("config/substationGeoDataByCountry.json");
+            substationsGeoDataByCountry = mapper.readValue(configStream, new TypeReference<HashMap<String, SubstationGeoData>>() {
             });
         } catch (IOException e) {
-            LOGGER.warn("No default geo data by country found for substation");
+            throw new UncheckedIOException(e);
         }
     }
 
