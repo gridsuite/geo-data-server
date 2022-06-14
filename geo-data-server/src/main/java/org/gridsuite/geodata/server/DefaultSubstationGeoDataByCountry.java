@@ -31,8 +31,7 @@ public class DefaultSubstationGeoDataByCountry {
     public void init() {
         substationsGeoDataByCountry = new HashMap<>();
         try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            InputStream configStream = classLoader.getResourceAsStream("config/substationGeoDataByCountry.json");
+            InputStream configStream = getClass().getResourceAsStream("/config/substationGeoDataByCountry.json");
             substationsGeoDataByCountry = mapper.readValue(configStream, new TypeReference<HashMap<String, SubstationGeoData>>() {
             });
         } catch (IOException e) {
