@@ -39,7 +39,7 @@ public class GeoDataService {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${network-geo-data.iterations:5}")
+    @Value("${network-geo-data.iterations:50}")
     private int maxIterations;
 
     @Autowired
@@ -47,6 +47,9 @@ public class GeoDataService {
 
     @Autowired
     private LineRepository lineRepository;
+
+    @Autowired
+    private DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
 
     private Set<String> toCountryIds(Collection<Country> countries) {
         return countries.stream().map(Country::name).collect(Collectors.toSet());
@@ -86,7 +89,7 @@ public class GeoDataService {
         Set<String> substationsToCalculate = new HashSet<>();
         for (Substation substation : substations) {
             SubstationGeoData substationGeoData = substationsGeoDataDb.get(substation.getId());
-            if (substationGeoData != null) {
+            if (substationGeoData != null && (substation.getCountry().isEmpty() || substation.getCountry().filter(c -> c.name().equals(substationGeoData.getCountry().name())).isPresent())) {
                 substationsGeoData.put(substation.getId(), substationGeoData);
             } else {
                 substationsToCalculate.add(substation.getId());
@@ -168,24 +171,42 @@ public class GeoDataService {
         }
     }
 
-    private static SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
+    private static Coordinate getAverageCoordinate(List<SubstationGeoData> neighboursGeoData) {
+        double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLat()).average().orElseThrow(IllegalStateException::new);
+        double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLon()).average().orElseThrow(IllegalStateException::new);
+        return new Coordinate(lat, lon);
+    }
+
+    private SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
                                                               Map<String, SubstationGeoData> substationsGeoData) {
         // get neighbours geo data
         List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationsGeoData::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+        String substationCountry = substation.getNullableCountry() != null ? substation.getNullableCountry().name() : null;
+        SubstationGeoData defaultSubstationGeoData = defaultSubstationsGeoData.get(substationCountry);
+
         Coordinate coordinate = null;
         if (neighboursGeoData.size() > 1) {
-            // centroid calculation
-            double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLat()).average().orElseThrow(IllegalStateException::new);
-            double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLon()).average().orElseThrow(IllegalStateException::new);
-            coordinate = new Coordinate(lat, lon);
+            // if no neighbour found in the same country, locate the substation to a default position in its country
+            if (neighboursGeoData.stream().noneMatch(n -> Objects.equals(n.getCountry(), substation.getNullableCountry())) &&
+                    defaultSubstationGeoData != null) {
+                neighboursGeoData = Collections.singletonList(defaultSubstationGeoData);
+            }
+            coordinate = getAverageCoordinate(neighboursGeoData);
         } else if (neighboursGeoData.size() == 1 && step == Step.TWO) {
-            // centroid calculation
-            double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
-            double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
-            coordinate = new Coordinate(lat, lon);
+            // if neighbour not in the same country, locate the substation to a default position in its country
+            if (!Objects.equals(neighboursGeoData.get(0).getCountry(), substation.getNullableCountry()) && defaultSubstationGeoData != null) {
+                coordinate = defaultSubstationGeoData.getCoordinate();
+            } else {
+                double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
+                double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
+                coordinate = new Coordinate(lat, lon);
+            }
+        } else if (neighboursGeoData.isEmpty() && step == Step.TWO && defaultSubstationGeoData != null) {
+            // if still no neighbour found at step TWO, try to locate the substation to a default position in its country
+            coordinate = defaultSubstationGeoData.getCoordinate();
         }
 
         Country country = substation.getCountry().orElse(null);

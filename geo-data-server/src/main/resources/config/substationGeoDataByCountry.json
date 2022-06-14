@@ -1,0 +1,114 @@
+{
+  "BE": {
+    "id": "BE",
+    "country": "BE",
+    "coordinate": {
+      "lat": 50.630348,
+      "lon": 4.552271
+    }
+  },
+  "ES": {
+    "id": "ES",
+    "country": "ES",
+    "coordinate": {
+      "lat": 41.726169,
+      "lon": -0.879979
+    }
+  },
+  "IT": {
+    "id": "IT",
+    "country": "IT",
+    "coordinate": {
+      "lat": 44.847192,
+      "lon": 10.699510
+    }
+  },
+  "PL": {
+    "id": "PL",
+    "country": "PL",
+    "coordinate": {
+      "lat": 52.191746,
+      "lon": 18.954337
+    }
+  },
+  "AT": {
+    "id": "AT",
+    "country": "AT",
+    "coordinate": {
+      "lat": 47.461774,
+      "lon": 14.262743
+    }
+  },
+  "GB": {
+    "id": "GB",
+    "country": "GB",
+    "coordinate": {
+      "lat": 51.070616,
+      "lon": -0.581219
+    }
+  },
+  "CH": {
+    "id": "CH",
+    "country": "CH",
+    "coordinate": {
+      "lat": 46.785262,
+      "lon": 7.415024
+    }
+  },
+  "PT": {
+    "id": "PT",
+    "country": "PT",
+    "coordinate": {
+      "lat": 41.557532,
+      "lon": -7.705075
+    }
+  },
+  "NO": {
+    "id": "NO",
+    "country": "NO",
+    "coordinate": {
+      "lat": 58.545816,
+      "lon": 7.413791
+    }
+  },
+  "NL": {
+    "id": "NL",
+    "country": "NL",
+    "coordinate": {
+      "lat": 51.766465,
+      "lon": 5.377789
+    }
+  },
+  "LU": {
+    "id": "LU",
+    "country": "LU",
+    "coordinate": {
+      "lat": 49.697210,
+      "lon": 6.157253
+    }
+  },
+  "DE": {
+    "id": "DE",
+    "country": "DE",
+    "coordinate": {
+      "lat": 49.697952,
+      "lon": 9.371889
+    }
+  },
+  "DK": {
+    "id": "DK",
+    "country": "DK",
+    "coordinate": {
+      "lat": 56.021326,
+      "lon": 9.714032
+    }
+  },
+  "CZ": {
+    "id": "CZ",
+    "country": "CZ",
+    "coordinate": {
+      "lat": 49.855715,
+      "lon": 13.698219
+    }
+  }
+}
