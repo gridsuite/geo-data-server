@@ -6,6 +6,7 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.powsybl.commons.PowsyblException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,11 +17,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {GeoDataException.class})
+    @ExceptionHandler(value = {GeoDataException.class, PowsyblException.class})
     protected ResponseEntity<Object> handleException(Exception exception) {
-        GeoDataException geoDataException = (GeoDataException) exception;
-        return ResponseEntity
-                .status(geoDataException.getType().getStatus())
-                .body(geoDataException.getMessage());
+        if (exception instanceof GeoDataException) {
+            GeoDataException geoDataException = (GeoDataException) exception;
+            return ResponseEntity
+                    .status(geoDataException.getType().getStatus())
+                    .body(geoDataException.getMessage());
+        }
+        return ResponseEntity.internalServerError().body(exception.getMessage());
     }
 }
