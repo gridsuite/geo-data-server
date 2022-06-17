@@ -88,8 +88,9 @@ public class GeoDataService {
         Map<String, SubstationGeoData> substationsGeoData = new HashMap<>();
         Set<String> substationsToCalculate = new HashSet<>();
         for (Substation substation : substations) {
-            SubstationGeoData substationGeoData = substationsGeoDataDb.get(substation.getId());
+            SubstationGeoData substationGeoData = Optional.ofNullable(substationsGeoDataDb.get(substation.getId())).orElseGet(() -> substationsGeoDataDb.get(substation.getNameOrId()));
             if (substationGeoData != null && (substation.getCountry().isEmpty() || substation.getCountry().filter(c -> c.name().equals(substationGeoData.getCountry().name())).isPresent())) {
+                substationGeoData.setId(substation.getId());
                 substationsGeoData.put(substation.getId(), substationGeoData);
             } else {
                 substationsToCalculate.add(substation.getId());

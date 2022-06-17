@@ -14,6 +14,7 @@ import lombok.*;
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

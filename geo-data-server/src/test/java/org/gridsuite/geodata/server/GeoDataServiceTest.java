@@ -9,6 +9,7 @@ package org.gridsuite.geodata.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import com.powsybl.iidm.network.test.NoEquipmentNetworkFactory;
 import org.gridsuite.geodata.extensions.Coordinate;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
@@ -176,6 +177,19 @@ public class GeoDataServiceTest {
         assertEquals(8, substationsGeoData5.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
         assertEquals(8, substationsGeoData5.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0.002);
         assertEquals(12, substationsGeoData5.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0.007);
+    }
+
+    @Test
+    public void testCgmesCase() {
+        Network network = createCgmesGeoDataNetwork();
+
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
+
+        assertEquals(2, substationsGeoData.size());
+        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS1")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
+        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS1")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
+        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS2")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
+        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS2")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
     }
 
     @Test
@@ -508,6 +522,62 @@ public class GeoDataServiceTest {
                 .setB1(284E-6 / 2)
                 .setG2(0.0)
                 .setB2(288E-6 / 2)
+                .add();
+
+        return network;
+    }
+
+    private Network createCgmesGeoDataNetwork() {
+        Network network = NoEquipmentNetworkFactory.create();
+
+        Substation s1 = network.newSubstation()
+                .setId("SubstationS1")
+                .setName("P1")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+
+        VoltageLevel vlhv1 = s1.newVoltageLevel()
+                .setId("VLHV1")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+
+        Bus nhv1 = vlhv1.getBusBreakerView().newBus()
+                .setId("NHV1")
+                .add();
+
+        Substation s2 = network.newSubstation()
+                .setId("SubstationS2")
+                .setName("P2")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+
+        VoltageLevel vlhv2 = s2.newVoltageLevel()
+                .setId("VLHV2")
+                .setNominalV(380.0)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+
+        Bus nhv2 = vlhv2.getBusBreakerView().newBus()
+                .setId("NHV2")
+                .add();
+
+        network.newLine()
+                .setId("NHV1_NHV2")
+                .setVoltageLevel1(vlhv1.getId())
+                .setBus1(nhv1.getId())
+                .setConnectableBus1(nhv1.getId())
+                .setVoltageLevel2(vlhv2.getId())
+                .setBus2(nhv2.getId())
+                .setConnectableBus2(nhv2.getId())
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
                 .add();
 
         return network;
