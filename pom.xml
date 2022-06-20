@@ -50,13 +50,12 @@
     <modules>
         <module>geo-data-distribution</module>
         <module>geo-data-server</module>
-        <module>geo-data-extensions</module>
     </modules>
 
     <properties>
         <java.version>11</java.version>
 
-        <gridsuite-dependencies.version>17</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>18</gridsuite-dependencies.version>
         <commons-lang3.version>3.9</commons-lang3.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>

@@ -6,8 +6,10 @@
  */
 package org.gridsuite.geodata.server;
 
+import org.gridsuite.geodata.server.dto.json.CoordinateJsonModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -18,5 +20,10 @@ public class GeoDataApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GeoDataApplication.class, args);
+    }
+
+    @Bean
+    public CoordinateJsonModule createCoordinateJsonModule() {
+        return new CoordinateJsonModule();
     }
 }

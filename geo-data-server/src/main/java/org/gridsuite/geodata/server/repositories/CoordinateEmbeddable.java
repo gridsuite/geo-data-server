@@ -6,8 +6,8 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import com.powsybl.iidm.network.extensions.Coordinate;
 import lombok.*;
-import org.gridsuite.geodata.extensions.Coordinate;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -34,8 +34,8 @@ public class CoordinateEmbeddable {
     static List<CoordinateEmbeddable> create(List<Coordinate> coordinates) {
         return coordinates.stream()
                 .map(p -> CoordinateEmbeddable.builder()
-                        .lat(p.getLat())
-                        .lon(p.getLon())
+                        .lat(p.getLatitude())
+                        .lon(p.getLongitude())
                         .build())
                 .collect(Collectors.toList());
     }

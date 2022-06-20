@@ -9,7 +9,7 @@ package org.gridsuite.geodata.server.repositories;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
-import org.gridsuite.geodata.extensions.Coordinate;
+import com.powsybl.iidm.network.extensions.Coordinate;
 import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.junit.Before;
@@ -49,8 +49,8 @@ public class LineRepositoryTest {
     @Test
     public void test() throws JsonProcessingException {
         List<Coordinate> coordinateEntities = new ArrayList<>();
-        coordinateEntities.add(Coordinate.builder().lat(11).lon(12).build());
-        coordinateEntities.add(Coordinate.builder().lat(13).lon(14.1).build());
+        coordinateEntities.add(new Coordinate(11, 12));
+        coordinateEntities.add(new Coordinate(13, 14.1));
 
         LineEntity.LineEntityBuilder lineEntityBuilder = LineEntity.builder();
         lineEntityBuilder.country("FR")

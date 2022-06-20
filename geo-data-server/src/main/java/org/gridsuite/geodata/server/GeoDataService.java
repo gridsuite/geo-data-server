@@ -8,8 +8,8 @@ package org.gridsuite.geodata.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.gridsuite.geodata.extensions.Coordinate;
-import org.gridsuite.geodata.extensions.SubstationPosition;
+import com.powsybl.iidm.network.extensions.Coordinate;
+import com.powsybl.iidm.network.extensions.SubstationPosition;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -173,8 +173,8 @@ public class GeoDataService {
     }
 
     private static Coordinate getAverageCoordinate(List<SubstationGeoData> neighboursGeoData) {
-        double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLat()).average().orElseThrow(IllegalStateException::new);
-        double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLon()).average().orElseThrow(IllegalStateException::new);
+        double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLatitude()).average().orElseThrow(IllegalStateException::new);
+        double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLongitude()).average().orElseThrow(IllegalStateException::new);
         return new Coordinate(lat, lon);
     }
 
@@ -201,8 +201,8 @@ public class GeoDataService {
             if (!Objects.equals(neighboursGeoData.get(0).getCountry(), substation.getNullableCountry()) && defaultSubstationGeoData != null) {
                 coordinate = defaultSubstationGeoData.getCoordinate();
             } else {
-                double lat = neighboursGeoData.get(0).getCoordinate().getLat() - 0.002; // 1° correspond à 111KM
-                double lon = neighboursGeoData.get(0).getCoordinate().getLon() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
+                double lat = neighboursGeoData.get(0).getCoordinate().getLatitude() - 0.002; // 1° correspond à 111KM
+                double lon = neighboursGeoData.get(0).getCoordinate().getLongitude() - 0.007; // 1° correspond à 111.11 cos(1) = 60KM
                 coordinate = new Coordinate(lat, lon);
             }
         } else if (neighboursGeoData.isEmpty() && step == Step.TWO && defaultSubstationGeoData != null) {
