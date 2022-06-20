@@ -6,6 +6,7 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.powsybl.ws.commons.Utils;
 import org.gridsuite.geodata.server.dto.json.CoordinateJsonModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 public class GeoDataApplication {
 
     public static void main(String[] args) {
+        Utils.initProperties();
         SpringApplication.run(GeoDataApplication.class, args);
     }
 
