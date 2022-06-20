@@ -186,10 +186,10 @@ public class GeoDataServiceTest {
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
         assertEquals(2, substationsGeoData.size());
-        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS1")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
-        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS1")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
-        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS2")).collect(Collectors.toList()).get(0).getCoordinate().getLat(), 0);
-        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS2")).collect(Collectors.toList()).get(0).getCoordinate().getLon(), 0);
+        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS1")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS1")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS2")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("SubstationS2")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
     }
 
     @Test
