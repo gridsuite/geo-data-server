@@ -8,6 +8,8 @@ package org.gridsuite.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.VariantManagerConstants;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import org.gridsuite.geodata.extensions.Coordinate;
@@ -67,6 +69,9 @@ public class GeoDataControllerTest {
     private static final String GEO_DATA_SUBSTATIONS = "/geo_data_substations.json";
     private static final String GEO_DATA_LINES = "/geo_data_lines.json";
 
+    private static final String VARIANT_ID = "First_variant";
+    private static final String WRONG_VARIANT_ID = "Wrong_variant";
+
     public String toString(String resourceName) {
         try {
             return new String(ByteStreams.toByteArray(Objects.requireNonNull(getClass().getResourceAsStream(resourceName))), StandardCharsets.UTF_8);
@@ -79,7 +84,9 @@ public class GeoDataControllerTest {
     public void test() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
 
-        given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
+        Network testNetwork = EurostagTutorialExample1Factory.create();
+        testNetwork.getVariantManager().cloneVariant(VariantManagerConstants.INITIAL_VARIANT_ID, VARIANT_ID);
+        given(service.getNetwork(networkUuid)).willReturn(testNetwork);
 
         mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
@@ -87,11 +94,33 @@ public class GeoDataControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
+                .contentType(APPLICATION_JSON))
+                .andExpect(content().string("Variant '" + WRONG_VARIANT_ID + "' not found"))
+                .andExpect(status().isInternalServerError());
+
         mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
+                .contentType(APPLICATION_JSON))
+                .andExpect(content().string("Variant '" + WRONG_VARIANT_ID + "' not found"))
+                .andExpect(status().isInternalServerError());
 
         String substationJson = objectMapper.writeValueAsString(Collections.singleton(
                 SubstationGeoData.builder()

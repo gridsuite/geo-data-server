@@ -7,6 +7,7 @@
 package org.gridsuite.geodata.server;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,10 +52,14 @@ public class GeoDataController {
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get substations geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
-                                                                  @RequestParam(required = false) List<String> countries) {
+    public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
+                                                                  @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
+                                                                  @Parameter(description = "Countries")@RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
+        if (variantId != null) {
+            network.getVariantManager().setWorkingVariant(variantId);
+        }
         List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet);
         return ResponseEntity.ok().body(substations);
     }
@@ -62,10 +67,14 @@ public class GeoDataController {
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get lines geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
-    public ResponseEntity<List<LineGeoData>> getLines(@RequestParam UUID networkUuid,
-                                                      @RequestParam(required = false) List<String> countries) {
+    public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
+                                                      @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
+                                                      @Parameter(description = "Countries")@RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
+        if (variantId != null) {
+            network.getVariantManager().setWorkingVariant(variantId);
+        }
         List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
         return ResponseEntity.ok().body(lines);
     }
