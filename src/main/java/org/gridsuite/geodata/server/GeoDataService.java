@@ -7,6 +7,7 @@
 package org.gridsuite.geodata.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
@@ -378,7 +379,7 @@ public class GeoDataService {
     }
 
     private List<Coordinate> toDto(String coordinates) throws JsonProcessingException {
-        return mapper.readValue(coordinates, List.class);
+        return mapper.readValue(coordinates, new TypeReference<List<Coordinate>>() { });
     }
 
     private Map<String, SubstationGeoData> getSubstationMap(Network network, Set<Country> countries) {
