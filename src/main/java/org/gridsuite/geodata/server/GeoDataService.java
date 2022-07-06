@@ -38,6 +38,8 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
+    static final double CALCULATED_NEIGHBORHOOD_OFFSET = 0.005;
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -149,20 +151,31 @@ public class GeoDataService {
         LOGGER.info("Missing substation geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
     }
 
+    private double nextNeighbourhoodOffset(double neighborhoodOffset) {
+        return neighborhoodOffset > 0 ? (neighborhoodOffset * -1) : (neighborhoodOffset * -1) + CALCULATED_NEIGHBORHOOD_OFFSET;
+    }
+
     private void step(Step step, Network network, Map<String, Set<String>> sortedNeighbours, Map<String, SubstationGeoData> substationsGeoData,
                       Set<String> substationsToCalculate) {
+
+        Map<String, Double> calculatedSubstationsOffset = new HashMap<>();
         for (int iteration = 0; iteration < maxIterations; iteration++) {
             int calculated = 0;
             for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext();) {
                 String substationId = it.next();
                 Set<String> neighbours = sortedNeighbours.get(substationId);
 
+                String neighborhoodSignature = String.join("", neighbours);
+                double neighborhoodOffset = calculatedSubstationsOffset.get(neighborhoodSignature) != null ? nextNeighbourhoodOffset(calculatedSubstationsOffset.get(neighborhoodSignature)) : 0;
+
                 // centroid calculation
                 Substation substation = network.getSubstation(substationId);
-                SubstationGeoData substationGeoData = calculateCentroidGeoData(substation, neighbours, step, substationsGeoData);
+                SubstationGeoData substationGeoData = calculateCentroidGeoData(substation, neighbours, step, substationsGeoData, neighborhoodOffset);
+
                 if (substationGeoData != null) {
                     calculated++;
                     substationsGeoData.put(substationId, substationGeoData);
+                    calculatedSubstationsOffset.put(neighborhoodSignature, neighborhoodOffset);
                     it.remove();
                 }
             }
@@ -174,14 +187,25 @@ public class GeoDataService {
         }
     }
 
-    private static Coordinate getAverageCoordinate(List<SubstationGeoData> neighboursGeoData) {
+    private static Coordinate getAverageCoordinate(List<SubstationGeoData> neighboursGeoData, double neighborhoodOffset) {
         double lat = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLatitude()).average().orElseThrow(IllegalStateException::new);
         double lon = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLongitude()).average().orElseThrow(IllegalStateException::new);
+
+        if (neighborhoodOffset != 0) {
+            double latDifference = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLatitude()).max().orElseThrow(IllegalStateException::new) - neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLatitude()).min().orElseThrow(IllegalStateException::new);
+            double lonDifference = neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLongitude()).max().orElseThrow(IllegalStateException::new) - neighboursGeoData.stream().mapToDouble(n -> n.getCoordinate().getLongitude()).min().orElseThrow(IllegalStateException::new);
+
+            if (latDifference > lonDifference) {
+                lon += neighborhoodOffset;
+            } else {
+                lat += neighborhoodOffset;
+            }
+        }
         return new Coordinate(lat, lon);
     }
 
     private SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
-                                                              Map<String, SubstationGeoData> substationsGeoData) {
+                                                              Map<String, SubstationGeoData> substationsGeoData, double neighborhoodOffset) {
         // get neighbours geo data
         List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationsGeoData::get)
                 .filter(Objects::nonNull)
@@ -197,7 +221,7 @@ public class GeoDataService {
                     defaultSubstationGeoData != null) {
                 neighboursGeoData = Collections.singletonList(defaultSubstationGeoData);
             }
-            coordinate = getAverageCoordinate(neighboursGeoData);
+            coordinate = getAverageCoordinate(neighboursGeoData, neighborhoodOffset);
         } else if (neighboursGeoData.size() == 1 && step == Step.TWO) {
             // if neighbour not in the same country, locate the substation to a default position in its country
             if (!Objects.equals(neighboursGeoData.get(0).getCountry(), substation.getNullableCountry()) && defaultSubstationGeoData != null) {
