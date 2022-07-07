@@ -158,15 +158,13 @@ public class GeoDataService {
     private void step(Step step, Network network, Map<String, Set<String>> sortedNeighbours, Map<String, SubstationGeoData> substationsGeoData,
                       Set<String> substationsToCalculate) {
 
-        Map<String, Double> calculatedSubstationsOffset = new HashMap<>();
+        Map<Set<String>, Double> calculatedSubstationsOffset = new HashMap<>();
         for (int iteration = 0; iteration < maxIterations; iteration++) {
             int calculated = 0;
             for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext();) {
                 String substationId = it.next();
                 Set<String> neighbours = sortedNeighbours.get(substationId);
-
-                String neighborhoodSignature = String.join("", neighbours);
-                double neighborhoodOffset = calculatedSubstationsOffset.get(neighborhoodSignature) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighborhoodSignature)) : 0;
+                double neighborhoodOffset = calculatedSubstationsOffset.get(neighbours) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighbours)) : 0;
 
                 // centroid calculation
                 Substation substation = network.getSubstation(substationId);
@@ -175,7 +173,7 @@ public class GeoDataService {
                 if (substationGeoData != null) {
                     calculated++;
                     substationsGeoData.put(substationId, substationGeoData);
-                    calculatedSubstationsOffset.put(neighborhoodSignature, neighborhoodOffset);
+                    calculatedSubstationsOffset.put(neighbours, neighborhoodOffset);
                     it.remove();
                 }
             }
