@@ -223,7 +223,7 @@ public class GeoDataServiceTest {
                 .setId("NOTEXISTBUS2")
                 .add();
 
-        Line notexistline1 = network.newLine()
+        Line notexistline = network.newLine()
                 .setId("NOTEXISTLINE1")
                 .setVoltageLevel1(notexistvl1.getId())
                 .setBus1(notexistbus1.getId())
@@ -238,7 +238,6 @@ public class GeoDataServiceTest {
                 .setG2(0.0)
                 .setB2(386E-6 / 2)
                 .add();
-
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
         assertFalse("Must not contain nulls", substationsGeoData.stream().anyMatch(Objects::isNull));
         assertFalse("Must not contain unknown substation " + notexistsub1.getId(),
@@ -248,8 +247,8 @@ public class GeoDataServiceTest {
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(Collections.singletonList(Country.FR)));
         assertFalse("Must not contain nulls", linesGeoData.stream().anyMatch(Objects::isNull));
-        assertFalse("Must not contain unknown lines " + notexistline1.getId(),
-                linesGeoData.stream().anyMatch(s -> notexistline1.getId().equals(s.getId())));
+        assertFalse("Must not contain unknown lines " + notexistline.getId(),
+                linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())));
     }
 
     @Test
@@ -467,12 +466,6 @@ public class GeoDataServiceTest {
 
         Substation p4 = network.newSubstation()
                 .setId("P4")
-                .setCountry(Country.FR)
-                .setTso("RTE")
-                .add();
-
-        Substation p9 = network.newSubstation()
-                .setId("P9")
                 .setCountry(Country.FR)
                 .setTso("RTE")
                 .add();
