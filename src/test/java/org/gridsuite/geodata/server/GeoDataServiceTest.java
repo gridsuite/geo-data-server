@@ -253,7 +253,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testNeighborhoodOffset() {
+    public void testSimilarNeighborhoodOffset() {
         Network network = EurostagTutorialExample1Factory.create();
         Substation p4 = network.newSubstation()
                 .setId("P4")
@@ -265,11 +265,11 @@ public class GeoDataServiceTest {
                 .setNominalV(380)
                 .setTopologyKind(TopologyKind.BUS_BREAKER)
                 .add();
-        Bus bus4 = vl4.getBusBreakerView().newBus()
+        vl4.getBusBreakerView().newBus()
                 .setId("NHV4")
                 .add();
 
-        Line line14 = network.newLine()
+        network.newLine()
                 .setId("LINE1_4")
                 .setVoltageLevel1("VLHV1")
                 .setBus1("NHV1")
@@ -285,7 +285,7 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
-        Line line24 = network.newLine()
+        network.newLine()
                 .setId("LINE2_4")
                 .setVoltageLevel1("VLHV2")
                 .setBus1("NHV2")
@@ -311,11 +311,11 @@ public class GeoDataServiceTest {
                 .setNominalV(380)
                 .setTopologyKind(TopologyKind.BUS_BREAKER)
                 .add();
-        Bus bus5 = vl5.getBusBreakerView().newBus()
+        vl5.getBusBreakerView().newBus()
                 .setId("NHV5")
                 .add();
 
-        Line line15 = network.newLine()
+        network.newLine()
                 .setId("LINE1_5")
                 .setVoltageLevel1("VLHV1")
                 .setBus1("NHV1")
@@ -331,7 +331,7 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
-        Line line25 = network.newLine()
+        network.newLine()
                 .setId("LINE2_5")
                 .setVoltageLevel1("VLHV2")
                 .setBus1("NHV2")
@@ -357,44 +357,15 @@ public class GeoDataServiceTest {
                 .setNominalV(380)
                 .setTopologyKind(TopologyKind.BUS_BREAKER)
                 .add();
-        Bus bus6 = vl6.getBusBreakerView().newBus()
+        vl6.getBusBreakerView().newBus()
                 .setId("NHV6")
-                .add();
-
-        Line line16 = network.newLine()
-                .setId("LINE1_6")
-                .setVoltageLevel1("VLHV1")
-                .setBus1("NHV1")
-                .setConnectableBus1("NHV1")
-                .setVoltageLevel2("VLHV6")
-                .setBus2("NHV6")
-                .setConnectableBus2("NHV6")
-                .setR(3.0)
-                .setX(33.0)
-                .setG1(0.0)
-                .setB1(386E-6 / 2)
-                .setG2(0.0)
-                .setB2(386E-6 / 2)
-                .add();
-
-        Line line26 = network.newLine()
-                .setId("LINE2_6")
-                .setVoltageLevel1("VLHV2")
-                .setBus1("NHV2")
-                .setConnectableBus1("NHV2")
-                .setVoltageLevel2("VLHV6")
-                .setBus2("NHV6")
-                .setConnectableBus2("NHV6")
-                .setR(3.0)
-                .setX(33.0)
-                .setG1(0.0)
-                .setB1(386E-6 / 2)
-                .setG2(0.0)
-                .setB2(386E-6 / 2)
                 .add();
 
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
+        SubstationGeoData pgd4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pgd5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
+        assertEquals(GeoDataService.CALCULATED_SUBSTATION_OFFSET, Math.abs(pgd5.getCoordinate().getLongitude()) - pgd4.getCoordinate().getLongitude(), 0.0001);
     }
 
     @Test
