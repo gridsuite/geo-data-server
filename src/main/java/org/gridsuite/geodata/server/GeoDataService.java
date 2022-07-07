@@ -151,7 +151,7 @@ public class GeoDataService {
         LOGGER.info("Missing substation geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
     }
 
-    private double nextNeighbourhoodOffset(double neighborhoodOffset) {
+    private double nextNeighborhoodOffset(double neighborhoodOffset) {
         return neighborhoodOffset > 0 ? (neighborhoodOffset * -1) : (neighborhoodOffset * -1) + CALCULATED_SUBSTATION_OFFSET;
     }
 
@@ -166,7 +166,7 @@ public class GeoDataService {
                 Set<String> neighbours = sortedNeighbours.get(substationId);
 
                 String neighborhoodSignature = String.join("", neighbours);
-                double neighborhoodOffset = calculatedSubstationsOffset.get(neighborhoodSignature) != null ? nextNeighbourhoodOffset(calculatedSubstationsOffset.get(neighborhoodSignature)) : 0;
+                double neighborhoodOffset = calculatedSubstationsOffset.get(neighborhoodSignature) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighborhoodSignature)) : 0;
 
                 // centroid calculation
                 Substation substation = network.getSubstation(substationId);

@@ -365,7 +365,7 @@ public class GeoDataServiceTest {
 
         SubstationGeoData pgd4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
         SubstationGeoData pgd5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
-        assertEquals(GeoDataService.CALCULATED_SUBSTATION_OFFSET, Math.abs(pgd5.getCoordinate().getLongitude()) - pgd4.getCoordinate().getLongitude(), 0.0001);
+        assertEquals(GeoDataService.CALCULATED_SUBSTATION_OFFSET, Math.abs(pgd4.getCoordinate().getLongitude() - pgd5.getCoordinate().getLongitude()), 0.0001);
     }
 
     @Test
