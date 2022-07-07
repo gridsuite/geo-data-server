@@ -38,7 +38,7 @@ public class GeoDataService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
-    static final double CALCULATED_NEIGHBORHOOD_OFFSET = 0.005;
+    static final double CALCULATED_SUBSTATION_OFFSET = 0.005;
 
     @Autowired
     private ObjectMapper mapper;
@@ -152,7 +152,7 @@ public class GeoDataService {
     }
 
     private double nextNeighbourhoodOffset(double neighborhoodOffset) {
-        return neighborhoodOffset > 0 ? (neighborhoodOffset * -1) : (neighborhoodOffset * -1) + CALCULATED_NEIGHBORHOOD_OFFSET;
+        return neighborhoodOffset > 0 ? (neighborhoodOffset * -1) : (neighborhoodOffset * -1) + CALCULATED_SUBSTATION_OFFSET;
     }
 
     private void step(Step step, Network network, Map<String, Set<String>> sortedNeighbours, Map<String, SubstationGeoData> substationsGeoData,

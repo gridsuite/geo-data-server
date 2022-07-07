@@ -223,7 +223,7 @@ public class GeoDataServiceTest {
                 .setId("NOTEXISTBUS2")
                 .add();
 
-        Line notexistline = network.newLine()
+        Line notexistline1 = network.newLine()
                 .setId("NOTEXISTLINE1")
                 .setVoltageLevel1(notexistvl1.getId())
                 .setBus1(notexistbus1.getId())
@@ -238,6 +238,7 @@ public class GeoDataServiceTest {
                 .setG2(0.0)
                 .setB2(386E-6 / 2)
                 .add();
+
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
         assertFalse("Must not contain nulls", substationsGeoData.stream().anyMatch(Objects::isNull));
         assertFalse("Must not contain unknown substation " + notexistsub1.getId(),
@@ -247,8 +248,153 @@ public class GeoDataServiceTest {
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(Collections.singletonList(Country.FR)));
         assertFalse("Must not contain nulls", linesGeoData.stream().anyMatch(Objects::isNull));
-        assertFalse("Must not contain unknown lines " + notexistline.getId(),
-                linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())));
+        assertFalse("Must not contain unknown lines " + notexistline1.getId(),
+                linesGeoData.stream().anyMatch(s -> notexistline1.getId().equals(s.getId())));
+    }
+
+    @Test
+    public void testNeighborhoodOffset() {
+        Network network = EurostagTutorialExample1Factory.create();
+        Substation p4 = network.newSubstation()
+                .setId("P4")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+        VoltageLevel vl4 = p4.newVoltageLevel()
+                .setId("VLHV4")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus bus4 = vl4.getBusBreakerView().newBus()
+                .setId("NHV4")
+                .add();
+
+        Line line14 = network.newLine()
+                .setId("LINE1_4")
+                .setVoltageLevel1("VLHV1")
+                .setBus1("NHV1")
+                .setConnectableBus1("NHV1")
+                .setVoltageLevel2("VLHV4")
+                .setBus2("NHV4")
+                .setConnectableBus2("NHV4")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        Line line24 = network.newLine()
+                .setId("LINE2_4")
+                .setVoltageLevel1("VLHV2")
+                .setBus1("NHV2")
+                .setConnectableBus1("NHV2")
+                .setVoltageLevel2("VLHV4")
+                .setBus2("NHV4")
+                .setConnectableBus2("NHV4")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        Substation p5 = network.newSubstation()
+                .setId("P5")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+        VoltageLevel vl5 = p5.newVoltageLevel()
+                .setId("VLHV5")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus bus5 = vl5.getBusBreakerView().newBus()
+                .setId("NHV5")
+                .add();
+
+        Line line15 = network.newLine()
+                .setId("LINE1_5")
+                .setVoltageLevel1("VLHV1")
+                .setBus1("NHV1")
+                .setConnectableBus1("NHV1")
+                .setVoltageLevel2("VLHV5")
+                .setBus2("NHV5")
+                .setConnectableBus2("NHV5")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        Line line25 = network.newLine()
+                .setId("LINE2_5")
+                .setVoltageLevel1("VLHV2")
+                .setBus1("NHV2")
+                .setConnectableBus1("NHV2")
+                .setVoltageLevel2("VLHV5")
+                .setBus2("NHV5")
+                .setConnectableBus2("NHV5")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        Substation p6 = network.newSubstation()
+                .setId("P6")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+        VoltageLevel vl6 = p6.newVoltageLevel()
+                .setId("VLHV6")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus bus6 = vl6.getBusBreakerView().newBus()
+                .setId("NHV6")
+                .add();
+
+        Line line16 = network.newLine()
+                .setId("LINE1_6")
+                .setVoltageLevel1("VLHV1")
+                .setBus1("NHV1")
+                .setConnectableBus1("NHV1")
+                .setVoltageLevel2("VLHV6")
+                .setBus2("NHV6")
+                .setConnectableBus2("NHV6")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        Line line26 = network.newLine()
+                .setId("LINE2_6")
+                .setVoltageLevel1("VLHV2")
+                .setBus1("NHV2")
+                .setConnectableBus1("NHV2")
+                .setVoltageLevel2("VLHV6")
+                .setBus2("NHV6")
+                .setConnectableBus2("NHV6")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
+
     }
 
     @Test
@@ -350,6 +496,12 @@ public class GeoDataServiceTest {
 
         Substation p4 = network.newSubstation()
                 .setId("P4")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+
+        Substation p9 = network.newSubstation()
+                .setId("P9")
                 .setCountry(Country.FR)
                 .setTso("RTE")
                 .add();
