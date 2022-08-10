@@ -127,6 +127,7 @@ public class GeoDataServiceTest {
     @Test
     public void test() {
         Network network = createGeoDataNetwork();
+        DefaultSubstationGeoParameter defaultSubstationGeoParameter = new DefaultSubstationGeoParameter(0.0, 0.0, defaultSubstationsGeoData.get("DE").getCoordinate());
 
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
@@ -169,8 +170,9 @@ public class GeoDataServiceTest {
 
         SubstationGeoData p6 = substationsGeoData4.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0);
         SubstationGeoData p7 = substationsGeoData4.stream().filter(s -> s.getId().equals("P7")).collect(Collectors.toList()).get(0);
-        assertEquals(0.002, Math.abs(p6.getCoordinate().getLatitude()) - p7.getCoordinate().getLatitude(), 0.0001);
-        assertEquals(0.007, Math.abs(p6.getCoordinate().getLongitude()) - p7.getCoordinate().getLongitude(), 0.0001);
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), p6.getCoordinate());
+        defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), p7.getCoordinate());
 
         List<SubstationGeoData> substationsGeoData5 = geoDataService.getSubstations(network, new HashSet<>(ImmutableList.of(Country.DE, Country.BE)));
 
