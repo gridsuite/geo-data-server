@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Nicolas Noir <nicolas.oir at rte-france.com>
@@ -44,5 +45,9 @@ public class DefaultSubstationGeoDataByCountry {
 
     public SubstationGeoData get(String countryName) {
         return substationsGeoDataByCountry.get(countryName);
+    }
+
+    public Set<Map.Entry<String, SubstationGeoData>> getEntrySet() {
+        return substationsGeoDataByCountry.entrySet();
     }
 }
