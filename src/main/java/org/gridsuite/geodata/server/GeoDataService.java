@@ -153,11 +153,9 @@ public class GeoDataService {
                     .collect(Collectors.toSet());
 
             for (String neighbour : neighbours) {
-                if (remainingSubstations.contains(substationsGeoData.get(neighbour))) {
-                    substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinates());
-                    remainingSubstations.remove(neighbour);
-                    geoParameters.incrementDefaultSubstationGeoParameters();
-                }
+                substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinates());
+                remainingSubstations.remove(neighbour);
+                geoParameters.incrementDefaultSubstationGeoParameters();
             }
             geoParameters = calculateDefaultSubstationGeoDataRecursively(substationsGeoData, neighbours.stream().collect(Collectors.toList()), remainingSubstations, geoParameters, sortedNeighbours);
         }
