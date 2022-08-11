@@ -435,8 +435,6 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
-
-
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.BE)));
         DefaultSubstationGeoParameter defaultSubstationGeoParameter = new DefaultSubstationGeoParameter(0.0, 0.0, defaultSubstationsGeoData.get("BE").getCoordinate());
 
