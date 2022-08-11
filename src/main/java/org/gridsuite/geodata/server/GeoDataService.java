@@ -128,27 +128,26 @@ public class GeoDataService {
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
         StopWatch stopWatch = StopWatch.createStarted();
         for (Map.Entry<String, SubstationGeoData> entry : defaultSubstationsGeoData.getEntrySet()) {
-            List<String> clutteredSubstationsIds = substationsGeoData.values().stream().filter(substationGeoData -> substationGeoData.getCountry().equals(entry.getValue().getCountry()) && (substationGeoData.getCoordinate().getLatitude() > (entry.getValue().getCoordinate().getLatitude() - 1)) && (substationGeoData.getCoordinate().getLatitude() < (entry.getValue().getCoordinate().getLatitude() + 1)) &&
+            Set<String> clutteredSubstationsIds = substationsGeoData.values().stream().filter(substationGeoData -> substationGeoData.getCountry().equals(entry.getValue().getCountry()) && (substationGeoData.getCoordinate().getLatitude() > (entry.getValue().getCoordinate().getLatitude() - 1)) && (substationGeoData.getCoordinate().getLatitude() < (entry.getValue().getCoordinate().getLatitude() + 1)) &&
                     (substationGeoData.getCoordinate().getLongitude() > (entry.getValue().getCoordinate().getLongitude() - 1)) && (substationGeoData.getCoordinate().getLongitude() < (entry.getValue().getCoordinate().getLongitude() + 1)))
-                    .sorted((s1, s2) -> s1.getId().compareToIgnoreCase(s2.getId()))
-                    .map(substationGeoData -> substationGeoData.getId()).collect(Collectors.toList());
+                    .map(substationGeoData -> substationGeoData.getId()).collect(Collectors.toSet());
 
-            calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, clutteredSubstationsIds.stream().collect(Collectors.toSet()), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
+            calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, new HashSet<>(clutteredSubstationsIds), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
         }
         stopWatch.stop();
         LOGGER.info("Default substations geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
     }
 
-    private DefaultSubstationGeoParameter calculateDefaultSubstationGeoDataRecursively(Map<String, SubstationGeoData> substationsGeoData, List<String> substationsToProcess, Set<String> remainingSubstations, DefaultSubstationGeoParameter initialGeoParameters, Map<String, Set<String>> sortedNeighbours) {
+    private DefaultSubstationGeoParameter calculateDefaultSubstationGeoDataRecursively(Map<String, SubstationGeoData> substationsGeoData, Set<String> substationsToProcess, Set<String> remainingSubstations, DefaultSubstationGeoParameter initialGeoParameters, Map<String, Set<String>> sortedNeighbours) {
         DefaultSubstationGeoParameter geoParameters = initialGeoParameters;
-        for (int i = 0; i < substationsToProcess.size(); i++) {
-            if (remainingSubstations.contains(substationsToProcess.get(i))) {
-                substationsGeoData.get(substationsToProcess.get(i)).setCoordinate(geoParameters.getCurrentCoordinates());
-                remainingSubstations.remove(substationsToProcess.get(i));
+        for (String substationToProcess : substationsToProcess) {
+            if (remainingSubstations.contains(substationToProcess)) {
+                substationsGeoData.get(substationToProcess).setCoordinate(geoParameters.getCurrentCoordinates());
+                remainingSubstations.remove(substationToProcess);
                 geoParameters.incrementDefaultSubstationGeoParameters();
             }
 
-            Set<String> neighbours = sortedNeighbours.get(substationsToProcess.get(i)).stream()
+            Set<String> neighbours = sortedNeighbours.get(substationToProcess).stream()
                     .filter(remainingSubstations::contains)
                     .collect(Collectors.toSet());
 
@@ -157,7 +156,7 @@ public class GeoDataService {
                 remainingSubstations.remove(neighbour);
                 geoParameters.incrementDefaultSubstationGeoParameters();
             }
-            geoParameters = calculateDefaultSubstationGeoDataRecursively(substationsGeoData, neighbours.stream().collect(Collectors.toList()), remainingSubstations, geoParameters, sortedNeighbours);
+            geoParameters = calculateDefaultSubstationGeoDataRecursively(substationsGeoData, neighbours, remainingSubstations, geoParameters, sortedNeighbours);
         }
         return geoParameters;
     }
