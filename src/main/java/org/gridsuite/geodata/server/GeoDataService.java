@@ -149,7 +149,7 @@ public class GeoDataService {
             }
 
             Set<String> neighbours = sortedNeighbours.get(substationsToProcess.get(i)).stream()
-                    .filter(neighbour -> remainingSubstations.contains(neighbour))
+                    .filter(remainingSubstations::contains)
                     .collect(Collectors.toSet());
 
             for (String neighbour : neighbours) {
