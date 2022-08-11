@@ -132,7 +132,9 @@ public class GeoDataService {
                     (substationGeoData.getCoordinate().getLongitude() > (entry.getValue().getCoordinate().getLongitude() - 1)) && (substationGeoData.getCoordinate().getLongitude() < (entry.getValue().getCoordinate().getLongitude() + 1)))
                     .map(substationGeoData -> substationGeoData.getId()).collect(Collectors.toSet());
 
-            calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, new HashSet<>(clutteredSubstationsIds), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
+            if (clutteredSubstationsIds.size() > DefaultSubstationGeoParameter.TRIGGERING_THRESHOLD) {
+                calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, new HashSet<>(clutteredSubstationsIds), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
+            }
         }
         stopWatch.stop();
         LOGGER.info("Default substations geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
@@ -147,16 +149,18 @@ public class GeoDataService {
                 geoParameters.incrementDefaultSubstationGeoParameters();
             }
 
-            Set<String> neighbours = sortedNeighbours.get(substationToProcess).stream()
-                    .filter(remainingSubstations::contains)
-                    .collect(Collectors.toSet());
+            if (sortedNeighbours.get(substationToProcess) != null) {
+                Set<String> neighbours = sortedNeighbours.get(substationToProcess).stream()
+                        .filter(remainingSubstations::contains)
+                        .collect(Collectors.toSet());
 
-            for (String neighbour : neighbours) {
-                substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinates());
-                remainingSubstations.remove(neighbour);
-                geoParameters.incrementDefaultSubstationGeoParameters();
+                for (String neighbour : neighbours) {
+                    substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinates());
+                    remainingSubstations.remove(neighbour);
+                    geoParameters.incrementDefaultSubstationGeoParameters();
+                }
+                geoParameters = calculateDefaultSubstationGeoDataRecursively(substationsGeoData, neighbours, remainingSubstations, geoParameters, sortedNeighbours);
             }
-            geoParameters = calculateDefaultSubstationGeoDataRecursively(substationsGeoData, neighbours, remainingSubstations, geoParameters, sortedNeighbours);
         }
         return geoParameters;
     }

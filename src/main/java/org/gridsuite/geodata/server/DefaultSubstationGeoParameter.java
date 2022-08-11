@@ -23,6 +23,8 @@ public class DefaultSubstationGeoParameter {
     static final double DEFAULT_SUBSTATION_RADIUS_OFFSET = 0.0001;
     static final double DEFAULT_SUBSTATION_ANGLE_OFFSET = 25;
 
+    static final double TRIGGERING_THRESHOLD = 5;
+
     private Double radius;
 
     private Double angle;
