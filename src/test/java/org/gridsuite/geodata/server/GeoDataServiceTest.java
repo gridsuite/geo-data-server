@@ -131,13 +131,13 @@ public class GeoDataServiceTest {
 
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
-        assertEquals(4, substationsGeoData.size());
+        assertEquals(5, substationsGeoData.size());
         assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, new HashSet<>(List.of(Country.FR)));
 
-        assertEquals(13, linesGeoData.size());
+        assertEquals(14, linesGeoData.size());
         assertEquals(2, getFromList(linesGeoData, "NHV1_NHV2_1").getCoordinates().size()); // line with no coordinate, so [substation1, substation2]
         List<Coordinate> lineNHV2 = getFromList(linesGeoData, "NHV2_NHV3").getCoordinates();
         List<Coordinate> lineNHV3 = new ArrayList<>(getFromList(linesGeoData, "NHV2_NHV3_inverted").getCoordinates());
@@ -150,12 +150,17 @@ public class GeoDataServiceTest {
 
         List<SubstationGeoData> substationsGeoData2 = geoDataService.getSubstations(network, new HashSet<>(ImmutableList.of(Country.FR, Country.BE)));
 
-        assertEquals(5, substationsGeoData2.size());
+        assertEquals(6, substationsGeoData2.size());
         assertEquals(2, substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(3, substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
 
         assertEquals(4, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(8, substationsGeoData2.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+
+        SubstationGeoData p4 = substationsGeoData2.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
+        SubstationGeoData p8 = substationsGeoData2.stream().filter(s -> s.getId().equals("P8")).collect(Collectors.toList()).get(0);
+        assertEquals(0.002, Math.abs(p4.getCoordinate().getLatitude()) - p8.getCoordinate().getLatitude(), 0.0001);
+        assertEquals(0.007, Math.abs(p4.getCoordinate().getLongitude()) - p8.getCoordinate().getLongitude(), 0.0001);
 
         List<SubstationGeoData> substationsGeoData3 = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.BE)));
 
@@ -720,6 +725,38 @@ public class GeoDataServiceTest {
                 .setB1(284E-6 / 2)
                 .setG2(0.0)
                 .setB2(288E-6 / 2)
+                .add();
+
+        Substation p8 = network.newSubstation()
+                .setId("P8")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+
+        VoltageLevel vlhv8 = p8.newVoltageLevel()
+                .setId("VLHV8")
+                .setNominalV(380.0)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+
+        Bus nhv8 = vlhv8.getBusBreakerView().newBus()
+                .setId("NHV8")
+                .add();
+
+        network.newLine()
+                .setId("NHV8_NHV4")
+                .setVoltageLevel1("VLHV4")
+                .setBus1("NHV4")
+                .setConnectableBus1("NHV4")
+                .setVoltageLevel2(vlhv8.getId())
+                .setBus2(nhv8.getId())
+                .setConnectableBus2(nhv8.getId())
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
                 .add();
 
         return network;
