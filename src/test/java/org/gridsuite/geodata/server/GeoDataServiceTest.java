@@ -127,6 +127,7 @@ public class GeoDataServiceTest {
     @Test
     public void test() {
         Network network = createGeoDataNetwork();
+        
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
         assertEquals(4, substationsGeoData.size());
