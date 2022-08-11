@@ -454,15 +454,15 @@ public class GeoDataServiceTest {
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.BE)));
         DefaultSubstationGeoParameter defaultSubstationGeoParameter = new DefaultSubstationGeoParameter(0.0, 0.0, defaultSubstationsGeoData.get("BE").getCoordinate());
 
-        SubstationGeoData pgd4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
-        SubstationGeoData pgd5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
-        SubstationGeoData pgd6 = substationsGeoData.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pg4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pg5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pg6 = substationsGeoData.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0);
 
-        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pgd4.getCoordinate());
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pg4.getCoordinate());
         defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
-        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pgd5.getCoordinate());
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pg5.getCoordinate());
         defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
-        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pgd6.getCoordinate());
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pg6.getCoordinate());
     }
 
     @Test
