@@ -132,7 +132,7 @@ public class GeoDataService {
                     (substationGeoData.getCoordinate().getLongitude() > (entry.getValue().getCoordinate().getLongitude() - 1)) && (substationGeoData.getCoordinate().getLongitude() < (entry.getValue().getCoordinate().getLongitude() + 1)))
                     .map(substationGeoData -> substationGeoData.getId()).collect(Collectors.toSet());
 
-            if (clutteredSubstationsIds.size() > DefaultSubstationGeoParameter.TRIGGERING_THRESHOLD) {
+            if (clutteredSubstationsIds.size() > DefaultSubstationGeoParameter.DECLUTTERING_THRESHOLD) {
                 calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, new HashSet<>(clutteredSubstationsIds), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
             }
         }
