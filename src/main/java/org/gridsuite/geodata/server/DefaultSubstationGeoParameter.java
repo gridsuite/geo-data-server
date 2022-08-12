@@ -29,12 +29,12 @@ public class DefaultSubstationGeoParameter {
 
     private Double angle;
 
-    private Coordinate currentCoordinates;
+    private Coordinate currentCoordinate;
 
     public void incrementDefaultSubstationGeoParameters() {
         this.radius += DEFAULT_SUBSTATION_RADIUS_OFFSET;
         this.angle += DEFAULT_SUBSTATION_ANGLE_OFFSET;
-        currentCoordinates = new Coordinate(currentCoordinates.getLatitude() + Math.sqrt(this.radius) * Math.cos(Math.toRadians(this.angle)),
-                currentCoordinates.getLongitude() + Math.sqrt(this.radius) * Math.sin(Math.toRadians(this.angle)));
+        currentCoordinate = new Coordinate(currentCoordinate.getLatitude() + Math.sqrt(this.radius) * Math.cos(Math.toRadians(this.angle)),
+                currentCoordinate.getLongitude() + Math.sqrt(this.radius) * Math.sin(Math.toRadians(this.angle)));
     }
 }

@@ -144,7 +144,7 @@ public class GeoDataService {
         DefaultSubstationGeoParameter geoParameters = initialGeoParameters;
         for (String substationToProcess : substationsToProcess) {
             if (remainingSubstations.contains(substationToProcess)) {
-                substationsGeoData.get(substationToProcess).setCoordinate(geoParameters.getCurrentCoordinates());
+                substationsGeoData.get(substationToProcess).setCoordinate(geoParameters.getCurrentCoordinate());
                 remainingSubstations.remove(substationToProcess);
                 geoParameters.incrementDefaultSubstationGeoParameters();
             }
@@ -155,7 +155,7 @@ public class GeoDataService {
                         .collect(Collectors.toSet());
 
                 for (String neighbour : neighbours) {
-                    substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinates());
+                    substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinate());
                     remainingSubstations.remove(neighbour);
                     geoParameters.incrementDefaultSubstationGeoParameters();
                 }
