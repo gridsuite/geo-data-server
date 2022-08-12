@@ -50,6 +50,9 @@ public class GeoDataServiceTest {
     @Autowired
     GeoDataService geoDataService;
 
+    @Autowired
+    private DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
+
     @Before
     public void setUp() throws JsonProcessingException {
         lineRepository.deleteAll();
@@ -124,7 +127,6 @@ public class GeoDataServiceTest {
     @Test
     public void test() {
         Network network = createGeoDataNetwork();
-
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
         assertEquals(4, substationsGeoData.size());
@@ -346,9 +348,47 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
+
+        SubstationGeoData pgd4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pgd5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
+        assertEquals(GeoDataService.CALCULATED_SUBSTATION_OFFSET, Math.abs(pgd4.getCoordinate().getLongitude() - pgd5.getCoordinate().getLongitude()), 0.0001);
+    }
+
+    @Test
+    public void testCalculatedDefaultSubstations() {
+        Network network = EurostagTutorialExample1Factory.create();
+        Substation p4 = network.newSubstation()
+                .setId("P4")
+                .setCountry(Country.BE)
+                .setTso("RTE")
+                .add();
+        VoltageLevel vl4 = p4.newVoltageLevel()
+                .setId("VLHV4")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        vl4.getBusBreakerView().newBus()
+                .setId("NHV4")
+                .add();
+
+        Substation p5 = network.newSubstation()
+                .setId("P5")
+                .setCountry(Country.BE)
+                .setTso("RTE")
+                .add();
+        VoltageLevel vl5 = p5.newVoltageLevel()
+                .setId("VLHV5")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        vl5.getBusBreakerView().newBus()
+                .setId("NHV5")
+                .add();
+
         Substation p6 = network.newSubstation()
                 .setId("P6")
-                .setCountry(Country.FR)
+                .setCountry(Country.BE)
                 .setTso("RTE")
                 .add();
         VoltageLevel vl6 = p6.newVoltageLevel()
@@ -360,11 +400,69 @@ public class GeoDataServiceTest {
                 .setId("NHV6")
                 .add();
 
-        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.FR)));
+        network.newLine()
+                .setId("LINE4_5")
+                .setVoltageLevel1("VLHV4")
+                .setBus1("NHV4")
+                .setConnectableBus1("NHV4")
+                .setVoltageLevel2("VLHV5")
+                .setBus2("NHV5")
+                .setConnectableBus2("NHV5")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
 
-        SubstationGeoData pgd4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
-        SubstationGeoData pgd5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
-        assertEquals(GeoDataService.CALCULATED_SUBSTATION_OFFSET, Math.abs(pgd4.getCoordinate().getLongitude() - pgd5.getCoordinate().getLongitude()), 0.0001);
+        network.newLine()
+                .setId("LINE4_6")
+                .setVoltageLevel1("VLHV4")
+                .setBus1("NHV4")
+                .setConnectableBus1("NHV4")
+                .setVoltageLevel2("VLHV6")
+                .setBus2("NHV6")
+                .setConnectableBus2("NHV6")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        //Extra substations in order to attain the trigger threshold
+        Substation p7 = network.newSubstation()
+                .setId("P7")
+                .setCountry(Country.BE)
+                .setTso("RTE")
+                .add();
+
+        Substation p8 = network.newSubstation()
+                .setId("P8")
+                .setCountry(Country.BE)
+                .setTso("RTE")
+                .add();
+
+        Substation p9 = network.newSubstation()
+                .setId("P9")
+                .setCountry(Country.BE)
+                .setTso("RTE")
+                .add();
+
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.BE)));
+        DefaultSubstationGeoParameter defaultSubstationGeoParameter = new DefaultSubstationGeoParameter(0.0, 0.0, defaultSubstationsGeoData.get("BE").getCoordinate());
+
+        SubstationGeoData pg4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pg5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
+        SubstationGeoData pg6 = substationsGeoData.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0);
+
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinate(), pg4.getCoordinate());
+        defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinate(), pg5.getCoordinate());
+        defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinate(), pg6.getCoordinate());
     }
 
     @Test

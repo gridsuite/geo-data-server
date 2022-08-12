@@ -108,9 +108,61 @@ public class GeoDataService {
             LOGGER.warn("Accuracy factor is less than 75% !");
         }
 
-        calculateMissingGeoData(network, substations, substationsGeoData, substationsToCalculate);
+        // adjacency matrix
+        Map<String, Set<String>> neighbours = getNeighbours(substations);
+
+        // let's sort this map by values first : max neighbors having known GPS coords
+        Map<String, Set<String>> sortedNeighbours = neighbours
+                .entrySet()
+                .stream()
+                .filter(e -> !substationsGeoData.containsKey(e.getKey()))
+                .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+
+        calculateMissingGeoData(network, sortedNeighbours, substationsGeoData, substationsToCalculate);
+        calculateDefaultSubstationsGeoData(substationsGeoData, sortedNeighbours);
 
         return new ArrayList<>(substationsGeoData.values());
+    }
+
+    private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
+        StopWatch stopWatch = StopWatch.createStarted();
+        for (Map.Entry<String, SubstationGeoData> entry : defaultSubstationsGeoData.getEntrySet()) {
+            Set<String> clutteredSubstationsIds = substationsGeoData.values().stream().filter(substationGeoData -> substationGeoData.getCountry().equals(entry.getValue().getCountry()) && (substationGeoData.getCoordinate().getLatitude() > (entry.getValue().getCoordinate().getLatitude() - 1)) && (substationGeoData.getCoordinate().getLatitude() < (entry.getValue().getCoordinate().getLatitude() + 1)) &&
+                    (substationGeoData.getCoordinate().getLongitude() > (entry.getValue().getCoordinate().getLongitude() - 1)) && (substationGeoData.getCoordinate().getLongitude() < (entry.getValue().getCoordinate().getLongitude() + 1)))
+                    .map(substationGeoData -> substationGeoData.getId()).collect(Collectors.toSet());
+
+            if (clutteredSubstationsIds.size() > DefaultSubstationGeoParameter.DECLUTTERING_THRESHOLD) {
+                calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, new HashSet<>(clutteredSubstationsIds), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
+            }
+        }
+        stopWatch.stop();
+        LOGGER.info("Default substations geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
+    }
+
+    private DefaultSubstationGeoParameter calculateDefaultSubstationGeoDataRecursively(Map<String, SubstationGeoData> substationsGeoData, Set<String> substationsToProcess, Set<String> remainingSubstations, DefaultSubstationGeoParameter initialGeoParameters, Map<String, Set<String>> sortedNeighbours) {
+        DefaultSubstationGeoParameter geoParameters = initialGeoParameters;
+        for (String substationToProcess : substationsToProcess) {
+            if (remainingSubstations.contains(substationToProcess)) {
+                substationsGeoData.get(substationToProcess).setCoordinate(geoParameters.getCurrentCoordinate());
+                remainingSubstations.remove(substationToProcess);
+                geoParameters.incrementDefaultSubstationGeoParameters();
+            }
+
+            if (sortedNeighbours.get(substationToProcess) != null) {
+                Set<String> neighbours = sortedNeighbours.get(substationToProcess).stream()
+                        .filter(remainingSubstations::contains)
+                        .collect(Collectors.toSet());
+
+                for (String neighbour : neighbours) {
+                    substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinate());
+                    remainingSubstations.remove(neighbour);
+                    geoParameters.incrementDefaultSubstationGeoParameters();
+                }
+                geoParameters = calculateDefaultSubstationGeoDataRecursively(substationsGeoData, neighbours, remainingSubstations, geoParameters, sortedNeighbours);
+            }
+        }
+        return geoParameters;
     }
 
     private static int neighboursComparator(Network network, Set<String> neighbors1, Set<String> neighbors2) {
@@ -123,21 +175,9 @@ public class GeoDataService {
         TWO
     }
 
-    private void calculateMissingGeoData(Network network, List<Substation> substations, Map<String, SubstationGeoData> substationsGeoData,
+    private void calculateMissingGeoData(Network network, Map<String, Set<String>> sortedNeighbours, Map<String, SubstationGeoData> substationsGeoData,
                                          Set<String> substationsToCalculate) {
         StopWatch stopWatch = StopWatch.createStarted();
-
-        // adjacency matrix
-        Map<String, Set<String>> neighbours = getNeighbours(substations);
-
-        // let's sort this map by values first : max neighbors having known GPS coords
-        Map<String, Set<String>> sortedNeighbours = neighbours
-                .entrySet()
-                .stream()
-                .filter(e -> !substationsGeoData.containsKey(e.getKey()))
-                .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-
         // STEP 1
         step(Step.ONE, network, sortedNeighbours, substationsGeoData, substationsToCalculate);
 
@@ -147,7 +187,6 @@ public class GeoDataService {
         }
 
         stopWatch.stop();
-
         LOGGER.info("Missing substation geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
     }
 
