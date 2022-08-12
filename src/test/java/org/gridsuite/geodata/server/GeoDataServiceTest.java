@@ -458,11 +458,11 @@ public class GeoDataServiceTest {
         SubstationGeoData pg5 = substationsGeoData.stream().filter(s -> s.getId().equals("P5")).collect(Collectors.toList()).get(0);
         SubstationGeoData pg6 = substationsGeoData.stream().filter(s -> s.getId().equals("P6")).collect(Collectors.toList()).get(0);
 
-        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pg4.getCoordinate());
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinate(), pg4.getCoordinate());
         defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
-        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pg5.getCoordinate());
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinate(), pg5.getCoordinate());
         defaultSubstationGeoParameter.incrementDefaultSubstationGeoParameters();
-        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinates(), pg6.getCoordinate());
+        assertEquals(defaultSubstationGeoParameter.getCurrentCoordinate(), pg6.getCoordinate());
     }
 
     @Test
