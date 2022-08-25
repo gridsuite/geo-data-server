@@ -7,6 +7,22 @@
       "lon": 8
     }
   },
+  "P10": {
+    "id": "P10",
+    "country": "DE",
+    "coordinate": {
+      "lat": 4,
+      "lon": -88
+    }
+  },
+  "P11": {
+    "id": "P11",
+    "country": "DE",
+    "coordinate": {
+      "lat": -44,
+      "lon": 8
+    }
+  },
   "DE": {
     "id": "DE",
     "country": "DE",

@@ -451,6 +451,18 @@ public class GeoDataServiceTest {
             .setTso("RTE")
             .add();
 
+        Substation p10 = network.newSubstation()
+            .setId("P10")
+            .setCountry(Country.DE)
+            .setTso("RTE")
+            .add();
+
+        Substation p11 = network.newSubstation()
+            .setId("P11")
+            .setCountry(Country.DE)
+            .setTso("RTE")
+            .add();
+
         Substation alienSubstation = network.newSubstation()
             .setId("sidious")
             .add();
