@@ -492,7 +492,7 @@ public class GeoDataServiceTest {
             .setB2(386E-6 / 2)
             .add();
 
-        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, Set.of());
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, Set.of(Country.BE));
         DefaultSubstationGeoParameter defaultSubstationGeoParameter = new DefaultSubstationGeoParameter(0.0, 0.0, defaultSubstationsGeoData.get("BE").getCoordinate());
 
         SubstationGeoData pg4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
