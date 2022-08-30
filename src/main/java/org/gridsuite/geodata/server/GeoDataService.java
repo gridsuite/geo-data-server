@@ -128,9 +128,9 @@ public class GeoDataService {
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
         StopWatch stopWatch = StopWatch.createStarted();
         for (Map.Entry<String, SubstationGeoData> entry : defaultSubstationsGeoData.getEntrySet()) {
-            Set<String> clutteredSubstationsIds = substationsGeoData.values().stream().filter(substationGeoData -> substationGeoData.getCountry().equals(entry.getValue().getCountry()) && (substationGeoData.getCoordinate().getLatitude() > (entry.getValue().getCoordinate().getLatitude() - 1)) && (substationGeoData.getCoordinate().getLatitude() < (entry.getValue().getCoordinate().getLatitude() + 1)) &&
-                    (substationGeoData.getCoordinate().getLongitude() > (entry.getValue().getCoordinate().getLongitude() - 1)) && (substationGeoData.getCoordinate().getLongitude() < (entry.getValue().getCoordinate().getLongitude() + 1)))
-                    .map(substationGeoData -> substationGeoData.getId()).collect(Collectors.toSet());
+            Set<String> clutteredSubstationsIds = substationsGeoData.values().stream()
+                .filter(substationGeoData -> isCompatible(substationGeoData, entry))
+                .map(SubstationGeoData::getId).collect(Collectors.toSet());
 
             if (clutteredSubstationsIds.size() > DefaultSubstationGeoParameter.DECLUTTERING_THRESHOLD) {
                 calculateDefaultSubstationGeoDataRecursively(substationsGeoData, clutteredSubstationsIds, new HashSet<>(clutteredSubstationsIds), new DefaultSubstationGeoParameter(0.0, 0.0, entry.getValue().getCoordinate()), sortedNeighbours);
@@ -138,6 +138,23 @@ public class GeoDataService {
         }
         stopWatch.stop();
         LOGGER.info("Default substations geo data calculated in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
+    }
+
+    private static boolean isCompatible(SubstationGeoData substationGeoData, Entry<String, SubstationGeoData> entry) {
+        if (substationGeoData.getCountry() == null) {
+            return false;
+        }
+        if (!substationGeoData.getCountry().equals(entry.getValue().getCountry())) {
+            return false;
+        }
+        if (Math.abs(substationGeoData.getCoordinate().getLatitude() - entry.getValue().getCoordinate().getLatitude()) >= 1.0) {
+            return false;
+        }
+        if (Math.abs(substationGeoData.getCoordinate().getLongitude() - entry.getValue().getCoordinate().getLongitude()) >= 1.0) {
+            return false;
+        }
+
+        return true;
     }
 
     private DefaultSubstationGeoParameter calculateDefaultSubstationGeoDataRecursively(Map<String, SubstationGeoData> substationsGeoData, Set<String> substationsToProcess, Set<String> remainingSubstations, DefaultSubstationGeoParameter initialGeoParameters, Map<String, Set<String>> sortedNeighbours) {

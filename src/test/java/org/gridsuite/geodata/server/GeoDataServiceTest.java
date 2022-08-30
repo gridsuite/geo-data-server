@@ -446,12 +446,53 @@ public class GeoDataServiceTest {
                 .add();
 
         Substation p9 = network.newSubstation()
-                .setId("P9")
-                .setCountry(Country.BE)
-                .setTso("RTE")
-                .add();
+            .setId("P9")
+            .setCountry(Country.BE)
+            .setTso("RTE")
+            .add();
 
-        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, new HashSet<>(Collections.singletonList(Country.BE)));
+        Substation p10 = network.newSubstation()
+            .setId("P10")
+            .setCountry(Country.DE)
+            .setTso("RTE")
+            .add();
+
+        Substation p11 = network.newSubstation()
+            .setId("P11")
+            .setCountry(Country.DE)
+            .setTso("RTE")
+            .add();
+
+        Substation alienSubstation = network.newSubstation()
+            .setId("sidious")
+            .add();
+
+        VoltageLevel alienVoltageLevel = alienSubstation.newVoltageLevel()
+            .setId("agent")
+            .setNominalV(380)
+            .setTopologyKind(TopologyKind.BUS_BREAKER)
+            .add();
+        alienVoltageLevel.getBusBreakerView().newBus()
+            .setId("schwartzy")
+            .add();
+
+        network.newLine()
+            .setId("LINE4_O")
+            .setVoltageLevel1("VLHV4")
+            .setBus1("NHV4")
+            .setConnectableBus1("NHV4")
+            .setVoltageLevel2("agent")
+            .setBus2("schwartzy")
+            .setConnectableBus2("schwartzy")
+            .setR(3.0)
+            .setX(33.0)
+            .setG1(0.0)
+            .setB1(386E-6 / 2)
+            .setG2(0.0)
+            .setB2(386E-6 / 2)
+            .add();
+
+        List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, Set.of(Country.BE));
         DefaultSubstationGeoParameter defaultSubstationGeoParameter = new DefaultSubstationGeoParameter(0.0, 0.0, defaultSubstationsGeoData.get("BE").getCoordinate());
 
         SubstationGeoData pg4 = substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0);
