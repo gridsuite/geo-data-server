@@ -8,5 +8,7 @@ network-store-server:
 network-geo-data:
   iterations : 50
 
-dbName: geo_data
+powsybl-ws:
+  database:
+    name: geo_data
 
