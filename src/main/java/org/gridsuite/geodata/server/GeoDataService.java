@@ -127,6 +127,9 @@ public class GeoDataService {
 
     List<SubstationGeoData> getSubstations(Network network, Set<Country> countries, List<String> substationsIds) {
         LOGGER.info("Loading substations geo data for countries {} of network '{}' and ids {}", countries, network.getId(), substationsIds.toString());
+        List<SubstationGeoData> data = getSubstations(network, countries);
+        data.forEach(sub -> System.out.println("data => " + sub.getId()));
+        substationsIds.forEach(id -> System.out.println("substationsId => " + id));
         return getSubstations(network, countries).stream().filter(substationGeoData -> substationsIds.contains(substationGeoData.getId())).collect(Collectors.toList());
     }
 

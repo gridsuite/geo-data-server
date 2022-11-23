@@ -69,10 +69,17 @@ public class GeoDataController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstationsById(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries,
+                                                                  @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Substations id") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
         Set<Country> countrySet = toCountrySet(countries);
+        System.out.println("WITH THE ID => ");
+        substationsIds.forEach(id -> System.out.println("ID => " + id));
         Network network = networkStoreService.getNetwork(networkUuid);
+        if (variantId != null) {
+            network.getVariantManager().setWorkingVariant(variantId);
+        }
         List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet, substationsIds);
+        substations.forEach(sub -> System.out.println("SUBSTATION => " + sub.getId()));
         return ResponseEntity.ok().body(substations);
     }
 
