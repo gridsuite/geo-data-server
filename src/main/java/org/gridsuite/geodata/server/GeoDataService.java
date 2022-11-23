@@ -125,6 +125,11 @@ public class GeoDataService {
         return new ArrayList<>(substationsGeoData.values());
     }
 
+    List<SubstationGeoData> getSubstations(Network network, Set<Country> countries, List<String> substationsIds) {
+        LOGGER.info("Loading substations geo data for countries {} of network '{}' and ids {}", countries, network.getId(), substationsIds.toString());
+        return getSubstations(network, countries).stream().filter(substationGeoData -> substationsIds.contains(substationGeoData.getId())).collect(Collectors.toList());
+    }
+
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
         StopWatch stopWatch = StopWatch.createStarted();
         for (Map.Entry<String, SubstationGeoData> entry : defaultSubstationsGeoData.getEntrySet()) {

@@ -64,6 +64,18 @@ public class GeoDataController {
         return ResponseEntity.ok().body(substations);
     }
 
+    @GetMapping(value = "/substations-by-ids", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get substations geographical data of the given ids")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
+    public ResponseEntity<List<SubstationGeoData>> getSubstationsById(@RequestParam UUID networkUuid,
+                                                                  @RequestParam(required = false) List<String> countries,
+                                                                  @Parameter(description = "Substations id") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
+        Set<Country> countrySet = toCountrySet(countries);
+        Network network = networkStoreService.getNetwork(networkUuid);
+        List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet, substationsIds);
+        return ResponseEntity.ok().body(substations);
+    }
+
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get lines geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
