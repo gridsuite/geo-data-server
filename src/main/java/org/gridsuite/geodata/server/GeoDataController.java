@@ -50,21 +50,6 @@ public class GeoDataController {
     }
 
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get substations geographical data")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
-                                                                  @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                                  @Parameter(description = "Countries")@RequestParam(required = false) List<String> countries) {
-        Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid);
-        if (variantId != null) {
-            network.getVariantManager().setWorkingVariant(variantId);
-        }
-        List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet);
-        return ResponseEntity.ok().body(substations);
-    }
-
-    @GetMapping(value = "/substations-by-ids", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get substations geographical data of the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstationsById(@RequestParam UUID networkUuid,
@@ -72,14 +57,18 @@ public class GeoDataController {
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Substations id") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        System.out.println("WITH THE ID => ");
-        substationsIds.forEach(id -> System.out.println("ID => " + id));
         Network network = networkStoreService.getNetwork(networkUuid);
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<SubstationGeoData> substations = geoDataService.getSubstations(network, countrySet, substationsIds);
-        substations.forEach(sub -> System.out.println("SUBSTATION => " + sub.getId()));
+        List<SubstationGeoData> substations;
+        if (substationsIds == null) {
+            System.out.println("NO SUB IDS");
+            substations = geoDataService.getSubstations(network, countrySet);
+        } else {
+            System.out.println("WITH SUB IDS");
+            substations = geoDataService.getSubstations(network, countrySet, substationsIds);
+        }
         return ResponseEntity.ok().body(substations);
     }
 
