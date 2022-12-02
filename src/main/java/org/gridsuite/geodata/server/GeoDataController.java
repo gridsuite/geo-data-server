@@ -51,7 +51,7 @@ public class GeoDataController {
     }
 
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get substations geographical data of the given ids")
+    @Operation(summary = "Get geographical data for substations with the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries,

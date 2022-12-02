@@ -163,27 +163,6 @@ public class GeoDataControllerTest {
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
-//    @Test
-//    public void testSubstationsGeodataByIds() throws Exception {
-//        UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
-//
-//        Network testNetwork = EurostagTutorialExample1Factory.create();
-//        testNetwork.getVariantManager().cloneVariant(VariantManagerConstants.INITIAL_VARIANT_ID, VARIANT_ID);
-//        given(service.getNetwork(networkUuid)).willReturn(testNetwork);
-//
-//        mvc.perform(post("/" + VERSION + "/substations")
-//                        .contentType(APPLICATION_JSON)
-//                        .content(toString(GEO_DATA_SUBSTATIONS)))
-//                .andExpect(status().isOk());
-//
-//        mvc.perform(post("/" + VERSION + "/lines")
-//                        .contentType(APPLICATION_JSON)
-//                        .content(toString(GEO_DATA_LINES)))
-//                .andExpect(status().isOk());
-//
-//
-//    }
-
     @Test
     public void testGetLinesError() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
