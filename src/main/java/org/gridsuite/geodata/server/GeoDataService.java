@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
+import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -126,7 +127,7 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
-        LOGGER.info("Loading substations geo data for ids {} of network '{}'", substationsIds, network.getId());
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", StringUtils.join(substationsIds, ", "), network.getId());
 
         StopWatch stopWatch = StopWatch.createStarted();
 
