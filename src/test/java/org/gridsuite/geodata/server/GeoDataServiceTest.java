@@ -846,5 +846,10 @@ public class GeoDataServiceTest {
         assertEquals(2, substationsGeoData.size());
         assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("P1")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(7, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+
+        substationsGeoData = geoDataService.getSubstations(network, List.of("P4"));
+
+        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+        assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
     }
 }
