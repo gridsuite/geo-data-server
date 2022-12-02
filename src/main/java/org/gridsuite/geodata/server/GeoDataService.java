@@ -136,7 +136,7 @@ public class GeoDataService {
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
         //If all geo data were found for all substations, we return geo data
-        if(substationsGeoData.size() == substationsIds.size()) {
+        if (substationsGeoData.size() == substationsIds.size()) {
             return new ArrayList<>(substationsGeoData.values());
         }
 
@@ -144,7 +144,7 @@ public class GeoDataService {
         Map<String, Set<String>> neighboursBySubstationId = getNeighbours(network.getSubstationStream().collect(Collectors.toList()));
         neighboursBySubstationId.keySet().removeIf(key -> !substationsIds.contains(key));
         //If adjacency matrix is empty, no computation can be done
-        if(neighboursBySubstationId.isEmpty()) {
+        if (neighboursBySubstationId.isEmpty()) {
             return null;
         }
 
