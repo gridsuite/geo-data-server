@@ -177,7 +177,6 @@ public class GeoDataService {
 
         //Calculated data are added to geoDataForComputation
         calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, substationsToCalculate);
-        //What is it for ? Anneau de garde ? Demander à Nicolas
         calculateDefaultSubstationsGeoData(geoDataForComputation, neighboursBySubstationId);
 
         //We remove linked substations from result - we only want requested ones
