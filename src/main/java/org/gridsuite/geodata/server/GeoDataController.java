@@ -83,12 +83,6 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-//        List<LineGeoData> lines;
-//        if (linesIds != null) {
-//            lines = geoDataService.getLines(network, linesIds);
-//        } else {
-//            lines = geoDataService.getLines(network, countrySet);
-//        }
         List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
         return ResponseEntity.ok().body(lines);
     }

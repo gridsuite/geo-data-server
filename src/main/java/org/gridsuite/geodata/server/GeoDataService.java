@@ -187,21 +187,6 @@ public class GeoDataService {
         return new ArrayList<>(geoDataForComputation.values());
     }
 
-//    List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
-//        LOGGER.info("Loading substations geo data for ids {} of network '{}'", substationsIds, network.getId());
-//
-//        StopWatch stopWatch = StopWatch.createStarted();
-//
-//        List<SubstationEntity> substationEntities = substationRepository.findByIdIn(substationsIds);
-//        List<SubstationGeoData> substationsGeoDataDb = substationEntities.stream()
-//                .map(SubstationEntity::toGeoData)
-//                .collect(Collectors.toList());
-//
-//        LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDb.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
-//
-//        return substationsGeoDataDb;
-//    }
-
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
         StopWatch stopWatch = StopWatch.createStarted();
         for (Map.Entry<String, SubstationGeoData> entry : defaultSubstationsGeoData.getEntrySet()) {
@@ -517,21 +502,6 @@ public class GeoDataService {
 
         return lineGeoData;
     }
-
-//    List<SubstationGeoData> getLines(Network network, List<String> linesIds) {
-//        LOGGER.info("Loading lines geo data for ids {} of network '{}'", linesIds, network.getId());
-//
-//        StopWatch stopWatch = StopWatch.createStarted();
-//
-//        List<LineEntity> substationEntities = lineRepository.findByIdIn(substationsIds);
-//        List<SubstationGeoData> substationsGeoDataDb = substationEntities.stream()
-//                .map(SubstationEntity::toGeoData)
-//                .collect(Collectors.toList());
-//
-//        LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDb.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
-//
-//        return substationsGeoDataDb;
-//    }
 
     public LineGeoData toDto(LineEntity lineEntity) {
         try {
