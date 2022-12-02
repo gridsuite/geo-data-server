@@ -127,8 +127,9 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
-        List<String> idsForLog = substationsIds.stream().map(id -> id.replaceAll("[\n\r\t]", "_")).collect(Collectors.toList());
-        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", StringUtils.join(idsForLog, ", "), network.getId());
+        List<String> escapedIds = substationsIds.stream().map(id -> id.replaceAll("[\n\r\t]", "_")).collect(Collectors.toList());
+        String idsAsString = StringUtils.join(escapedIds, ", ");
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", idsAsString, network.getId());
 
         StopWatch stopWatch = StopWatch.createStarted();
 
@@ -147,7 +148,7 @@ public class GeoDataService {
         neighboursBySubstationId.keySet().removeIf(key -> !substationsIds.contains(key));
         //If adjacency matrix is empty, no computation can be done
         if (neighboursBySubstationId.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<String> selectedNeighbours = new ArrayList<>();
