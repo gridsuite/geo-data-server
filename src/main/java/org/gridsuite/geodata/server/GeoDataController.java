@@ -6,6 +6,7 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.powsybl.network.store.client.PreloadingStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,22 +53,20 @@ public class GeoDataController {
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get substations geographical data of the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstationsById(@RequestParam UUID networkUuid,
+    public ResponseEntity<List<SubstationGeoData>> getSubstations(@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Substations id") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid);
+        Network network = networkStoreService.getNetwork(networkUuid, substationsIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
         List<SubstationGeoData> substations;
-        if (substationsIds == null) {
-            System.out.println("NO SUB IDS");
-            substations = geoDataService.getSubstations(network, countrySet);
+        if (substationsIds != null) {
+            substations = geoDataService.getSubstations(network, substationsIds);
         } else {
-            System.out.println("WITH SUB IDS");
-            substations = geoDataService.getSubstations(network, countrySet, substationsIds);
+            substations = geoDataService.getSubstations(network, countrySet);
         }
         return ResponseEntity.ok().body(substations);
     }
@@ -77,12 +76,19 @@ public class GeoDataController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                      @Parameter(description = "Countries")@RequestParam(required = false) List<String> countries) {
+                                                      @Parameter(description = "Countries") @RequestParam(required = false) List<String> countries,
+                                                      @Parameter(description = "Lines id") @RequestParam(name = "lineId", required = false) List<String> linesIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
+//        List<LineGeoData> lines;
+//        if (linesIds != null) {
+//            lines = geoDataService.getLines(network, linesIds);
+//        } else {
+//            lines = geoDataService.getLines(network, countrySet);
+//        }
         List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
         return ResponseEntity.ok().body(lines);
     }
