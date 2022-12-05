@@ -154,16 +154,24 @@ public class GeoDataService {
         }
 
         List<String> selectedNeighbours = new ArrayList<>();
-
-        substationsToCalculate.forEach(id -> {
-            selectedNeighbours.addAll(neighboursBySubstationId.get(id));
-        });
+        substationsToCalculate.forEach(id ->
+            selectedNeighbours.addAll(neighboursBySubstationId.get(id))
+        );
 
         //Initialize a map with geo data of the neighbours
         substationEntities = substationRepository.findByIdIn(selectedNeighbours);
         Map<String, SubstationGeoData> geoDataForComputation = substationEntities.stream()
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+
+        // If a "one step neighbour" do not have geo data, we look for geo data of its neighbours
+        selectedNeighbours.stream().forEach(neighbourId -> {
+            if (geoDataForComputation.get(neighbourId) == null) {
+                Map<String, Set<String>> neighboursMap = getNeighbours(List.of(network.getSubstation(neighbourId)));
+                List<String> neighbours = neighboursMap.get(neighbourId).stream().collect(Collectors.toList());
+                geoDataForComputation.put(neighbourId, getClosestNeighbourWithGeoData(network, neighbours));
+            }
+        });
 
         //Calculated data are added to geoDataForComputation
         calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, new HashSet<>(substationsToCalculate));
@@ -175,6 +183,27 @@ public class GeoDataService {
         LOGGER.info("Substations with given ids read/computed from DB in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
         //We return geo data found in the DB and the computed ones
         return new ArrayList<>(Stream.concat(geoDataForComputation.values().stream(), substationsGeoData.values().stream()).collect(Collectors.toList()));
+    }
+
+    private SubstationGeoData getClosestNeighbourWithGeoData(Network network, List<String> neighbours) {
+        List<SubstationEntity> substationEntities = substationRepository.findByIdIn(neighbours);
+        Map<String, SubstationGeoData> substationsGeoData = substationEntities.stream()
+                .map(SubstationEntity::toGeoData)
+                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+
+        for (int i = 0; i < neighbours.size(); i++) {
+            if (substationsGeoData.get(neighbours.get(i)) != null) {
+                return substationsGeoData.get(neighbours.get(i));
+            } else {
+                Map<String, Set<String>> neighboursMap = getNeighbours(network.getSubstationStream().filter(s -> neighbours.contains(s.getId())).collect(Collectors.toList()));
+                List<String> neighboursOfNeighbours = new ArrayList<>();
+                neighbours.forEach(id ->
+                        neighboursOfNeighbours.addAll(neighboursMap.get(id))
+                );
+                return getClosestNeighbourWithGeoData(network, neighboursOfNeighbours);
+            }
+        }
+        return null;
     }
 
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {

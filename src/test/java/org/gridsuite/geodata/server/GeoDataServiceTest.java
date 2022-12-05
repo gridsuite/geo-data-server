@@ -847,10 +847,26 @@ public class GeoDataServiceTest {
         assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("P1")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(7, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
 
+        network.newLine()
+                .setId("NHV4_NHV5")
+                .setVoltageLevel1("VLHV4")
+                .setBus1("NHV4")
+                .setConnectableBus1("NHV4")
+                .setVoltageLevel2("VLHV5")
+                .setBus2("NHV4")
+                .setConnectableBus2("NHV4")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
         substationsGeoData = geoDataService.getSubstations(network, List.of("P4", "P3"));
 
-        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
-        assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(2.5, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+        assertEquals(1.75, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(7, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
         assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
     }
