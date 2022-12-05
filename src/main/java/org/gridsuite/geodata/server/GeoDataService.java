@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -143,51 +144,37 @@ public class GeoDataService {
             return new ArrayList<>(substationsGeoData.values());
         }
 
-        //Get adjacency matrix for the given substation ids
-        Map<String, Set<String>> neighboursBySubstationId = getNeighbours(network.getSubstationStream().collect(Collectors.toList()));
-        neighboursBySubstationId.keySet().removeIf(key -> !substationsIds.contains(key));
+        Set<String> substationsToCalculate = substationsIds.stream().filter(s -> !substationsGeoData.containsKey(s)).collect(Collectors.toSet());
+
+        //Get adjacency matrix for the substation to compute
+        Map<String, Set<String>> neighboursBySubstationId = getNeighbours(network.getSubstationStream().filter(s -> substationsToCalculate.contains(s.getId())).collect(Collectors.toList()));
         //If adjacency matrix is empty, no computation can be done
         if (neighboursBySubstationId.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<String> selectedNeighbours = new ArrayList<>();
-        List<Substation> requestedSubstations = new ArrayList<>();
 
-        substationsIds.stream().forEach(id -> {
-            requestedSubstations.add(network.getSubstation(id));
+        substationsToCalculate.forEach(id -> {
             selectedNeighbours.addAll(neighboursBySubstationId.get(id));
         });
 
-        //Initialize a map with geo data of the requested substations and the ones they are linked with
+        //Initialize a map with geo data of the neighbours
         substationEntities = substationRepository.findByIdIn(selectedNeighbours);
         Map<String, SubstationGeoData> geoDataForComputation = substationEntities.stream()
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
-        Set<String> substationsToCalculate = new HashSet<>();
-
-        //We split the requested substations : found ones ->  geoDataForComputation, unknown -> substationsToCalculate
-        for (Substation substation : requestedSubstations) {
-            SubstationGeoData substationGeoData = Optional.ofNullable(substationsGeoData.get(substation.getId())).orElseGet(() -> substationsGeoData.get(substation.getNameOrId()));
-            if (substationGeoData != null && (substation.getCountry().isEmpty() || substation.getCountry().filter(c -> c.name().equals(substationGeoData.getCountry().name())).isPresent())) {
-                substationGeoData.setId(substation.getId());
-                geoDataForComputation.put(substation.getId(), substationGeoData);
-            } else {
-                substationsToCalculate.add(substation.getId());
-            }
-        }
-
         //Calculated data are added to geoDataForComputation
-        calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, substationsToCalculate);
+        calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, new HashSet<>(substationsToCalculate));
         calculateDefaultSubstationsGeoData(geoDataForComputation, neighboursBySubstationId);
 
         //We remove linked substations from result - we only want requested ones
-        geoDataForComputation.keySet().removeIf(key -> !substationsIds.contains(key));
+        geoDataForComputation.keySet().removeIf(key -> !substationsToCalculate.contains(key));
 
         LOGGER.info("Substations with given ids read/computed from DB in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
-
-        return new ArrayList<>(geoDataForComputation.values());
+        //We return geo data found in the DB and the computed ones
+        return new ArrayList<>(Stream.concat(geoDataForComputation.values().stream(), substationsGeoData.values().stream()).collect(Collectors.toList()));
     }
 
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
