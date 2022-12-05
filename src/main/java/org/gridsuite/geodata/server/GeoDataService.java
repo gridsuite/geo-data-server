@@ -167,9 +167,7 @@ public class GeoDataService {
         // If a "one step neighbour" do not have geo data, we look for geo data of its neighbours
         selectedNeighbours.stream().forEach(neighbourId -> {
             if (geoDataForComputation.get(neighbourId) == null) {
-                Map<String, Set<String>> neighboursMap = getNeighbours(List.of(network.getSubstation(neighbourId)));
-                List<String> neighbours = neighboursMap.get(neighbourId).stream().collect(Collectors.toList());
-                geoDataForComputation.put(neighbourId, getClosestNeighbourWithGeoData(network, neighbours));
+                geoDataForComputation.put(neighbourId, getClosestNeighbourWithGeoData(network, getNeighbours(List.of(network.getSubstation(neighbourId))).get(neighbourId).stream().collect(Collectors.toList())));
             }
         });
 
@@ -191,7 +189,7 @@ public class GeoDataService {
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
-        for (int i = 0; i < neighbours.size(); i++) {
+        for (int i = 0; i < neighbours.size(); ++i) {
             if (substationsGeoData.get(neighbours.get(i)) != null) {
                 return substationsGeoData.get(neighbours.get(i));
             } else {
