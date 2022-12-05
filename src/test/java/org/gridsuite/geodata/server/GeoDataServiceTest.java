@@ -847,14 +847,30 @@ public class GeoDataServiceTest {
         assertEquals(1, substationsGeoData.stream().filter(s -> s.getId().equals("P1")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(7, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
 
+        Substation p8 = network.newSubstation()
+                .setId("P8")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+
+        VoltageLevel vlhv8 = p8.newVoltageLevel()
+                .setId("VLHV8")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+
+        Bus nhv8 = vlhv8.getBusBreakerView().newBus()
+                .setId("NHV8")
+                .add();
+
         network.newLine()
-                .setId("NHV4_NHV5")
+                .setId("NHV4_NHV8")
                 .setVoltageLevel1("VLHV4")
                 .setBus1("NHV4")
                 .setConnectableBus1("NHV4")
-                .setVoltageLevel2("VLHV5")
-                .setBus2("NHV4")
-                .setConnectableBus2("NHV4")
+                .setVoltageLevel2(vlhv8.getId())
+                .setBus2(nhv8.getId())
+                .setConnectableBus2(nhv8.getId())
                 .setR(3.0)
                 .setX(33.0)
                 .setG1(0.0)
@@ -862,6 +878,24 @@ public class GeoDataServiceTest {
                 .setG2(0.0)
                 .setB2(386E-6 / 2)
                 .add();
+
+
+        network.newLine()
+                .setId("NHV8_NHV5")
+                .setVoltageLevel1("VLHV8")
+                .setBus1("NHV8")
+                .setConnectableBus1("NHV8")
+                .setVoltageLevel2("VLHV5")
+                .setBus2("NHV5")
+                .setConnectableBus2("NHV5")
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
 
         substationsGeoData = geoDataService.getSubstations(network, List.of("P4", "P3"));
 
