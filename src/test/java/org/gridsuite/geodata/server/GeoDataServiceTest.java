@@ -879,7 +879,6 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
-
         network.newLine()
                 .setId("NHV8_NHV5")
                 .setVoltageLevel1("VLHV8")
@@ -895,7 +894,6 @@ public class GeoDataServiceTest {
                 .setG2(0.0)
                 .setB2(386E-6 / 2)
                 .add();
-
 
         substationsGeoData = geoDataService.getSubstations(network, List.of("P4", "P3"));
 
