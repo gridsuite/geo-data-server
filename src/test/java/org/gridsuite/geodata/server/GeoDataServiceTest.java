@@ -77,6 +77,12 @@ public class GeoDataServiceTest {
                 .coordinate(new CoordinateEmbeddable(2, 7))
                 .build());
 
+        substationEntities.add(SubstationEntity.builder()
+                .id("P22")
+                .country("FR")
+                .coordinate(new CoordinateEmbeddable(10, 20))
+                .build());
+
         substationRepository.saveAll(substationEntities);
 
         List<LineEntity> lineEntities = new ArrayList<>();
@@ -895,11 +901,61 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
-        substationsGeoData = geoDataService.getSubstations(network, List.of("P4", "P3"));
+        Substation p22 = network.newSubstation()
+                .setId("P22")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
 
-        assertEquals(2.5, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
-        assertEquals(1.75, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        VoltageLevel vlhv22 = p22.newVoltageLevel()
+                .setId("VLHV22")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+
+        vlhv22.getBusBreakerView().newBus()
+                .setId("NHV22")
+                .add();
+
+        Substation p9 = network.newSubstation()
+                .setId("P9")
+                .setCountry(Country.FR)
+                .setTso("RTE")
+                .add();
+
+        VoltageLevel vlhv9 = p9.newVoltageLevel()
+                .setId("VLHV9")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+
+        Bus nhv9 = vlhv9.getBusBreakerView().newBus()
+                .setId("NHV9")
+                .add();
+
+        network.newLine()
+                .setId("NHV22_NHV9")
+                .setVoltageLevel1("VLHV22")
+                .setBus1("NHV22")
+                .setConnectableBus1("NHV22")
+                .setVoltageLevel2(vlhv9.getId())
+                .setBus2(nhv9.getId())
+                .setConnectableBus2(nhv9.getId())
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        substationsGeoData = geoDataService.getSubstations(network, List.of("P4", "P3", "P9"));
+
+        assertEquals(3, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+        assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P4")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(7, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
         assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+        assertEquals(19.993, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
+        assertEquals(9.998, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
     }
 }
