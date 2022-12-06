@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -135,46 +134,32 @@ public class GeoDataService {
 
         StopWatch stopWatch = StopWatch.createStarted();
 
-        Map<String, SubstationGeoData> substationsGeoData = substationRepository.findByIdIn(substationsIds).stream()
-                .map(SubstationEntity::toGeoData)
-                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+        Map<String, SubstationGeoData> substationsGeoData = new HashMap<>();
 
-        //If all geo data were found for all substations, we return geo data
-        if (substationsGeoData.size() == substationsIds.size()) {
-            return new ArrayList<>(substationsGeoData.values());
-        }
-
-        Set<String> requestedSubstations = substationsIds.stream().filter(s -> !substationsGeoData.containsKey(s)).collect(Collectors.toSet());
-
-        Set<String> substationsToCalculate = new HashSet<>(requestedSubstations);
-
-        //Get adjacency matrix for the substation to compute
-        Map<String, Set<String>> neighboursBySubstationId = getNeighbours(network.getSubstationStream().filter(s -> substationsToCalculate.contains(s.getId())).collect(Collectors.toList()));
-        //If adjacency matrix is empty, no computation can be done
-        if (neighboursBySubstationId.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        Set<String> selectedNeighbours = new HashSet<>();
-        substationsToCalculate.forEach(id -> selectedNeighbours.addAll(neighboursBySubstationId.get(id)));
+        Set<String> substationsToCalculate = new HashSet<>();
 
         Map<String, SubstationGeoData> geoDataForComputation = new HashMap<>();
+        Map<String, Set<String>> neighboursBySubstationId = new HashMap<>();
 
-        prepareGeoDataForComputation(network, geoDataForComputation, selectedNeighbours, neighboursBySubstationId, substationsToCalculate);
+        prepareGeoDataForComputation(network, geoDataForComputation, neighboursBySubstationId, substationsToCalculate, substationsIds.stream().collect(Collectors.toSet()));
 
         //Calculated data are added to geoDataForComputation
         calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, substationsToCalculate);
         calculateDefaultSubstationsGeoData(geoDataForComputation, neighboursBySubstationId);
 
         //We remove linked substations from result - we only want requested ones
-        geoDataForComputation.keySet().removeIf(key -> !requestedSubstations.contains(key));
+        geoDataForComputation.keySet().removeIf(key -> !substationsIds.contains(key));
 
         LOGGER.info("Substations with given ids read/computed from DB in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
         //We return geo data found in the DB and the computed ones
         return new ArrayList<>(Stream.concat(geoDataForComputation.values().stream(), substationsGeoData.values().stream()).collect(Collectors.toList()));
     }
 
-    private void prepareGeoDataForComputation(Network network, Map<String, SubstationGeoData> geoDataForComputation, Set<String> neighbours, Map<String, Set<String>> neighboursBySubstationId, Set<String> substationsToCalculate) {
+    private void prepareGeoDataForComputation(Network network, Map<String, SubstationGeoData> geoDataForComputation, Map<String, Set<String>> neighboursBySubstationId, Set<String> substationsToCalculate, Set<String> neighbours) {
+        if (neighbours.isEmpty()) {
+            return;
+        }
+
         Map<String, SubstationGeoData> foundGeoData = substationRepository.findByIdIn(neighbours).stream()
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
@@ -182,21 +167,22 @@ public class GeoDataService {
         geoDataForComputation.putAll(foundGeoData);
 
         Set<String> allNeighbours = new HashSet<>();
-        AtomicBoolean isSomeGeoDataNotFound = new AtomicBoolean(false);
+
+        List<Substation> substations = new ArrayList<>();
 
         neighbours.stream().forEach(neighbourId -> {
             if (geoDataForComputation.get(neighbourId) == null && !substationsToCalculate.contains(neighbourId)) {
-                isSomeGeoDataNotFound.set(true);
                 substationsToCalculate.add(neighbourId);
-                Set<String> newNeighbours = getNeighbours(List.of(network.getSubstation(neighbourId))).get(neighbourId);
-                allNeighbours.addAll(newNeighbours);
-                neighboursBySubstationId.put(neighbourId, newNeighbours);
+                substations.add(network.getSubstation(neighbourId));
             }
         });
+        Map<String, Set<String>> newNeighbours = getNeighbours(substations);
+        substations.stream().forEach(substation -> {
+            allNeighbours.addAll(newNeighbours.get(substation.getId()));
+            neighboursBySubstationId.put(substation.getId(), newNeighbours.get(substation.getId()));
+        });
 
-        if (isSomeGeoDataNotFound.get()) {
-            prepareGeoDataForComputation(network, geoDataForComputation, allNeighbours, neighboursBySubstationId, substationsToCalculate);
-        }
+        prepareGeoDataForComputation(network, geoDataForComputation, neighboursBySubstationId, substationsToCalculate, allNeighbours);
     }
 
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
