@@ -78,7 +78,7 @@ public class GeoDataServiceTest {
                 .build());
 
         substationEntities.add(SubstationEntity.builder()
-                .id("P22")
+                .id("P12")
                 .country("FR")
                 .coordinate(new CoordinateEmbeddable(10, 20))
                 .build());
@@ -901,20 +901,20 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
 
-        Substation p22 = network.newSubstation()
-                .setId("P22")
+        Substation p12 = network.newSubstation()
+                .setId("P12")
                 .setCountry(Country.FR)
                 .setTso("RTE")
                 .add();
 
-        VoltageLevel vlhv22 = p22.newVoltageLevel()
-                .setId("VLHV22")
+        VoltageLevel vlhv12 = p12.newVoltageLevel()
+                .setId("VLHV12")
                 .setNominalV(380)
                 .setTopologyKind(TopologyKind.BUS_BREAKER)
                 .add();
 
-        vlhv22.getBusBreakerView().newBus()
-                .setId("NHV22")
+        vlhv12.getBusBreakerView().newBus()
+                .setId("NHV12")
                 .add();
 
         Substation p9 = network.newSubstation()
@@ -934,10 +934,10 @@ public class GeoDataServiceTest {
                 .add();
 
         network.newLine()
-                .setId("NHV22_NHV9")
-                .setVoltageLevel1("VLHV22")
-                .setBus1("NHV22")
-                .setConnectableBus1("NHV22")
+                .setId("NHV12_NHV9")
+                .setVoltageLevel1("VLHV12")
+                .setBus1("NHV12")
+                .setConnectableBus1("NHV12")
                 .setVoltageLevel2(vlhv9.getId())
                 .setBus2(nhv9.getId())
                 .setConnectableBus2(nhv9.getId())

@@ -76,8 +76,7 @@ public class GeoDataController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                      @Parameter(description = "Countries") @RequestParam(required = false) List<String> countries,
-                                                      @Parameter(description = "Lines id") @RequestParam(name = "lineId", required = false) List<String> linesIds) {
+                                                      @Parameter(description = "Countries") @RequestParam(required = false) List<String> countries) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
         if (variantId != null) {

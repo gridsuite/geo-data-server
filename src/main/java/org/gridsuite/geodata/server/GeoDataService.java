@@ -135,8 +135,7 @@ public class GeoDataService {
 
         StopWatch stopWatch = StopWatch.createStarted();
 
-        List<SubstationEntity> substationEntities = substationRepository.findByIdIn(substationsIds);
-        Map<String, SubstationGeoData> substationsGeoData = substationEntities.stream()
+        Map<String, SubstationGeoData> substationsGeoData = substationRepository.findByIdIn(substationsIds).stream()
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
