@@ -177,10 +177,8 @@ public class GeoDataService {
             }
         });
         Map<String, Set<String>> newNeighbours = getNeighbours(substations);
-        substations.stream().forEach(substation -> {
-            allNeighbours.addAll(newNeighbours.get(substation.getId()));
-            neighboursBySubstationId.put(substation.getId(), newNeighbours.get(substation.getId()));
-        });
+        substations.stream().forEach(substation -> allNeighbours.addAll(newNeighbours.get(substation.getId())));
+        neighboursBySubstationId.putAll(newNeighbours);
 
         prepareGeoDataForComputation(network, geoDataForComputation, neighboursBySubstationId, substationsToCalculate, allNeighbours);
     }
