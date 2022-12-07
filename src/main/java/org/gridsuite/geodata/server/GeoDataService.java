@@ -132,7 +132,7 @@ public class GeoDataService {
 
     List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
         String escapedIds = StringUtils.join(substationsIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
-        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds), network.getId());
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
 
         StopWatch stopWatch = StopWatch.createStarted();
 
