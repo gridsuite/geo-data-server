@@ -56,7 +56,7 @@ public class GeoDataController {
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                                   @RequestParam(required = false) List<String> countries,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                                  @Parameter(description = "Substations id") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
+                                                                  @Parameter(description = "Substations ids") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid, substationsIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
         if (variantId != null) {
@@ -76,13 +76,19 @@ public class GeoDataController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                      @Parameter(description = "Countries") @RequestParam(required = false) List<String> countries) {
+                                                      @Parameter(description = "Countries") @RequestParam(required = false) List<String> countries,
+                                                      @Parameter(description = "Lines ids") @RequestParam(name = "lineId", required = false) List<String> linesIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<LineGeoData> lines = geoDataService.getLines(network, countrySet);
+        List<LineGeoData> lines;
+        if (linesIds != null) {
+            lines = geoDataService.getLines(network, linesIds);
+        } else {
+            lines = geoDataService.getLines(network, countrySet);
+        }
         return ResponseEntity.ok().body(lines);
     }
 

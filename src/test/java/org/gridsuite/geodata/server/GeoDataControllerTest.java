@@ -164,6 +164,12 @@ public class GeoDataControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=NHV1_NHV2_2&lineId=NHV1_NHV2_1")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test

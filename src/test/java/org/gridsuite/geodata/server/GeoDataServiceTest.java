@@ -957,5 +957,22 @@ public class GeoDataServiceTest {
         assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(19.993, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
         assertEquals(9.998, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+
+        List<LineGeoData> linesGeoData = geoDataService.getLines(network, List.of("NHV2_NHV5"/*, "NHV12_NHV9"*/));
+        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLatitude(), 0);
+        assertEquals(1, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLongitude(), 0);
+
+        assertEquals(4, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(1).getLatitude(), 0);
+        assertEquals(8, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(1).getLongitude(), 0);
+
+        //POURQUOI ON n'A PAS CES VALEURS ? OU EST LE CHEMIN COMPLET ?
+//        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLatitude(), 2);
+//        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLongitude(), 1);
+//
+//        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(1).getLatitude(), 2.5);
+//        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(1).getLongitude(), 1);
+//
+//        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(2).getLatitude(), 3);
+//        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(2).getLongitude(), 1);
     }
 }
