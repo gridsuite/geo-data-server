@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
+import com.powsybl.ws.commons.LogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
@@ -130,7 +131,7 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
-        List<String> escapedIds = substationsIds.stream().map(id -> sanitizeParam(id)).collect(Collectors.toList());
+        List<String> escapedIds = substationsIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList());
         LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", StringUtils.join(escapedIds, ", "), network.getId());
 
         StopWatch stopWatch = StopWatch.createStarted();
@@ -500,7 +501,7 @@ public class GeoDataService {
 
     @Transactional(readOnly = true)
     public List<LineGeoData> getLines(Network network, List<String> linesIds) {
-        List<String> escapedIds = linesIds.stream().map(id -> sanitizeParam(id)).collect(Collectors.toList());
+        List<String> escapedIds = linesIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList());
         LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", StringUtils.join(escapedIds, ", "), network.getId());
 
         Objects.requireNonNull(network);
@@ -509,9 +510,7 @@ public class GeoDataService {
 
         List<Line> lines = new ArrayList<>();
 
-        linesIds.stream().forEach(id -> {
-            lines.add(network.getLine(id));
-        });
+        linesIds.stream().forEach(id -> lines.add(network.getLine(id)));
 
         // read lines from DB
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(linesIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
