@@ -131,8 +131,8 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
-        List<String> escapedIds = substationsIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList());
-        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", StringUtils.join(escapedIds, ", "), network.getId());
+        String escapedIds = StringUtils.join(substationsIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds), network.getId());
 
         StopWatch stopWatch = StopWatch.createStarted();
 
@@ -501,8 +501,8 @@ public class GeoDataService {
 
     @Transactional(readOnly = true)
     public List<LineGeoData> getLines(Network network, List<String> linesIds) {
-        List<String> escapedIds = linesIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList());
-        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", StringUtils.join(escapedIds, ", "), network.getId());
+        String escapedIds = StringUtils.join(linesIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
 
         Objects.requireNonNull(network);
 
