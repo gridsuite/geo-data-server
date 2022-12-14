@@ -56,15 +56,15 @@ public class GeoDataController {
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
-                                                                  @Parameter(description = "Substations ids") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
+                                                                  @Parameter(description = "Substation ids") @RequestParam(name = "substationIds", required = false) List<String> substationIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid, substationsIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
+        Network network = networkStoreService.getNetwork(networkUuid, substationIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
         List<SubstationGeoData> substations;
-        if (substationsIds != null) {
-            substations = geoDataService.getSubstations(network, substationsIds);
+        if (substationIds != null) {
+            substations = geoDataService.getSubstations(network, substationIds);
         } else {
             substations = geoDataService.getSubstations(network, countrySet);
         }
@@ -76,16 +76,16 @@ public class GeoDataController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                      @Parameter(description = "Countries") @RequestParam(required = false) List<String> countries,
-                                                      @Parameter(description = "Lines ids") @RequestParam(name = "lineId", required = false) List<String> linesIds) {
+                                                      @Parameter(description = "Countries") @RequestParam(name = "variantId", required = false) List<String> countries,
+                                                      @Parameter(description = "Line ids") @RequestParam(name = "lineIds", required = false) List<String> lineIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
         List<LineGeoData> lines;
-        if (linesIds != null) {
-            lines = geoDataService.getLines(network, linesIds);
+        if (lineIds != null) {
+            lines = geoDataService.getLines(network, lineIds);
         } else {
             lines = geoDataService.getLines(network, countrySet);
         }
