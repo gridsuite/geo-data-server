@@ -960,7 +960,7 @@ public class GeoDataServiceTest {
         assertEquals(19.993, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
         assertEquals(9.998, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
 
-        List<LineGeoData> linesGeoData = geoDataService.getLines(network, List.of("NHV2_NHV5"));
+        List<LineGeoData> linesGeoData = geoDataService.getLines(network, List.of("NHV2_NHV5", "NHV1_NHV2_1"));
 
         assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLatitude(), 0);
         assertEquals(1, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLongitude(), 0);
@@ -976,5 +976,11 @@ public class GeoDataServiceTest {
 
         assertEquals(4, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(4).getLatitude(), 0);
         assertEquals(8, linesGeoData.stream().filter(s -> s.getId().equals("NHV2_NHV5")).collect(Collectors.toList()).get(0).getCoordinates().get(4).getLongitude(), 0);
+
+        assertEquals(1, linesGeoData.stream().filter(s -> s.getId().equals("NHV1_NHV2_1")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLatitude(), 0);
+        assertEquals(1, linesGeoData.stream().filter(s -> s.getId().equals("NHV1_NHV2_1")).collect(Collectors.toList()).get(0).getCoordinates().get(0).getLongitude(), 0);
+
+        assertEquals(3, linesGeoData.stream().filter(s -> s.getId().equals("NHV1_NHV2_1")).collect(Collectors.toList()).get(0).getCoordinates().get(1).getLatitude(), 0);
+        assertEquals(1, linesGeoData.stream().filter(s -> s.getId().equals("NHV1_NHV2_1")).collect(Collectors.toList()).get(0).getCoordinates().get(1).getLongitude(), 0);
     }
 }
