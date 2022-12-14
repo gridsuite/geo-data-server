@@ -56,7 +56,7 @@ public class GeoDataController {
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
-                                                                  @Parameter(description = "Substation ids") @RequestParam(name = "substationIds", required = false) List<String> substationIds) {
+                                                                  @Parameter(description = "Substation ids") @RequestParam(name = "substationId", required = false) List<String> substationIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid, substationIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
         if (variantId != null) {
@@ -77,7 +77,7 @@ public class GeoDataController {
     public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                       @Parameter(description = "Countries") @RequestParam(name = "variantId", required = false) List<String> countries,
-                                                      @Parameter(description = "Line ids") @RequestParam(name = "lineIds", required = false) List<String> lineIds) {
+                                                      @Parameter(description = "Line ids") @RequestParam(name = "lineId", required = false) List<String> lineIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid);
         if (variantId != null) {
