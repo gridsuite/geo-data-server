@@ -130,9 +130,11 @@ public class GeoDataService {
         return new ArrayList<>(substationsGeoData.values());
     }
 
-    List<SubstationGeoData> getSubstations(Network network, List<String> substationsIds) {
-        String escapedIds = StringUtils.join(substationsIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
+    List<SubstationGeoData> getSubstations(Network network, List<String> substationIds) {
+        String escapedIds = StringUtils.join(substationIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
         LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
+
+        Objects.requireNonNull(network);
 
         StopWatch stopWatch = StopWatch.createStarted();
 
@@ -143,14 +145,14 @@ public class GeoDataService {
         Map<String, SubstationGeoData> geoDataForComputation = new HashMap<>();
         Map<String, Set<String>> neighboursBySubstationId = new HashMap<>();
 
-        prepareGeoDataForComputation(network, geoDataForComputation, neighboursBySubstationId, substationsToCalculate, substationsIds.stream().collect(Collectors.toSet()));
+        prepareGeoDataForComputation(network, geoDataForComputation, neighboursBySubstationId, substationsToCalculate, substationIds.stream().collect(Collectors.toSet()));
 
         //Calculated data are added to geoDataForComputation
         calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, substationsToCalculate);
         calculateDefaultSubstationsGeoData(geoDataForComputation, neighboursBySubstationId);
 
         //We remove linked substations from result - we only want requested ones
-        geoDataForComputation.keySet().removeIf(key -> !substationsIds.contains(key));
+        geoDataForComputation.keySet().removeIf(key -> !substationIds.contains(key));
 
         LOGGER.info("Substations with given ids read/computed from DB in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
         //We return geo data found in the DB and the computed ones
