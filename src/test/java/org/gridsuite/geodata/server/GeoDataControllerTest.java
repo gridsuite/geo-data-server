@@ -175,8 +175,9 @@ public class GeoDataControllerTest {
     @Test
     public void testGetLinesError() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
-
-        given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
+        Network testNetwork = EurostagTutorialExample1Factory.create();
+        given(service.getNetwork(networkUuid)).willReturn(testNetwork);
+        given(service.getNetwork(networkUuid, PreloadingStrategy.COLLECTION)).willReturn(testNetwork);
         given(lineRepository.findAllById(any())).willThrow(new GeoDataException(GeoDataException.Type.PARSING_ERROR, new RuntimeException("Error parsing")));
 
         mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid)
