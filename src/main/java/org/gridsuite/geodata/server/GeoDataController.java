@@ -54,8 +54,8 @@ public class GeoDataController {
     @Operation(summary = "Get geographical data for substations with the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
-                                                                  @RequestParam(required = false) List<String> countries,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
+                                                                  @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                                   @Parameter(description = "Substations ids") @RequestParam(name = "substationId", required = false) List<String> substationsIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid, substationsIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
