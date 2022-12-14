@@ -847,7 +847,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testGetGeodataById() {
+    public void testGetSubstationsGeodataById() {
         Network network = createGeoDataNetwork();
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstations(network, List.of("P1", "P3"));
 
@@ -959,6 +959,11 @@ public class GeoDataServiceTest {
         assertEquals(2, substationsGeoData.stream().filter(s -> s.getId().equals("P3")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
         assertEquals(19.993, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLongitude(), 0);
         assertEquals(9.998, substationsGeoData.stream().filter(s -> s.getId().equals("P9")).collect(Collectors.toList()).get(0).getCoordinate().getLatitude(), 0);
+    }
+
+    @Test
+    public void testGetLinesGeodataById() {
+        Network network = createGeoDataNetwork();
 
         List<LineGeoData> linesGeoData = geoDataService.getLines(network, List.of("NHV2_NHV5", "NHV1_NHV2_1"));
 
