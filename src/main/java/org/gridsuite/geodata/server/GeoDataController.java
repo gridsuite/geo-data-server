@@ -17,6 +17,8 @@ import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
 public class GeoDataController {
 
     static final String API_VERSION = "v1";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
 
     @Autowired
     private GeoDataService geoDataService;
@@ -64,9 +68,12 @@ public class GeoDataController {
         }
         List<SubstationGeoData> substations;
         if (substationIds != null) {
-            substations = geoDataService.getSubstations(network, substationIds);
+            if (!countrySet.isEmpty()) {
+                LOGGER.warn("Countries will not be taken into account to filter substation position.");
+            }
+            substations = geoDataService.getSubstationsByIds(network, substationIds.stream().collect(Collectors.toSet()));
         } else {
-            substations = geoDataService.getSubstations(network, countrySet);
+            substations = geoDataService.getSubstationsByCountries(network, countrySet);
         }
         return ResponseEntity.ok().body(substations);
     }
@@ -85,9 +92,12 @@ public class GeoDataController {
         }
         List<LineGeoData> lines;
         if (lineIds != null) {
-            lines = geoDataService.getLines(network, lineIds);
+            if (!countrySet.isEmpty()) {
+                LOGGER.warn("Countries will not be taken into account to filter line position.");
+            }
+            lines = geoDataService.getLinesByIds(network, lineIds.stream().collect(Collectors.toSet()));
         } else {
-            lines = geoDataService.getLines(network, countrySet);
+            lines = geoDataService.getLinesByCountries(network, countrySet);
         }
         return ResponseEntity.ok().body(lines);
     }
