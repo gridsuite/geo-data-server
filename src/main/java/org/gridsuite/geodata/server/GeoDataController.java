@@ -42,7 +42,7 @@ public class GeoDataController {
 
     static final String API_VERSION = "v1";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataController.class);
 
     @Autowired
     private GeoDataService geoDataService;
