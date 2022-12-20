@@ -2,8 +2,9 @@ spring:
   application:
     name: geo-data-server
 
-network-store-server:
-   preloading-strategy: COLLECTION
+backing-services:
+  network-store-server:
+    preloading-strategy: COLLECTION
 
 network-geo-data:
   iterations : 50
