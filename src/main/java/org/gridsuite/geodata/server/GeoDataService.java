@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
+import com.powsybl.ws.commons.LogUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -28,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -74,7 +77,7 @@ public class GeoDataService {
         return substationsGeoDataDB;
     }
 
-    List<SubstationGeoData> getSubstations(Network network, Set<Country> countries) {
+    List<SubstationGeoData> getSubstationsByCountries(Network network, Set<Country> countries) {
         LOGGER.info("Loading substations geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
@@ -123,6 +126,61 @@ public class GeoDataService {
         calculateDefaultSubstationsGeoData(substationsGeoData, sortedNeighbours);
 
         return new ArrayList<>(substationsGeoData.values());
+    }
+
+    List<SubstationGeoData> getSubstationsByIds(Network network, Set<String> substationIds) {
+        String escapedIds = StringUtils.join(substationIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
+
+        Objects.requireNonNull(network);
+
+        StopWatch stopWatch = StopWatch.createStarted();
+
+        Map<String, SubstationGeoData> substationsGeoData = new HashMap<>();
+
+        Set<String> substationsToCalculate = new HashSet<>();
+
+        Map<String, SubstationGeoData> geoDataForComputation = new HashMap<>();
+        Map<String, Set<String>> neighboursBySubstationId = new HashMap<>();
+
+        prepareGeoDataForComputation(network, geoDataForComputation, neighboursBySubstationId, substationsToCalculate, substationIds);
+
+        //Calculated data are added to geoDataForComputation
+        calculateMissingGeoData(network, neighboursBySubstationId, geoDataForComputation, substationsToCalculate);
+        calculateDefaultSubstationsGeoData(geoDataForComputation, neighboursBySubstationId);
+
+        //We remove linked substations from result - we only want requested ones
+        geoDataForComputation.keySet().removeIf(key -> !substationIds.contains(key));
+
+        LOGGER.info("Substations with given ids read/computed from DB in {} ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
+        //We return geo data found in the DB and the computed ones
+        return new ArrayList<>(Stream.concat(geoDataForComputation.values().stream(), substationsGeoData.values().stream()).collect(Collectors.toList()));
+    }
+
+    private void prepareGeoDataForComputation(Network network, Map<String, SubstationGeoData> geoDataForComputation, Map<String, Set<String>> neighboursBySubstationId, Set<String> substationsToCalculate, Set<String> neighbours) {
+        Set<String> neighboursToBeTreated = new HashSet<>(neighbours);
+        while (!neighboursToBeTreated.isEmpty()) {
+            Map<String, SubstationGeoData> foundGeoData = substationRepository.findByIdIn(neighboursToBeTreated).stream()
+                    .map(SubstationEntity::toGeoData)
+                    .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+
+            geoDataForComputation.putAll(foundGeoData);
+
+            Set<String> allNeighbours = new HashSet<>();
+
+            List<Substation> substations = new ArrayList<>();
+
+            neighboursToBeTreated.stream().forEach(neighbourId -> {
+                if (geoDataForComputation.get(neighbourId) == null && !substationsToCalculate.contains(neighbourId)) {
+                    substationsToCalculate.add(neighbourId);
+                    substations.add(network.getSubstation(neighbourId));
+                }
+            });
+            Map<String, Set<String>> newNeighbours = getNeighbours(substations);
+            substations.stream().forEach(substation -> allNeighbours.addAll(newNeighbours.get(substation.getId())));
+            neighboursBySubstationId.putAll(newNeighbours);
+            neighboursToBeTreated = allNeighbours;
+        }
     }
 
     private void calculateDefaultSubstationsGeoData(Map<String, SubstationGeoData> substationsGeoData, Map<String, Set<String>> sortedNeighbours) {
@@ -415,7 +473,7 @@ public class GeoDataService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineGeoData> getLines(Network network, Set<Country> countries) {
+    public List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
@@ -433,9 +491,41 @@ public class GeoDataService {
         Set<Country> countryAndNextTo =
             lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull))
                 .collect(Collectors.toSet());
-        Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMap(network, countryAndNextTo);
+        Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line))
             .filter(Objects::nonNull).collect(Collectors.toList());
+        LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
+
+        return lineGeoData;
+    }
+
+    @Transactional(readOnly = true)
+    public List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
+        String escapedIds = StringUtils.join(linesIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
+        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
+
+        Objects.requireNonNull(network);
+
+        StopWatch stopWatch = StopWatch.createStarted();
+
+        List<Line> lines = new ArrayList<>();
+
+        linesIds.stream().forEach(id -> lines.add(network.getLine(id)));
+
+        // read lines from DB
+        Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(linesIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
+
+        Set<String> substations = new HashSet<>();
+        lines.forEach(line -> {
+            String s1 = line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow().getId();
+            String s2 = line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow().getId();
+            substations.add(s1);
+            substations.add(s2);
+        });
+
+        Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByIds(network, substations);
+        List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line))
+                .filter(Objects::nonNull).collect(Collectors.toList());
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
@@ -460,7 +550,11 @@ public class GeoDataService {
         return mapper.readValue(coordinates, new TypeReference<List<Coordinate>>() { });
     }
 
-    private Map<String, SubstationGeoData> getSubstationMap(Network network, Set<Country> countries) {
-        return getSubstations(network, countries).stream().collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+    private Map<String, SubstationGeoData> getSubstationMapByCountries(Network network, Set<Country> countries) {
+        return getSubstationsByCountries(network, countries).stream().collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+    }
+
+    private Map<String, SubstationGeoData> getSubstationMapByIds(Network network, Set<String> substationsIds) {
+        return getSubstationsByIds(network, substationsIds).stream().collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
     }
 }

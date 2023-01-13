@@ -13,6 +13,7 @@ import com.powsybl.iidm.network.VariantManagerConstants;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
+import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineRepository;
@@ -87,6 +88,8 @@ public class GeoDataControllerTest {
         Network testNetwork = EurostagTutorialExample1Factory.create();
         testNetwork.getVariantManager().cloneVariant(VariantManagerConstants.INITIAL_VARIANT_ID, VARIANT_ID);
         given(service.getNetwork(networkUuid)).willReturn(testNetwork);
+        given(service.getNetwork(networkUuid, PreloadingStrategy.NONE)).willReturn(testNetwork);
+        given(service.getNetwork(networkUuid, PreloadingStrategy.COLLECTION)).willReturn(testNetwork);
 
         mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
@@ -155,13 +158,38 @@ public class GeoDataControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(toString(GEO_DATA_LINES)))
                 .andExpect(status().isOk());
+
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&substationId=P1&substationId=P2&country=" + Country.FR)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&substationId=P1&substationId=P2")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=NHV1_NHV2_2&lineId=NHV1_NHV2_1&country=" + Country.FR)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=NHV1_NHV2_2&lineId=NHV1_NHV2_1")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
     public void testGetLinesError() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
-
-        given(service.getNetwork(networkUuid)).willReturn(EurostagTutorialExample1Factory.create());
+        Network testNetwork = EurostagTutorialExample1Factory.create();
+        given(service.getNetwork(networkUuid)).willReturn(testNetwork);
+        given(service.getNetwork(networkUuid, PreloadingStrategy.COLLECTION)).willReturn(testNetwork);
         given(lineRepository.findAllById(any())).willThrow(new GeoDataException(GeoDataException.Type.PARSING_ERROR, new RuntimeException("Error parsing")));
 
         mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid)
