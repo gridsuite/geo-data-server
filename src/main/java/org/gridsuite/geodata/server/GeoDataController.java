@@ -99,9 +99,6 @@ public class GeoDataController {
         } else {
             lines = geoDataService.getLinesByCountries(network, countrySet);
         }
-         // Add hvdc lines
-        List<LineGeoData> hvdcLines = geoDataService.getHvdcLines(network);
-        lines.addAll(hvdcLines);
         return ResponseEntity.ok().body(lines);
     }
 
