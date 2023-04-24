@@ -72,7 +72,7 @@ public class GeoDataService {
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
-        LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
+        LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return substationsGeoDataDB;
     }
@@ -441,7 +441,7 @@ public class GeoDataService {
         if (geoData == null || geoData.getCoordinates().isEmpty() || (geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty())) {
             return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(), sub1.getId(), sub2.getId(),
                 List.of(substation1Coordinate, substation2Coordinate));
-        } else if (emptyOrEquals(geoData.getSubstationStart(),  sub2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub1.getId())) {
+        } else if (emptyOrEquals(geoData.getSubstationStart(), sub2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), sub1.getId())) {
             return new LineGeoData(line.getId(), sub1.getNullableCountry(), sub2.getNullableCountry(),
                 geoData.getSubstationStart(),
                 geoData.getSubstationEnd(),
