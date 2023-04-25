@@ -16,7 +16,7 @@ import java.io.IOException;
 /**
  * @author Geoffroy Jamgotchian <geoffroy.jamgotchian at rte-france.com>
  */
-public class CoordinateSerializer extends StdSerializer<Coordinate>  {
+public class CoordinateSerializer extends StdSerializer<Coordinate> {
 
     public CoordinateSerializer() {
         super(Coordinate.class);

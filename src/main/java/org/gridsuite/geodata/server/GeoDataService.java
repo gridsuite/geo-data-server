@@ -72,7 +72,7 @@ public class GeoDataService {
                 .map(SubstationEntity::toGeoData)
                 .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
-        LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(),  stopWatch.getTime(TimeUnit.MILLISECONDS));
+        LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return substationsGeoDataDB;
     }
@@ -439,8 +439,9 @@ public class GeoDataService {
         if (geoData == null || geoData.getCoordinates().isEmpty() || (geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty())) {
             return new LineGeoData(lineId, substation1.getNullableCountry(), substation2.getNullableCountry(), substation1.getId(), substation2.getId(),
                 List.of(substation1Coordinate, substation2Coordinate));
-        } else if (emptyOrEquals(geoData.getSubstationStart(),  substation2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), substation1.getId())) {
+        } else if (emptyOrEquals(geoData.getSubstationStart(), substation2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), substation1.getId())) {
             return new LineGeoData(lineId, substation1.getNullableCountry(), substation2.getNullableCountry(),
+
                 geoData.getSubstationStart(),
                 geoData.getSubstationEnd(),
                 addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, true));
@@ -540,7 +541,7 @@ public class GeoDataService {
         });
 
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByIds(network, substations);
-        List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb,  line.getId(),
+        List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line.getId(),
                 line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
                 line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow()))
                 .filter(Objects::nonNull).collect(Collectors.toList());

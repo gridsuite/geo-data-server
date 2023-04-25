@@ -24,7 +24,7 @@ import java.util.List;
 @ToString
 public class LineGeoData {
 
-    private  String id;
+    private String id;
 
     private Country country1;
 

@@ -21,10 +21,10 @@ public class CoordinateEntityTest {
 
     @Test
     public void test() {
-        List<CoordinateEmbeddable> coordinateEntities =  CoordinateEmbeddable.create(Arrays.asList(new Coordinate(1, 1), new Coordinate(2, 2)));
+        List<CoordinateEmbeddable> coordinateEntities = CoordinateEmbeddable.create(Arrays.asList(new Coordinate(1, 1), new Coordinate(2, 2)));
         assertEquals(2, coordinateEntities.size(), 0);
 
-        var coordinateEntityBuilder =  CoordinateEmbeddable.builder().lat(2).lon(2);
+        var coordinateEntityBuilder = CoordinateEmbeddable.builder().lat(2).lon(2);
         assertEquals("CoordinateEmbeddable.CoordinateEmbeddableBuilder(lat=2.0, lon=2.0)", coordinateEntityBuilder.toString());
         assertEquals("CoordinateEmbeddable(lat=2.0, lon=2.0)", coordinateEntityBuilder.build().toString());
     }
