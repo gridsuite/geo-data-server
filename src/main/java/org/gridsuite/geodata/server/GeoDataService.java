@@ -495,8 +495,8 @@ public class GeoDataService {
         Set<Country> countryAndNextTo =
                 lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull))
                         .collect(Collectors.toSet());
-        countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).collect(Collectors.toSet()));
-        countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).collect(Collectors.toSet()));
+        countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
+        countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
         List<LineGeoData> geoData = new ArrayList<>();
         List<LineGeoData> lineGeoData = lines.stream().map(line ->
