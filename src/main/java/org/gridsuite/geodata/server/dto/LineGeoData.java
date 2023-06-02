@@ -34,5 +34,6 @@ public class LineGeoData {
 
     String substationEnd;
 
+    @Builder.Default
     private List<Coordinate> coordinates = new ArrayList<>();
 }
