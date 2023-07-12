@@ -108,8 +108,14 @@
 
 
     <dependencies>
-        <!-- compile scope -->
+        <!-- Annotation processor dependencies -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- compile scope -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
