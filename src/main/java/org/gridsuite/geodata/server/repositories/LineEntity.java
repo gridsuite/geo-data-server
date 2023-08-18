@@ -9,11 +9,11 @@ package org.gridsuite.geodata.server.repositories;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>

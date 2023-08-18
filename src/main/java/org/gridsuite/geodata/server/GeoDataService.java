@@ -436,7 +436,7 @@ public class GeoDataService {
 
         Coordinate substation1Coordinate = substation1GeoData.getCoordinate();
         Coordinate substation2Coordinate = substation2GeoData.getCoordinate();
-        if (geoData == null || geoData.getCoordinates().isEmpty() || (geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty())) {
+        if (geoData == null || geoData.getCoordinates().isEmpty() || geoData.getSubstationStart().isEmpty() && geoData.getSubstationEnd().isEmpty()) {
             return new LineGeoData(lineId, substation1.getNullableCountry(), substation2.getNullableCountry(), substation1.getId(), substation2.getId(),
                 List.of(substation1Coordinate, substation2Coordinate));
         } else if (emptyOrEquals(geoData.getSubstationStart(), substation2.getId()) && emptyOrEquals(geoData.getSubstationEnd(), substation1.getId())) {
