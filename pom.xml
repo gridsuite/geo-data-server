@@ -49,7 +49,7 @@
     </developers>
 
     <properties>
-        <gridsuite-dependencies.version>27</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>28</gridsuite-dependencies.version>
         <commons-lang3.version>3.9</commons-lang3.version>
 
         <liquibase-hibernate-package>org.gridsuite.geodata.server</liquibase-hibernate-package>
