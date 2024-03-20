@@ -481,13 +481,16 @@ public class GeoDataService {
         StopWatch stopWatch = StopWatch.createStarted();
 
         List<Line> lines = network.getLineStream().collect(Collectors.toList());
+        List<TieLine> tieLines = network.getTieLineStream().collect(Collectors.toList());
         List<HvdcLine> hvdcLines = network.getHvdcLineStream().collect(Collectors.toList());
 
         // read lines from DB
         Set<String> ids = new HashSet<>();
         Set<String> lineIds = lines.stream().map(Line::getId).collect(Collectors.toSet());
+        Set<String> tieLineIds = tieLines.stream().map(TieLine::getId).collect(Collectors.toSet());
         Set<String> hvdcLineIds = hvdcLines.stream().map(HvdcLine::getId).collect(Collectors.toSet());
         ids.addAll(lineIds);
+        ids.addAll(tieLineIds);
         ids.addAll(hvdcLineIds);
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(ids).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
@@ -495,6 +498,8 @@ public class GeoDataService {
         Set<Country> countryAndNextTo =
                 lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull))
                         .collect(Collectors.toSet());
+        countryAndNextTo.addAll(tieLines.stream().map(tieLine -> tieLine.getDanglingLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
+        countryAndNextTo.addAll(tieLines.stream().map(tieLine -> tieLine.getDanglingLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
         countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
         countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
@@ -505,11 +510,16 @@ public class GeoDataService {
                                 line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
                                 line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow()))
                 .filter(Objects::nonNull).collect(Collectors.toList());
+        List<LineGeoData> tieLineGeoData = tieLines.stream().map(tieLine -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, tieLine.getId(),
+                        tieLine.getDanglingLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
+                        tieLine.getDanglingLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow()))
+                .filter(Objects::nonNull).collect(Collectors.toList());
         List<LineGeoData> hvdcLineGeoData = hvdcLines.stream().map(hvdcLine -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, hvdcLine.getId(),
                         hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
                         hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow()))
                 .filter(Objects::nonNull).collect(Collectors.toList());
         geoData.addAll(lineGeoData);
+        geoData.addAll(tieLineGeoData);
         geoData.addAll(hvdcLineGeoData);
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
