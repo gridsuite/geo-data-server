@@ -504,8 +504,7 @@ public class GeoDataService {
                                 tieLine.getDanglingLine1().getTerminal().getVoltageLevel().getSubstation(),
                                 tieLine.getDanglingLine2().getTerminal().getVoltageLevel().getSubstation()
                         ))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                        .flatMap(Optional::stream)
                         .map(Substation::getNullableCountry)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet())
