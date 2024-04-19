@@ -13,6 +13,7 @@ import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
 import com.powsybl.ws.commons.LogUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -480,56 +481,32 @@ public class GeoDataService {
 
         StopWatch stopWatch = StopWatch.createStarted();
 
-        List<Line> lines = network.getLineStream().toList();
-        List<TieLine> tieLines = network.getTieLineStream().toList();
-        List<HvdcLine> hvdcLines = network.getHvdcLineStream().toList();
-
         // read lines from DB
-        Set<String> ids = new HashSet<>();
-        Set<String> lineIds = lines.stream().map(Line::getId).collect(Collectors.toSet());
-        Set<String> tieLineIds = tieLines.stream().map(TieLine::getId).collect(Collectors.toSet());
-        Set<String> hvdcLineIds = hvdcLines.stream().map(HvdcLine::getId).collect(Collectors.toSet());
-        ids.addAll(lineIds);
-        ids.addAll(tieLineIds);
-        ids.addAll(hvdcLineIds);
-        Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(ids).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
+        Map<String, Pair<Substation, Substation>> mapSubstationsByLine = new HashMap<>();
+
+        network.getLineStream().forEach(line -> mapSubstationsByLine.put(line.getId(), Pair.of(line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
+            line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow())));
+        network.getTieLineStream().forEach(tieLine -> mapSubstationsByLine.put(tieLine.getId(), Pair.of(tieLine.getDanglingLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
+            tieLine.getDanglingLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow())));
+        network.getHvdcLineStream().forEach(hvdcLine -> mapSubstationsByLine.put(hvdcLine.getId(), Pair.of(hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
+            hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow())));
+
+        Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(mapSubstationsByLine.keySet()).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
         // we also want the destination substation (so we add the neighbouring country)
-        Set<Country> countryAndNextTo =
-                lines.stream().flatMap(line -> line.getTerminals().stream().map(term -> term.getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull))
-                        .collect(Collectors.toSet());
-        countryAndNextTo.addAll(
-                tieLines.stream()
-                        .flatMap(tieLine -> Stream.of(
-                                tieLine.getDanglingLine1().getTerminal().getVoltageLevel().getSubstation(),
-                                tieLine.getDanglingLine2().getTerminal().getVoltageLevel().getSubstation()
-                        ))
-                        .flatMap(Optional::stream)
-                        .map(Substation::getNullableCountry)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet())
-        );
-        countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
-        countryAndNextTo.addAll(hvdcLines.stream().map(hvdcLine -> hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow().getNullableCountry()).filter(Objects::nonNull).collect(Collectors.toSet()));
+        Set<Country> countryAndNextTo = mapSubstationsByLine.entrySet().stream().flatMap(entry ->
+             Stream.of(entry.getValue().getLeft(), entry.getValue().getRight()).map(Substation::getNullableCountry).filter(Objects::nonNull)).collect(Collectors.toSet());
+
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
         List<LineGeoData> geoData = new ArrayList<>();
-        List<LineGeoData> lineGeoData = lines.stream().map(line ->
-                        getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb,
-                                line.getId(),
-                                line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
-                                line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow()))
-                .filter(Objects::nonNull).toList();
-        List<LineGeoData> tieLineGeoData = tieLines.stream().map(tieLine -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, tieLine.getId(),
-                        tieLine.getDanglingLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
-                        tieLine.getDanglingLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow()))
-                .filter(Objects::nonNull).toList();
-        List<LineGeoData> hvdcLineGeoData = hvdcLines.stream().map(hvdcLine -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, hvdcLine.getId(),
-                        hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
-                        hvdcLine.getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow()))
-                .filter(Objects::nonNull).toList();
-        geoData.addAll(lineGeoData);
-        geoData.addAll(tieLineGeoData);
-        geoData.addAll(hvdcLineGeoData);
+
+        mapSubstationsByLine.forEach((key, value) -> {
+            LineGeoData geo = getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, key, value.getLeft(), value.getRight());
+            if (geo != null) {
+                geoData.add(geo);
+            }
+        });
+
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return geoData;
