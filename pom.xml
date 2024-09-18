@@ -49,8 +49,8 @@
     </developers>
 
     <properties>
-        <gridsuite-dependencies.version>32</gridsuite-dependencies.version>
-
+        <gridsuite-dependencies.version>33</gridsuite-dependencies.version>
+        <powsybl-network-store.version>1.17.1</powsybl-network-store.version>
         <liquibase-hibernate-package>org.gridsuite.geodata.server</liquibase-hibernate-package>
         <dropwizard.version>4.2.26</dropwizard.version>
     </properties>
@@ -136,6 +136,19 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-network-store-client</artifactId>
+            <version>${powsybl-network-store.version}</version>
+        </dependency>
+        <!-- FIXME: to be removed at next powsybl-ws-dependencies upgrade  -->
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-network-store-iidm-impl</artifactId>
+            <version>${powsybl-network-store.version}</version>
+        </dependency>
+        <!-- FIXME: to be removed at next powsybl-ws-dependencies upgrade  -->
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-network-store-model</artifactId>
+            <version>${powsybl-network-store.version}</version>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
