@@ -51,6 +51,8 @@
     <properties>
         <gridsuite-dependencies.version>34</gridsuite-dependencies.version>
         <liquibase-hibernate-package>org.gridsuite.geodata.server</liquibase-hibernate-package>
+        <!-- FIXME: powsybl-ws-commons version is overridden. To be removed at next gridsuite-dependencies.version upgrade -->
+        <powsybl-ws-commons.version>1.15.0</powsybl-ws-commons.version>
     </properties>
 
     <build>
@@ -90,7 +92,7 @@
             <dependency>
                 <groupId>com.powsybl</groupId>
                 <artifactId>powsybl-ws-commons</artifactId>
-                <version>1.15.0</version>
+                <version>${powsybl-ws-commons.version}</version>
             </dependency>
 
             <!-- imports -->
