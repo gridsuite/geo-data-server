@@ -7,20 +7,19 @@
 package org.gridsuite.geodata.server.repositories;
 
 import com.powsybl.iidm.network.extensions.Coordinate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-public class CoordinateEntityTest {
-
+class CoordinateEntityTest {
     @Test
-    public void test() {
+    void test() {
         List<CoordinateEmbeddable> coordinateEntities = CoordinateEmbeddable.create(Arrays.asList(new Coordinate(1, 1), new Coordinate(2, 2)));
         assertEquals(2, coordinateEntities.size(), 0);
 
