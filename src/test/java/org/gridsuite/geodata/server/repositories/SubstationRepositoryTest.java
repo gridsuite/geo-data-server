@@ -6,39 +6,28 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
-import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringRunner.class)
-@ContextHierarchy({
-    @ContextConfiguration(classes = {GeoDataApplication.class})
-    })
-public class SubstationRepositoryTest {
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class SubstationRepositoryTest {
 
     @Autowired
     private SubstationRepository repository;
 
-    @Before
-    public void setUp() {
-        repository.deleteAll();
-    }
-
     @Test
-    public void test() {
+    void test() {
         SubstationEntity.SubstationEntityBuilder substationEntityBuilder = SubstationEntity.builder()
                 .country("FR")
                 .id("ID")

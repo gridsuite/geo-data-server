@@ -10,30 +10,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.extensions.Coordinate;
-import org.gridsuite.geodata.server.GeoDataApplication;
 import org.gridsuite.geodata.server.dto.LineGeoData;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringRunner.class)
-@ContextHierarchy({
-    @ContextConfiguration(classes = {GeoDataApplication.class})
-})
-public class LineRepositoryTest {
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureJson
+class LineRepositoryTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -41,13 +37,8 @@ public class LineRepositoryTest {
     @Autowired
     private LineRepository repository;
 
-    @Before
-    public void setUp() {
-        repository.deleteAll();
-    }
-
     @Test
-    public void test() throws JsonProcessingException {
+    void test() throws JsonProcessingException {
         List<Coordinate> coordinateEntities = new ArrayList<>();
         coordinateEntities.add(new Coordinate(11, 12));
         coordinateEntities.add(new Coordinate(13, 14.1));
@@ -80,6 +71,5 @@ public class LineRepositoryTest {
         assertEquals("Samy", le.getSubstationStart());
         assertEquals("Scooby", le.getSubstationEnd());
         assertTrue(le.isSide1());
-
     }
 }
