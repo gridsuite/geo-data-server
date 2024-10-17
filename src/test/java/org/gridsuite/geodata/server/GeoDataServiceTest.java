@@ -6,36 +6,30 @@
  */
 package org.gridsuite.geodata.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import com.powsybl.iidm.network.test.NoEquipmentNetworkFactory;
+import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.Coordinate;
+import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
+import com.powsybl.iidm.network.test.NoEquipmentNetworkFactory;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
-import com.powsybl.iidm.network.*;
-import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringRunner.class)
-@ContextHierarchy({
-    @ContextConfiguration(classes = GeoDataApplication.class)
-    })
-public class GeoDataServiceTest {
+@SpringBootTest(classes = GeoDataApplication.class)
+class GeoDataServiceTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,15 +41,13 @@ public class GeoDataServiceTest {
     private LineRepository lineRepository;
 
     @Autowired
-    GeoDataService geoDataService;
+    private GeoDataService geoDataService;
 
     @Autowired
     private DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
 
-    @Before
-    public void setUp() throws JsonProcessingException {
-        lineRepository.deleteAll();
-        substationRepository.deleteAll();
+    @BeforeEach
+    void setUp() throws Exception {
         List<SubstationEntity> substationEntities = new ArrayList<>();
 
         substationEntities.add(SubstationEntity.builder()
@@ -125,14 +117,20 @@ public class GeoDataServiceTest {
         lineRepository.saveAll(lineEntities);
     }
 
-    static LineGeoData getFromList(List<LineGeoData> list, String id) {
+    @AfterEach
+    void cleanDb() {
+        lineRepository.deleteAll();
+        substationRepository.deleteAll();
+    }
+
+    private static LineGeoData getFromList(List<LineGeoData> list, String id) {
         Optional<LineGeoData> res = list.stream().filter(l -> l.getId().equals(id)).findAny();
         assertTrue(res.isPresent());
         return res.get();
     }
 
     @Test
-    public void test() {
+    void test() {
         Network network = createGeoDataNetwork();
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
 
@@ -189,7 +187,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testCgmesCase() {
+    void testCgmesCase() {
         Network network = createCgmesGeoDataNetwork();
 
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
@@ -202,7 +200,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testNonExisting() {
+    void testNonExisting() {
         Network network = EurostagTutorialExample1Factory.create();
         Substation notexistsub1 = network.newSubstation()
                 .setId("NOTEXISTSUB1")
@@ -248,20 +246,20 @@ public class GeoDataServiceTest {
                 .setB2(386E-6 / 2)
                 .add();
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
-        assertFalse("Must not contain nulls", substationsGeoData.stream().anyMatch(Objects::isNull));
-        assertFalse("Must not contain unknown substation " + notexistsub1.getId(),
-                substationsGeoData.stream().anyMatch(s -> notexistsub1.getId().equals(s.getId())));
-        assertFalse("Must not contain unknown substation " + notexistsub2.getId(),
-                substationsGeoData.stream().anyMatch(s -> notexistsub2.getId().equals(s.getId())));
+        assertFalse(substationsGeoData.stream().anyMatch(Objects::isNull), "Must not contain nulls");
+        assertFalse(substationsGeoData.stream().anyMatch(s -> notexistsub1.getId().equals(s.getId())),
+                "Must not contain unknown substation " + notexistsub1.getId());
+        assertFalse(substationsGeoData.stream().anyMatch(s -> notexistsub2.getId().equals(s.getId())),
+                "Must not contain unknown substation " + notexistsub2.getId());
 
         List<LineGeoData> linesGeoData = geoDataService.getLinesByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
-        assertFalse("Must not contain nulls", linesGeoData.stream().anyMatch(Objects::isNull));
-        assertFalse("Must not contain unknown lines " + notexistline.getId(),
-                linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())));
+        assertFalse(linesGeoData.stream().anyMatch(Objects::isNull), "Must not contain nulls");
+        assertFalse(linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())),
+                "Must not contain unknown lines " + notexistline.getId());
     }
 
     @Test
-    public void testSimilarNeighborhoodOffset() {
+    void testSimilarNeighborhoodOffset() {
         Network network = EurostagTutorialExample1Factory.create();
         Substation p4 = network.newSubstation()
                 .setId("P4")
@@ -363,7 +361,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testCalculatedDefaultSubstations() {
+    void testCalculatedDefaultSubstations() {
         Network network = EurostagTutorialExample1Factory.create();
         Substation p4 = network.newSubstation()
                 .setId("P4")
@@ -514,7 +512,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testLineCoordinatesError() {
+    void testLineCoordinatesError() {
         LineEntity lineEntity = LineEntity.create(LineGeoData.builder()
                 .id("idLine")
                 .country1(Country.FR)
@@ -527,7 +525,7 @@ public class GeoDataServiceTest {
             geoDataService.toDto(lineEntity));
     }
 
-    private Network createGeoDataNetwork() {
+    private static Network createGeoDataNetwork() {
         Network network = EurostagTutorialExample1Factory.create();
 
         Substation p3 = network.newSubstation()
@@ -846,7 +844,7 @@ public class GeoDataServiceTest {
         return network;
     }
 
-    private Network createCgmesGeoDataNetwork() {
+    private static Network createCgmesGeoDataNetwork() {
         Network network = NoEquipmentNetworkFactory.create();
 
         Substation s1 = network.newSubstation()
@@ -903,7 +901,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testGetSubstationsGeodataById() {
+    void testGetSubstationsGeodataById() {
         Network network = createGeoDataNetwork();
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByIds(network, Set.of("P1", "P3"));
 
@@ -1018,7 +1016,7 @@ public class GeoDataServiceTest {
     }
 
     @Test
-    public void testGetLinesGeodataById() {
+    void testGetLinesGeodataById() {
         Network network = createGeoDataNetwork();
 
         List<LineGeoData> linesGeoData = geoDataService.getLinesByIds(network, Set.of("NHV2_NHV5", "NHV1_NHV2_1"));

@@ -7,6 +7,7 @@
 package org.gridsuite.geodata.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManagerConstants;
@@ -18,22 +19,17 @@ import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.google.common.io.ByteStreams;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.powsybl.network.store.model.NetworkStoreApi.VERSION;
@@ -48,9 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @WebMvcTest(GeoDataController.class)
-public class GeoDataControllerTest {
+class GeoDataControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -73,16 +68,12 @@ public class GeoDataControllerTest {
     private static final String VARIANT_ID = "First_variant";
     private static final String WRONG_VARIANT_ID = "Wrong_variant";
 
-    public String toString(String resourceName) {
-        try {
-            return new String(ByteStreams.toByteArray(Objects.requireNonNull(getClass().getResourceAsStream(resourceName))), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    private static String toString(String resourceName) throws IOException {
+        return new String(ByteStreams.toByteArray(Objects.requireNonNull(GeoDataControllerTest.class.getResourceAsStream(resourceName))), StandardCharsets.UTF_8);
     }
 
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
 
         Network testNetwork = EurostagTutorialExample1Factory.create();
@@ -185,7 +176,7 @@ public class GeoDataControllerTest {
     }
 
     @Test
-    public void testGetLinesError() throws Exception {
+    void testGetLinesError() throws Exception {
         UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
         Network testNetwork = EurostagTutorialExample1Factory.create();
         given(service.getNetwork(networkUuid)).willReturn(testNetwork);
