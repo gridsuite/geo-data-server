@@ -539,14 +539,7 @@ public class GeoDataService {
 
         StopWatch stopWatch = StopWatch.createStarted();
 
-        List<Line> lines = new ArrayList<>();
-
-        linesIds.forEach(id -> {
-            Line line = network.getLine(id);
-            if (line != null) {
-                lines.add(line);
-            }
-        });
+        List<Line> lines = linesIds.stream().map(network::getLine).filter(Objects::nonNull).collect(Collectors.toList());
 
         // read lines from DB
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(linesIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
