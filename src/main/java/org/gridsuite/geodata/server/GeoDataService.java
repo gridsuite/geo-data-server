@@ -178,7 +178,12 @@ public class GeoDataService {
             neighboursToBeTreated.forEach(neighbourId -> {
                 if (geoDataForComputation.get(neighbourId) == null && !substationsToCalculate.contains(neighbourId)) {
                     substationsToCalculate.add(neighbourId);
-                    substations.add(network.getSubstation(neighbourId));
+                    Substation sub = network.getSubstation(neighbourId);
+                    if (sub != null) { // neighbours comes from a Request param string, could not exists in the network
+                        substations.add(sub);
+                    } else {
+                        LOGGER.debug("{} substation doesn't exist in the newtwork, will be ignored.", neighbourId);
+                    }
                 }
             });
             Map<String, Set<String>> newNeighbours = getNeighbours(substations);
@@ -283,17 +288,19 @@ public class GeoDataService {
             for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext();) {
                 String substationId = it.next();
                 Set<String> neighbours = sortedNeighbours.get(substationId);
-                double neighborhoodOffset = calculatedSubstationsOffset.get(neighbours) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighbours)) : 0;
+                if (neighbours != null) { // substationsToCalculate comes from a Request param string, could not exists in the network
+                    double neighborhoodOffset = calculatedSubstationsOffset.get(neighbours) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighbours)) : 0;
 
-                // centroid calculation
-                Substation substation = network.getSubstation(substationId);
-                SubstationGeoData substationGeoData = calculateCentroidGeoData(substation, neighbours, step, substationsGeoData, neighborhoodOffset);
+                    // centroid calculation
+                    Substation substation = network.getSubstation(substationId);
+                    SubstationGeoData substationGeoData = calculateCentroidGeoData(substation, neighbours, step, substationsGeoData, neighborhoodOffset);
 
-                if (substationGeoData != null) {
-                    calculated++;
-                    substationsGeoData.put(substationId, substationGeoData);
-                    calculatedSubstationsOffset.put(neighbours, neighborhoodOffset);
-                    it.remove();
+                    if (substationGeoData != null) {
+                        calculated++;
+                        substationsGeoData.put(substationId, substationGeoData);
+                        calculatedSubstationsOffset.put(neighbours, neighborhoodOffset);
+                        it.remove();
+                    }
                 }
             }
             LOGGER.info("Step {}, iteration {}, {} substation's coordinates have been calculated, {} remains unknown",
@@ -536,7 +543,14 @@ public class GeoDataService {
 
         List<Line> lines = new ArrayList<>();
 
-        linesIds.forEach(id -> lines.add(network.getLine(id)));
+        linesIds.forEach(id -> {
+            Line line = network.getLine(id);
+            if (line != null) { // linesIds comes from a Request param string, could not exists in the network
+                lines.add(line);
+            } else {
+                LOGGER.debug("{} line doesn't exist in the newtwork, will be ignored.", id);
+            }
+        });
 
         // read lines from DB
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(linesIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
