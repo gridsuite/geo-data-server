@@ -162,13 +162,13 @@ class GeoDataControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&substationId=null&substationId=P2")
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&substationId=notExistsId&substationId=P2")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&substationId=null")
+        mvc.perform(get("/" + VERSION + "/substations?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&substationId=notExistsId")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -186,13 +186,13 @@ class GeoDataControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=NHV1_NHV2_2&lineId=null")
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=NHV1_NHV2_2&lineId=notExistsId")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=null")
+        mvc.perform(get("/" + VERSION + "/lines?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=notExistsId")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))

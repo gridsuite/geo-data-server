@@ -179,8 +179,10 @@ public class GeoDataService {
                 if (geoDataForComputation.get(neighbourId) == null && !substationsToCalculate.contains(neighbourId)) {
                     substationsToCalculate.add(neighbourId);
                     Substation sub = network.getSubstation(neighbourId);
-                    if (sub != null) {
+                    if (sub != null) { // comes from a Request param string, could not exists in the network
                         substations.add(sub);
+                    } else {
+                        LOGGER.debug("{} substation doesn't exist in the newtwork, will be ignored.", neighbourId);
                     }
                 }
             });
@@ -539,7 +541,16 @@ public class GeoDataService {
 
         StopWatch stopWatch = StopWatch.createStarted();
 
-        List<Line> lines = linesIds.stream().map(network::getLine).filter(Objects::nonNull).collect(Collectors.toList());
+        List<Line> lines = new ArrayList<>();
+
+        linesIds.forEach(id -> {
+            Line line = network.getLine(id);
+            if (line != null) { // comes from a Request param string, could not exists in the network
+                lines.add(line);
+            } else {
+                LOGGER.debug("{} line doesn't exist in the newtwork, will be ignored.", id);
+            }
+        });
 
         // read lines from DB
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(linesIds).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
