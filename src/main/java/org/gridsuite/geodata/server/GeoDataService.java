@@ -179,7 +179,7 @@ public class GeoDataService {
                 if (geoDataForComputation.get(neighbourId) == null && !substationsToCalculate.contains(neighbourId)) {
                     substationsToCalculate.add(neighbourId);
                     Substation sub = network.getSubstation(neighbourId);
-                    if (sub != null) { // comes from a Request param string, could not exists in the network
+                    if (sub != null) { // neighbours comes from a Request param string, could not exists in the network
                         substations.add(sub);
                     } else {
                         LOGGER.debug("{} substation doesn't exist in the newtwork, will be ignored.", neighbourId);
@@ -288,7 +288,7 @@ public class GeoDataService {
             for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext();) {
                 String substationId = it.next();
                 Set<String> neighbours = sortedNeighbours.get(substationId);
-                if (neighbours != null) {
+                if (neighbours != null) { // substationsToCalculate comes from a Request param string, could not exists in the network
                     double neighborhoodOffset = calculatedSubstationsOffset.get(neighbours) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighbours)) : 0;
 
                     // centroid calculation
@@ -545,7 +545,7 @@ public class GeoDataService {
 
         linesIds.forEach(id -> {
             Line line = network.getLine(id);
-            if (line != null) { // comes from a Request param string, could not exists in the network
+            if (line != null) { // linesIds comes from a Request param string, could not exists in the network
                 lines.add(line);
             } else {
                 LOGGER.debug("{} line doesn't exist in the newtwork, will be ignored.", id);
