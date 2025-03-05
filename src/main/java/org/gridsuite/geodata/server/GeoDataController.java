@@ -6,29 +6,31 @@
  */
 package org.gridsuite.geodata.server;
 
-import com.powsybl.network.store.client.PreloadingStrategy;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.gridsuite.geodata.server.dto.LineGeoData;
-import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
+import com.powsybl.network.store.client.PreloadingStrategy;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PreDestroy;
+import org.gridsuite.geodata.server.dto.LineGeoData;
+import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -50,56 +52,79 @@ public class GeoDataController {
     @Autowired
     private NetworkStoreService networkStoreService;
 
+    private final ExecutorService executorService;
+
+    public GeoDataController(@Value("${max-concurrent-requests}") int maxConcurrentRequests) {
+        this.executorService = Executors.newFixedThreadPool(maxConcurrentRequests);
+    }
+
     private static Set<Country> toCountrySet(@RequestParam(required = false) List<String> countries) {
         return countries != null ? countries.stream().map(Country::valueOf).collect(Collectors.toSet()) : Collections.emptySet();
     }
 
     @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get geographical data for substations with the given ids")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID") @RequestParam UUID networkUuid,
-                                                                  @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                                  @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
-                                                                  @Parameter(description = "Substation ids") @RequestParam(name = "substationId", required = false) List<String> substationIds) {
-        Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid, substationIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
-        if (variantId != null) {
-            network.getVariantManager().setWorkingVariant(variantId);
-        }
-        List<SubstationGeoData> substations;
-        if (substationIds != null) {
-            if (!countrySet.isEmpty()) {
-                LOGGER.warn("Countries will not be taken into account to filter substation position.");
+    public ResponseEntity<List<SubstationGeoData>> getSubstations(
+            @RequestParam UUID networkUuid,
+            @RequestParam(name = "variantId", required = false) String variantId,
+            @RequestParam(name = "country", required = false) List<String> countries,
+            @RequestParam(name = "substationId", required = false) List<String> substationIds) throws ExecutionException, InterruptedException {
+
+        CompletableFuture<ResponseEntity<List<SubstationGeoData>>> futureSubstations = CompletableFuture.supplyAsync(() -> {
+            try {
+                Set<Country> countrySet = toCountrySet(countries);
+                Network network = networkStoreService.getNetwork(networkUuid, substationIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
+                if (variantId != null) {
+                    network.getVariantManager().setWorkingVariant(variantId);
+                }
+                List<SubstationGeoData> substations;
+                if (substationIds != null) {
+                    if (!countrySet.isEmpty()) {
+                        LOGGER.warn("Countries will not be taken into account to filter substation position.");
+                    }
+                    substations = geoDataService.getSubstationsByIds(network, new HashSet<>(substationIds));
+                } else {
+                    substations = geoDataService.getSubstationsByCountries(network, countrySet);
+                }
+                return ResponseEntity.ok(substations);
+            } catch (Exception e) {
+                LOGGER.error("Error fetching line data: ", e);
+                return ResponseEntity.internalServerError().body(Collections.emptyList());
             }
-            substations = geoDataService.getSubstationsByIds(network, substationIds.stream().collect(Collectors.toSet()));
-        } else {
-            substations = geoDataService.getSubstationsByCountries(network, countrySet);
-        }
-        return ResponseEntity.ok().body(substations);
+        }, executorService);
+        return futureSubstations.get();
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get lines geographical data")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
-    public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
-                                                      @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
-                                                      @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
-                                                      @Parameter(description = "Line ids") @RequestParam(name = "lineId", required = false) List<String> lineIds) {
-        Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid, lineIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
-        if (variantId != null) {
-            network.getVariantManager().setWorkingVariant(variantId);
-        }
-        List<LineGeoData> lines;
-        if (lineIds != null) {
-            if (!countrySet.isEmpty()) {
-                LOGGER.warn("Countries will not be taken into account to filter line position.");
+    public ResponseEntity<List<LineGeoData>> getLines(
+            @RequestParam UUID networkUuid,
+            @RequestParam(name = "variantId", required = false) String variantId,
+            @RequestParam(name = "country", required = false) List<String> countries,
+            @RequestParam(name = "lineId", required = false) List<String> lineIds) throws ExecutionException, InterruptedException {
+
+        CompletableFuture<ResponseEntity<List<LineGeoData>>> futureLines = CompletableFuture.supplyAsync(() -> {
+            try {
+                Set<Country> countrySet = toCountrySet(countries);
+                Network network = networkStoreService.getNetwork(networkUuid, lineIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
+                if (variantId != null) {
+                    network.getVariantManager().setWorkingVariant(variantId);
+                }
+                List<LineGeoData> lines;
+                if (lineIds != null) {
+                    if (!countrySet.isEmpty()) {
+                        LOGGER.warn("Countries will not be taken into account to filter line position.");
+                    }
+                    lines = geoDataService.getLinesByIds(network, new HashSet<>(lineIds));
+                } else {
+                    lines = geoDataService.getLinesByCountries(network, countrySet);
+                }
+                return ResponseEntity.ok(lines);
+            } catch (Exception e) {
+                LOGGER.error("Error fetching line data: ", e);
+                return ResponseEntity.internalServerError().body(Collections.emptyList());
             }
-            lines = geoDataService.getLinesByIds(network, lineIds.stream().collect(Collectors.toSet()));
-        } else {
-            lines = geoDataService.getLinesByCountries(network, countrySet);
-        }
-        return ResponseEntity.ok().body(lines);
+        }, executorService);
+
+        return futureLines.get();
     }
 
     @PostMapping(value = "/substations")
@@ -116,5 +141,10 @@ public class GeoDataController {
     public ResponseEntity<Void> saveLines(@RequestBody List<LineGeoData> linesGeoData) {
         geoDataService.saveLines(linesGeoData);
         return ResponseEntity.ok().build();
+    }
+
+    @PreDestroy
+    private void preDestroy() {
+        executorService.shutdown();
     }
 }
