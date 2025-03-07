@@ -67,7 +67,7 @@ public class GeoDataController {
             network.getVariantManager().setWorkingVariant(variantId);
         }
         List<SubstationGeoData> substations;
-        if (substationIds != null && !substationIds.isEmpty()) {
+        if (substationIds != null) {
             if (!countrySet.isEmpty()) {
                 LOGGER.warn("Countries will not be taken into account to filter substation position.");
             }
@@ -91,7 +91,7 @@ public class GeoDataController {
             network.getVariantManager().setWorkingVariant(variantId);
         }
         List<LineGeoData> lines;
-        if (lineIds != null && !lineIds.isEmpty()) {
+        if (lineIds != null) {
             if (!countrySet.isEmpty()) {
                 LOGGER.warn("Countries will not be taken into account to filter line position.");
             }

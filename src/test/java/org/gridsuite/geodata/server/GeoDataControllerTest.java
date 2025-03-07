@@ -163,7 +163,7 @@ class GeoDataControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&lineId=NHV1_NHV2_2&lineId=NHV1_NHV2_1&country=" + Country.FR)
+        mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&country=" + Country.FR)
                         .contentType(APPLICATION_JSON)
                         .content("[\"NHV1_NHV2_2\", \"NHV1_NHV2_1\"]"))
                 .andExpect(status().isOk())
