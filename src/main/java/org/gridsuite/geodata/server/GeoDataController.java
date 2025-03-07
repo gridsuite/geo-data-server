@@ -54,13 +54,13 @@ public class GeoDataController {
         return countries != null ? countries.stream().map(Country::valueOf).collect(Collectors.toSet()) : Collections.emptySet();
     }
 
-    @GetMapping(value = "/substations", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/substations/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get geographical data for substations with the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
     public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID") @RequestParam UUID networkUuid,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
-                                                                  @Parameter(description = "Substation ids") @RequestParam(name = "substationId", required = false) List<String> substationIds) {
+                                                                  @RequestBody(required = false) List<String> substationIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid, substationIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
         if (variantId != null) {
@@ -78,13 +78,13 @@ public class GeoDataController {
         return ResponseEntity.ok().body(substations);
     }
 
-    @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/lines/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get lines geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
     public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                       @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
-                                                      @Parameter(description = "Line ids") @RequestParam(name = "lineId", required = false) List<String> lineIds) {
+                                                      @RequestBody(required = false) List<String> lineIds) {
         Set<Country> countrySet = toCountrySet(countries);
         Network network = networkStoreService.getNetwork(networkUuid, lineIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
         if (variantId != null) {
