@@ -490,6 +490,10 @@ public class GeoDataService {
 
     @Transactional(readOnly = true)
     public List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
+        return getInternalLinesByCountries(network, countries);
+    }
+
+    private List<LineGeoData> getInternalLinesByCountries(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
@@ -543,9 +547,9 @@ public class GeoDataService {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter substation position.");
                 }
-                return this.getSubstationsByIds(network, new HashSet<>(substationIds));
+                return getSubstationsByIds(network, new HashSet<>(substationIds));
             } else {
-                return this.getSubstationsByCountries(network, countrySet);
+                return getSubstationsByCountries(network, countrySet);
             }
         });
         try {
@@ -558,15 +562,16 @@ public class GeoDataService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
         CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
             if (lineIds != null) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
-                return this.getLinesByIds(network, new HashSet<>(lineIds));
+                return getInternalLinesByIds(network, new HashSet<>(lineIds));
             } else {
-                return this.getLinesByCountries(network, countrySet);
+                return getInternalLinesByCountries(network, countrySet);
             }
         });
         try {
@@ -581,6 +586,10 @@ public class GeoDataService {
 
     @Transactional(readOnly = true)
     public List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
+        return getInternalLinesByIds(network, linesIds);
+    }
+
+    private List<LineGeoData> getInternalLinesByIds(Network network, Set<String> linesIds) {
         String escapedIds = StringUtils.join(linesIds.stream().map(LogUtils::sanitizeParam).toList(), ", ");
         LOGGER.info("Loading lines geo data for lines with ids {} of network '{}'", escapedIds, network.getId());
 
