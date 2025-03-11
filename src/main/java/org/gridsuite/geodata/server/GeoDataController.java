@@ -6,6 +6,9 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,11 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.network.store.client.NetworkStoreService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -42,8 +40,6 @@ public class GeoDataController {
 
     static final String API_VERSION = "v1";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataController.class);
-
     @Autowired
     private GeoDataService geoDataService;
 
@@ -66,15 +62,7 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<SubstationGeoData> substations;
-        if (substationIds != null) {
-            if (!countrySet.isEmpty()) {
-                LOGGER.warn("Countries will not be taken into account to filter substation position.");
-            }
-            substations = geoDataService.getSubstationsByIds(network, substationIds.stream().collect(Collectors.toSet()));
-        } else {
-            substations = geoDataService.getSubstationsByCountries(network, countrySet);
-        }
+        List<SubstationGeoData> substations = geoDataService.getSubstationsData(network, countrySet, substationIds);
         return ResponseEntity.ok().body(substations);
     }
 
@@ -90,15 +78,7 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<LineGeoData> lines;
-        if (lineIds != null) {
-            if (!countrySet.isEmpty()) {
-                LOGGER.warn("Countries will not be taken into account to filter line position.");
-            }
-            lines = geoDataService.getLinesByIds(network, lineIds.stream().collect(Collectors.toSet()));
-        } else {
-            lines = geoDataService.getLinesByCountries(network, countrySet);
-        }
+        List<LineGeoData> lines = geoDataService.getLinesData(network, countrySet, lineIds);
         return ResponseEntity.ok().body(lines);
     }
 

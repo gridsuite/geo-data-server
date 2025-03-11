@@ -16,7 +16,9 @@ import java.util.Objects;
 public class GeoDataException extends RuntimeException {
 
     public enum Type {
-        PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
+        PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
+        FAILED_LINES_LOADING(HttpStatus.INTERNAL_SERVER_ERROR),
+        FAILED_SUBSTATIONS_LOADING(HttpStatus.INTERNAL_SERVER_ERROR);
 
         public final HttpStatus status;
 
