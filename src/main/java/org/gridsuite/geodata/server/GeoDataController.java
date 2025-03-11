@@ -17,8 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -41,8 +39,6 @@ import java.util.stream.Collectors;
 public class GeoDataController {
 
     static final String API_VERSION = "v1";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeoDataController.class);
 
     @Autowired
     private GeoDataService geoDataService;
