@@ -541,6 +541,7 @@ public class GeoDataService {
         };
     }
 
+    @Transactional(readOnly = true)
     public List<SubstationGeoData> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
         CompletableFuture<List<SubstationGeoData>> substationGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
             if (substationIds != null) {
