@@ -10,16 +10,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import com.powsybl.commons.exceptions.UncheckedInterruptedException;
+import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
 import com.powsybl.ws.commons.LogUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import org.gridsuite.geodata.server.repositories.*;
-import com.powsybl.iidm.network.*;
-import org.apache.commons.lang3.time.StopWatch;
+import org.gridsuite.geodata.server.repositories.LineEntity;
+import org.gridsuite.geodata.server.repositories.LineRepository;
+import org.gridsuite.geodata.server.repositories.SubstationEntity;
+import org.gridsuite.geodata.server.repositories.SubstationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,10 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_LINES_LOADING;
+import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_SUBSTATIONS_LOADING;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -55,14 +63,18 @@ public class GeoDataService {
 
     private final DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
 
+    private final GeoDataExecutionService geoDataExecutionService;
+
     public GeoDataService(ObjectMapper mapper,
                           SubstationRepository substationRepository,
                           LineRepository lineRepository,
-                          DefaultSubstationGeoDataByCountry defaultSubstationsGeoData) {
+                          DefaultSubstationGeoDataByCountry defaultSubstationsGeoData,
+                          GeoDataExecutionService geoDataExecutionService) {
         this.mapper = mapper;
         this.substationRepository = substationRepository;
         this.lineRepository = lineRepository;
         this.defaultSubstationsGeoData = defaultSubstationsGeoData;
+        this.geoDataExecutionService = geoDataExecutionService;
     }
 
     private Set<String> toCountryIds(Collection<Country> countries) {
@@ -96,7 +108,7 @@ public class GeoDataService {
         // filter substation by countries
         List<Substation> substations = network.getSubstationStream()
                 .filter(s -> countries.isEmpty() || s.getCountry().filter(countries::contains).isPresent())
-                .collect(Collectors.toList());
+                .toList();
 
         // split substations with a known position and the others
         Map<String, SubstationGeoData> substationsGeoData = new HashMap<>();
@@ -136,7 +148,7 @@ public class GeoDataService {
     }
 
     List<SubstationGeoData> getSubstationsByIds(Network network, Set<String> substationIds) {
-        String escapedIds = StringUtils.join(substationIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
+        String escapedIds = StringUtils.join(substationIds.stream().map(LogUtils::sanitizeParam).toList(), ", ");
         LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
 
         Objects.requireNonNull(network);
@@ -326,7 +338,7 @@ public class GeoDataService {
         // get neighbours geo data
         List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationsGeoData::get)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         String substationCountry = substation.getNullableCountry() != null ? substation.getNullableCountry().name() : null;
         SubstationGeoData defaultSubstationGeoData = defaultSubstationsGeoData.get(substationCountry);
@@ -388,7 +400,7 @@ public class GeoDataService {
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
 
-        List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).collect(Collectors.toList());
+        List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).toList();
         substationRepository.saveAll(substationEntities);
     }
 
@@ -476,8 +488,7 @@ public class GeoDataService {
 
     }
 
-    @Transactional(readOnly = true)
-    public List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
+    List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
@@ -526,9 +537,52 @@ public class GeoDataService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
-        String escapedIds = StringUtils.join(linesIds.stream().map(LogUtils::sanitizeParam).collect(Collectors.toList()), ", ");
-        LOGGER.info("Loading substations geo data for substations with ids {} of network '{}'", escapedIds, network.getId());
+    public List<SubstationGeoData> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
+        CompletableFuture<List<SubstationGeoData>> substationGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
+            if (substationIds != null) {
+                if (!countrySet.isEmpty()) {
+                    LOGGER.warn("Countries will not be taken into account to filter substation position.");
+                }
+                return getSubstationsByIds(network, new HashSet<>(substationIds));
+            } else {
+                return getSubstationsByCountries(network, countrySet);
+            }
+        });
+        try {
+            return substationGeoDataFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new UncheckedInterruptedException(e);
+        } catch (Exception e) {
+            throw new GeoDataException(FAILED_SUBSTATIONS_LOADING, e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
+        CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
+            if (lineIds != null) {
+                if (!countrySet.isEmpty()) {
+                    LOGGER.warn("Countries will not be taken into account to filter line position.");
+                }
+                return getLinesByIds(network, new HashSet<>(lineIds));
+            } else {
+                return getLinesByCountries(network, countrySet);
+            }
+        });
+        try {
+            return lineGeoDataFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new UncheckedInterruptedException(e);
+        } catch (Exception e) {
+            throw new GeoDataException(FAILED_LINES_LOADING, e);
+        }
+    }
+
+    List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
+        String escapedIds = StringUtils.join(linesIds.stream().map(LogUtils::sanitizeParam).toList(), ", ");
+        LOGGER.info("Loading lines geo data for lines with ids {} of network '{}'", escapedIds, network.getId());
 
         Objects.requireNonNull(network);
 
@@ -553,7 +607,7 @@ public class GeoDataService {
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line.getId(),
                 line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
                 line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow()))
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
