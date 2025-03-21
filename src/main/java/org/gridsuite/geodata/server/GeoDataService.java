@@ -488,12 +488,7 @@ public class GeoDataService {
 
     }
 
-    @Transactional(readOnly = true)
-    public List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
-        return getInternalLinesByCountries(network, countries);
-    }
-
-    private List<LineGeoData> getInternalLinesByCountries(Network network, Set<Country> countries) {
+    List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
 
         Objects.requireNonNull(network);
@@ -570,9 +565,9 @@ public class GeoDataService {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
-                return getInternalLinesByIds(network, new HashSet<>(lineIds));
+                return getLinesByIds(network, new HashSet<>(lineIds));
             } else {
-                return getInternalLinesByCountries(network, countrySet);
+                return getLinesByCountries(network, countrySet);
             }
         });
         try {
@@ -585,12 +580,7 @@ public class GeoDataService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
-        return getInternalLinesByIds(network, linesIds);
-    }
-
-    private List<LineGeoData> getInternalLinesByIds(Network network, Set<String> linesIds) {
+    List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
         String escapedIds = StringUtils.join(linesIds.stream().map(LogUtils::sanitizeParam).toList(), ", ");
         LOGGER.info("Loading lines geo data for lines with ids {} of network '{}'", escapedIds, network.getId());
 
