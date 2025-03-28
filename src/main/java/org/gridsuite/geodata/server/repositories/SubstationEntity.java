@@ -48,7 +48,7 @@ public class SubstationEntity {
     private CoordinateEmbeddable coordinate;
 
     public static SubstationEntity create(SubstationGeoData s) {
-        SubstationEntity substationEntity = SubstationEntity.builder()
+        return SubstationEntity.builder()
                 .country(s.getCountry().toString())
                 .id(s.getId())
                 .coordinate(CoordinateEmbeddable.builder()
@@ -56,7 +56,6 @@ public class SubstationEntity {
                         .lon(Precision.round(s.getCoordinate().getLongitude(), ROUND_PRECISION))
                         .build())
                 .build();
-        return substationEntity;
     }
 
     public SubstationGeoData toGeoData() {
