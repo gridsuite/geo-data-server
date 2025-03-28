@@ -8,6 +8,7 @@ package org.gridsuite.geodata.server.repositories;
 
 import com.powsybl.iidm.network.extensions.Coordinate;
 import lombok.NoArgsConstructor;
+import org.apache.commons.math3.util.Precision;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import com.powsybl.iidm.network.Country;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+
+import static org.gridsuite.geodata.server.GeoDataService.ROUND_PRECISION;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -45,14 +48,15 @@ public class SubstationEntity {
     private CoordinateEmbeddable coordinate;
 
     public static SubstationEntity create(SubstationGeoData s) {
-        return SubstationEntity.builder()
+        SubstationEntity substationEntity = SubstationEntity.builder()
                 .country(s.getCountry().toString())
                 .id(s.getId())
                 .coordinate(CoordinateEmbeddable.builder()
-                        .lat(s.getCoordinate().getLatitude())
-                        .lon(s.getCoordinate().getLongitude())
+                        .lat(Precision.round(s.getCoordinate().getLatitude(), ROUND_PRECISION))
+                        .lon(Precision.round(s.getCoordinate().getLongitude(), ROUND_PRECISION))
                         .build())
                 .build();
+        return substationEntity;
     }
 
     public SubstationGeoData toGeoData() {

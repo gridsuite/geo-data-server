@@ -7,6 +7,7 @@
 package org.gridsuite.geodata.server;
 
 import org.gridsuite.geodata.server.dto.json.CoordinateJsonModule;
+import org.gridsuite.geodata.server.dto.json.LineGeoDataJsonModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -25,5 +26,10 @@ public class GeoDataApplication {
     @Bean
     public CoordinateJsonModule createCoordinateJsonModule() {
         return new CoordinateJsonModule();
+    }
+
+    @Bean
+    public LineGeoDataJsonModule createLineGeoDataJsonModule() {
+        return new LineGeoDataJsonModule();
     }
 }
