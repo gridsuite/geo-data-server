@@ -18,6 +18,7 @@ import com.powsybl.ws.commons.LogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.util.Precision;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineEntity;
@@ -38,6 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.round;
 import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_LINES_LOADING;
 import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_SUBSTATIONS_LOADING;
 
@@ -64,6 +66,7 @@ public class GeoDataService {
     private final DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
 
     private final GeoDataExecutionService geoDataExecutionService;
+    public static final int ROUND_PRECISION = 5;
 
     public GeoDataService(ObjectMapper mapper,
                           SubstationRepository substationRepository,
@@ -125,7 +128,7 @@ public class GeoDataService {
 
         LOGGER.info("{} substations, {} found in the DB, {} not found", substations.size(), substationsGeoData.size(), substationsToCalculate.size());
 
-        long accuracyFactor = Math.round(100 * (double) substationsGeoData.size() / (substationsToCalculate.size() + substationsGeoData.size()));
+        long accuracyFactor = round(100 * (double) substationsGeoData.size() / (substationsToCalculate.size() + substationsGeoData.size()));
         if (accuracyFactor < 75) {
             LOGGER.warn("Accuracy factor is less than 75% !");
         }
@@ -399,7 +402,6 @@ public class GeoDataService {
     @SuppressWarnings("javasecurity:S5145")
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
-
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).toList();
         substationRepository.saveAll(substationEntities);
     }
@@ -411,7 +413,12 @@ public class GeoDataService {
         try {
             List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
             for (LineGeoData l : linesGeoData) {
-                String coords = mapper.writeValueAsString(l.getCoordinates());
+                List<Coordinate> fullCoordinates = l.getCoordinates();
+                // round the coordinates
+                fullCoordinates.forEach(coordinate ->
+                    new Coordinate(Precision.round(coordinate.getLatitude(), ROUND_PRECISION),
+                        Precision.round(coordinate.getLongitude(), ROUND_PRECISION)));
+                String coords = mapper.writeValueAsString(fullCoordinates);
                 if (l.getCountry1() == l.getCountry2()) {
                     linesEntities.add(LineEntity.create(l, true, coords));
                 } else {
