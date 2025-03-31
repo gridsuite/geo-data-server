@@ -415,10 +415,10 @@ public class GeoDataService {
             for (LineGeoData l : linesGeoData) {
                 List<Coordinate> fullCoordinates = l.getCoordinates();
                 // round the coordinates
-                fullCoordinates.forEach(coordinate ->
+                List<Coordinate> roundedCoordinates = fullCoordinates.stream().map(coordinate ->
                     new Coordinate(Precision.round(coordinate.getLatitude(), ROUND_PRECISION),
-                        Precision.round(coordinate.getLongitude(), ROUND_PRECISION)));
-                String coords = mapper.writeValueAsString(fullCoordinates);
+                        Precision.round(coordinate.getLongitude(), ROUND_PRECISION))).toList();
+                String coords = mapper.writeValueAsString(roundedCoordinates);
                 if (l.getCountry1() == l.getCountry2()) {
                     linesEntities.add(LineEntity.create(l, true, coords));
                 } else {
