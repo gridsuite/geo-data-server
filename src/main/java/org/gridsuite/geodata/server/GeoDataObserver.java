@@ -66,21 +66,21 @@ public class GeoDataObserver {
                 .lowCardinalityKeyValue(NETWORK_ID_TAG_NAME, networkId);
     }
 
-    private Observation createSubstationsObservation(String geoDataType) {
+    private Observation createSubstationsObservation(String networkId) {
         return Observation.createNotStarted(GeoDataObserver.GET_SUBSTATIONS_OBSERVATION_NAME, observationRegistry)
-                .lowCardinalityKeyValue(NETWORK_ID_TAG_NAME, geoDataType);
+                .lowCardinalityKeyValue(NETWORK_ID_TAG_NAME, networkId);
     }
 
-    private void recordLinesCount(String geoDataType, long count) {
+    private void recordLinesCount(String networkId, long count) {
         Counter.builder(GeoDataObserver.NUMBER_LINES_METER_NAME)
-                .tag(NETWORK_ID_TAG_NAME, geoDataType)
+                .tag(NETWORK_ID_TAG_NAME, networkId)
                 .register(meterRegistry)
                 .increment(count);
     }
 
-    private void recordSubstationsCount(String geoDataType, long count) {
+    private void recordSubstationsCount(String networkId, long count) {
         Counter.builder(GeoDataObserver.NUMBER_SUBSTATIONS_METER_NAME)
-                .tag(NETWORK_ID_TAG_NAME, geoDataType)
+                .tag(NETWORK_ID_TAG_NAME, networkId)
                 .register(meterRegistry)
                 .increment(count);
     }
@@ -88,13 +88,13 @@ public class GeoDataObserver {
     public void createThreadPoolMetric(ThreadPoolExecutor threadPoolExecutor) {
         Gauge.builder(TASK_POOL_METER_NAME_PREFIX + TASK_TYPE_TAG_VALUE_CURRENT,
                         threadPoolExecutor, ThreadPoolExecutor::getActiveCount)
-                .description("The number of active import/export tasks in the thread pool")
+                .description("The number of active request tasks in the thread pool")
                 .tag(TASK_TYPE_TAG_NAME, TASK_TYPE_TAG_VALUE_CURRENT)
                 .register(meterRegistry);
 
         Gauge.builder(TASK_POOL_METER_NAME_PREFIX + TASK_TYPE_TAG_VALUE_PENDING,
                         threadPoolExecutor, executor -> executor.getQueue().size())
-                .description("The number of pending import/export tasks in the thread pool")
+                .description("The number of pending request tasks in the thread pool")
                 .tag(TASK_TYPE_TAG_NAME, TASK_TYPE_TAG_VALUE_PENDING)
                 .register(meterRegistry);
     }
