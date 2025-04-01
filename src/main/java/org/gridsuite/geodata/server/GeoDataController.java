@@ -44,6 +44,9 @@ public class GeoDataController {
     private GeoDataService geoDataService;
 
     @Autowired
+    private GeoDataObserver geoDataObserver;
+
+    @Autowired
     private NetworkStoreService networkStoreService;
 
     private static Set<Country> toCountrySet(@RequestParam(required = false) List<String> countries) {
@@ -62,7 +65,7 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<SubstationGeoData> substations = geoDataService.getSubstationsData(network, countrySet, substationIds);
+        List<SubstationGeoData> substations = geoDataObserver.observeSubstationsData(network.getId(), () -> geoDataService.getSubstationsData(network, countrySet, substationIds));
         return ResponseEntity.ok().body(substations);
     }
 
@@ -78,7 +81,7 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<LineGeoData> lines = geoDataService.getLinesData(network, countrySet, lineIds);
+        List<LineGeoData> lines = geoDataObserver.observeLinesData(network.getId(), () -> geoDataService.getLinesData(network, countrySet, lineIds));
         return ResponseEntity.ok().body(lines);
     }
 
