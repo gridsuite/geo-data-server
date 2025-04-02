@@ -61,6 +61,9 @@ class GeoDataControllerTest {
     @MockBean
     private LineRepository lineRepository;
 
+    @MockBean
+    private GeoDataObserver geoDataObserver;
+
     private static final String GEO_DATA_SUBSTATIONS = "/geo_data_substations.json";
     private static final String GEO_DATA_LINES = "/geo_data_lines.json";
 
