@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class GeoDataObserver {
 
     private static final String OBSERVATION_PREFIX = "app.geo-data.";
-    private static final String TASK_POOL_METER_NAME_PREFIX = OBSERVATION_PREFIX + "tasks.";
+    private static final String TASK_POOL_METER_NAME_PREFIX = OBSERVATION_PREFIX + "tasks.pool";
     private static final String TASK_TYPE_TAG_NAME = "type";
     private static final String TASK_TYPE_TAG_VALUE_CURRENT = "current";
     private static final String TASK_TYPE_TAG_VALUE_PENDING = "pending";
