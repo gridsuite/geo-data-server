@@ -6,24 +6,12 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.extensions.Coordinate;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import org.apache.commons.math3.util.Precision;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import com.powsybl.iidm.network.Country;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
-
-import static org.gridsuite.geodata.server.GeoDataService.ROUND_PRECISION;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -47,22 +35,22 @@ public class SubstationEntity {
     @Embedded
     private CoordinateEmbeddable coordinate;
 
-    public static SubstationEntity create(SubstationGeoData s) {
+    public static SubstationEntity create(SubstationGeoData s, int geoDataRoundPrecision) {
         return SubstationEntity.builder()
-                .country(s.getCountry().toString())
-                .id(s.getId())
-                .coordinate(CoordinateEmbeddable.builder()
-                        .lat(Precision.round(s.getCoordinate().getLatitude(), ROUND_PRECISION))
-                        .lon(Precision.round(s.getCoordinate().getLongitude(), ROUND_PRECISION))
-                        .build())
-                .build();
+            .country(s.getCountry().toString())
+            .id(s.getId())
+            .coordinate(CoordinateEmbeddable.builder()
+                .lat(Precision.round(s.getCoordinate().getLatitude(), geoDataRoundPrecision))
+                .lon(Precision.round(s.getCoordinate().getLongitude(), geoDataRoundPrecision))
+                .build())
+            .build();
     }
 
     public SubstationGeoData toGeoData() {
         return SubstationGeoData.builder()
-                .country(Country.valueOf(country))
-                .id(id)
-                .coordinate(new Coordinate(coordinate.getLat(), coordinate.getLon()))
-                .build();
+            .country(Country.valueOf(country))
+            .id(id)
+            .coordinate(new Coordinate(coordinate.getLat(), coordinate.getLon()))
+            .build();
     }
 }
