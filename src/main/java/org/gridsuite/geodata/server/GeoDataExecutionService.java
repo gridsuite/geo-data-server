@@ -7,12 +7,13 @@
 package org.gridsuite.geodata.server;
 
 import jakarta.annotation.PreDestroy;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Supplier;
 
 /**
@@ -20,10 +21,12 @@ import java.util.function.Supplier;
  */
 @Service
 public class GeoDataExecutionService {
-    private final ExecutorService executorService;
+    private final ThreadPoolExecutor executorService;
 
-    public GeoDataExecutionService(@Value("${max-concurrent-requests}") int maxConcurrentRequests) {
-        this.executorService = Executors.newFixedThreadPool(maxConcurrentRequests);
+    public GeoDataExecutionService(@Value("${max-concurrent-requests}") int maxConcurrentRequests,
+                                   @NonNull GeoDataObserver geoDataObserver) {
+        executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxConcurrentRequests);
+        geoDataObserver.createThreadPoolMetric(executorService);
     }
 
     @PreDestroy
