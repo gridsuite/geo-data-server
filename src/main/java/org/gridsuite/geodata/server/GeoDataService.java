@@ -456,8 +456,8 @@ public class GeoDataService {
         // need to return the line in the network order without the substations
         if (substation1GeoData == null || substation2GeoData == null) {
             LOGGER.error("line {} has substations with unknown gps positions({}={}, {}={})", lineId,
-                substation1.getId(), substation1GeoData,
-                substation2.getId(), substation2GeoData);
+                    substation1.getId(), substation1GeoData,
+                    substation2.getId(), substation2GeoData);
             return null;
         }
 
@@ -508,14 +508,14 @@ public class GeoDataService {
 
         // read lines from DB
         Map<String, Pair<Substation, Substation>> mapSubstationsByLine =
-            Streams.concat(network.getLineStream(), network.getTieLineStream(), network.getHvdcLineStream())
-                .collect(Collectors.toMap(Identifiable::getId, this::getSubstations));
+                Streams.concat(network.getLineStream(), network.getTieLineStream(), network.getHvdcLineStream())
+                        .collect(Collectors.toMap(Identifiable::getId, this::getSubstations));
 
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(mapSubstationsByLine.keySet()).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
         // we also want the destination substation (so we add the neighbouring country)
         Set<Country> countryAndNextTo = mapSubstationsByLine.entrySet().stream().flatMap(entry ->
-            Stream.of(entry.getValue().getLeft(), entry.getValue().getRight()).map(Substation::getNullableCountry).filter(Objects::nonNull)).collect(Collectors.toSet());
+             Stream.of(entry.getValue().getLeft(), entry.getValue().getRight()).map(Substation::getNullableCountry).filter(Objects::nonNull)).collect(Collectors.toSet());
 
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
         List<LineGeoData> geoData = new ArrayList<>();
@@ -617,7 +617,7 @@ public class GeoDataService {
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line.getId(),
                 line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
                 line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow()))
-            .filter(Objects::nonNull).toList();
+                .filter(Objects::nonNull).toList();
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
