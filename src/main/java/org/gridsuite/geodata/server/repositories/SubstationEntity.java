@@ -37,20 +37,20 @@ public class SubstationEntity {
 
     public static SubstationEntity create(SubstationGeoData s, int geoDataRoundPrecision) {
         return SubstationEntity.builder()
-            .country(s.getCountry().toString())
-            .id(s.getId())
-            .coordinate(CoordinateEmbeddable.builder()
-                .lat(Precision.round(s.getCoordinate().getLatitude(), geoDataRoundPrecision))
-                .lon(Precision.round(s.getCoordinate().getLongitude(), geoDataRoundPrecision))
-                .build())
-            .build();
+                .country(s.getCountry().toString())
+                .id(s.getId())
+                .coordinate(CoordinateEmbeddable.builder()
+                        .lat(Precision.round(s.getCoordinate().getLatitude(), geoDataRoundPrecision))
+                        .lon(Precision.round(s.getCoordinate().getLongitude(), geoDataRoundPrecision))
+                        .build())
+                .build();
     }
 
     public SubstationGeoData toGeoData() {
         return SubstationGeoData.builder()
-            .country(Country.valueOf(country))
-            .id(id)
-            .coordinate(new Coordinate(coordinate.getLat(), coordinate.getLon()))
-            .build();
+                .country(Country.valueOf(country))
+                .id(id)
+                .coordinate(new Coordinate(coordinate.getLat(), coordinate.getLon()))
+                .build();
     }
 }

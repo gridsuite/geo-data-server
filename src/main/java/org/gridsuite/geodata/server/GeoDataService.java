@@ -93,8 +93,8 @@ public class GeoDataService {
         List<SubstationEntity> substationEntities = countries.isEmpty() ? substationRepository.findAll() :
             substationRepository.findByCountryIn(toCountryIds(countries));
         Map<String, SubstationGeoData> substationsGeoDataDB = substationEntities.stream()
-            .map(SubstationEntity::toGeoData)
-            .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+                .map(SubstationEntity::toGeoData)
+                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
         LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
@@ -112,8 +112,8 @@ public class GeoDataService {
 
         // filter substation by countries
         List<Substation> substations = network.getSubstationStream()
-            .filter(s -> countries.isEmpty() || s.getCountry().filter(countries::contains).isPresent())
-            .toList();
+                .filter(s -> countries.isEmpty() || s.getCountry().filter(countries::contains).isPresent())
+                .toList();
 
         // split substations with a known position and the others
         Map<String, SubstationGeoData> substationsGeoData = new HashMap<>();
@@ -140,11 +140,11 @@ public class GeoDataService {
 
         // let's sort this map by values first : max neighbors having known GPS coords
         Map<String, Set<String>> sortedNeighbours = neighbours
-            .entrySet()
-            .stream()
-            .filter(e -> !substationsGeoData.containsKey(e.getKey()))
-            .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
-            .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+                .entrySet()
+                .stream()
+                .filter(e -> !substationsGeoData.containsKey(e.getKey()))
+                .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
         calculateMissingGeoData(network, sortedNeighbours, substationsGeoData, substationsToCalculate);
         calculateDefaultSubstationsGeoData(substationsGeoData, sortedNeighbours);
@@ -183,8 +183,8 @@ public class GeoDataService {
         Set<String> neighboursToBeTreated = new HashSet<>(neighbours);
         while (!neighboursToBeTreated.isEmpty()) {
             Map<String, SubstationGeoData> foundGeoData = substationRepository.findByIdIn(neighboursToBeTreated).stream()
-                .map(SubstationEntity::toGeoData)
-                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+                    .map(SubstationEntity::toGeoData)
+                    .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
             geoDataForComputation.putAll(foundGeoData);
 
@@ -248,8 +248,8 @@ public class GeoDataService {
 
             if (sortedNeighbours.get(substationToProcess) != null) {
                 Set<String> neighbours = sortedNeighbours.get(substationToProcess).stream()
-                    .filter(remainingSubstations::contains)
-                    .collect(Collectors.toSet());
+                        .filter(remainingSubstations::contains)
+                        .collect(Collectors.toSet());
 
                 for (String neighbour : neighbours) {
                     substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinate());
@@ -264,7 +264,7 @@ public class GeoDataService {
 
     private static int neighboursComparator(Network network, Set<String> neighbors1, Set<String> neighbors2) {
         return neighbors2.stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull).collect(Collectors.toSet()).size() -
-            neighbors1.stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull).collect(Collectors.toSet()).size();
+                neighbors1.stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull).collect(Collectors.toSet()).size();
     }
 
     enum Step {
@@ -297,7 +297,7 @@ public class GeoDataService {
         Map<Set<String>, Double> calculatedSubstationsOffset = new HashMap<>();
         for (int iteration = 0; iteration < maxIterations; iteration++) {
             int calculated = 0;
-            for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext(); ) {
+            for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext();) {
                 String substationId = it.next();
                 Set<String> neighbours = sortedNeighbours.get(substationId);
                 double neighborhoodOffset = calculatedSubstationsOffset.get(neighbours) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighbours)) : 0;
@@ -314,7 +314,7 @@ public class GeoDataService {
                 }
             }
             LOGGER.info("Step {}, iteration {}, {} substation's coordinates have been calculated, {} remains unknown",
-                step == Step.ONE ? 1 : 2, iteration, calculated, substationsToCalculate.size());
+                    step == Step.ONE ? 1 : 2, iteration, calculated, substationsToCalculate.size());
             if (calculated == 0) {
                 break;
             }
@@ -339,11 +339,11 @@ public class GeoDataService {
     }
 
     private SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
-                                                       Map<String, SubstationGeoData> substationsGeoData, double neighborhoodOffset) {
+                                                              Map<String, SubstationGeoData> substationsGeoData, double neighborhoodOffset) {
         // get neighbours geo data
         List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationsGeoData::get)
-            .filter(Objects::nonNull)
-            .toList();
+                .filter(Objects::nonNull)
+                .toList();
 
         String substationCountry = substation.getNullableCountry() != null ? substation.getNullableCountry().name() : null;
         SubstationGeoData defaultSubstationGeoData = defaultSubstationsGeoData.get(substationCountry);
@@ -352,7 +352,7 @@ public class GeoDataService {
         if (neighboursGeoData.size() > 1) {
             // if no neighbour found in the same country, locate the substation to a default position in its country
             if (neighboursGeoData.stream().noneMatch(n -> Objects.equals(n.getCountry(), substation.getNullableCountry())) &&
-                defaultSubstationGeoData != null) {
+                    defaultSubstationGeoData != null) {
                 neighboursGeoData = Collections.singletonList(defaultSubstationGeoData);
             }
             coordinate = getAverageCoordinate(neighboursGeoData, neighborhoodOffset);
@@ -404,6 +404,7 @@ public class GeoDataService {
     @SuppressWarnings("javasecurity:S5145")
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
+
         List<SubstationEntity> substationEntities = substationsGeoData.stream().map(s -> SubstationEntity.create(s, geoDataRoundPrecision)).toList();
         substationRepository.saveAll(substationEntities);
     }
@@ -417,8 +418,8 @@ public class GeoDataService {
             for (LineGeoData l : linesGeoData) {
                 List<Coordinate> fullCoordinates = Objects.requireNonNull(l.getCoordinates());
                 // round the coordinates
-                List<Coordinate> roundedCoordinates = fullCoordinates.stream().filter(Objects::nonNull)
-                    .map(coordinate -> new Coordinate(Precision.round(coordinate.getLatitude(), geoDataRoundPrecision),
+                List<Coordinate> roundedCoordinates = fullCoordinates.stream().map(coordinate ->
+                    new Coordinate(Precision.round(coordinate.getLatitude(), geoDataRoundPrecision),
                         Precision.round(coordinate.getLongitude(), geoDataRoundPrecision))).toList();
                 String jsonCoords = mapper.writeValueAsString(roundedCoordinates);
                 if (l.getCountry1() == l.getCountry2()) {
