@@ -15,3 +15,4 @@ powsybl-ws:
     name: geo_data
 
 max-concurrent-requests: 2
+geo_data_round_precision: 5

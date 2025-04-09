@@ -18,6 +18,7 @@ import com.powsybl.ws.commons.LogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.util.Precision;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineEntity;
@@ -38,6 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.round;
 import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_LINES_LOADING;
 import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_SUBSTATIONS_LOADING;
 
@@ -64,17 +66,20 @@ public class GeoDataService {
     private final DefaultSubstationGeoDataByCountry defaultSubstationsGeoData;
 
     private final GeoDataExecutionService geoDataExecutionService;
+    private final int geoDataRoundPrecision;
 
     public GeoDataService(ObjectMapper mapper,
                           SubstationRepository substationRepository,
                           LineRepository lineRepository,
                           DefaultSubstationGeoDataByCountry defaultSubstationsGeoData,
-                          GeoDataExecutionService geoDataExecutionService) {
+                          GeoDataExecutionService geoDataExecutionService,
+                          @Value("${geo_data_round_precision}") int geoDataRoundPrecision) {
         this.mapper = mapper;
         this.substationRepository = substationRepository;
         this.lineRepository = lineRepository;
         this.defaultSubstationsGeoData = defaultSubstationsGeoData;
         this.geoDataExecutionService = geoDataExecutionService;
+        this.geoDataRoundPrecision = geoDataRoundPrecision;
     }
 
     private Set<String> toCountryIds(Collection<Country> countries) {
@@ -125,7 +130,7 @@ public class GeoDataService {
 
         LOGGER.info("{} substations, {} found in the DB, {} not found", substations.size(), substationsGeoData.size(), substationsToCalculate.size());
 
-        long accuracyFactor = Math.round(100 * (double) substationsGeoData.size() / (substationsToCalculate.size() + substationsGeoData.size()));
+        long accuracyFactor = round(100 * (double) substationsGeoData.size() / (substationsToCalculate.size() + substationsGeoData.size()));
         if (accuracyFactor < 75) {
             LOGGER.warn("Accuracy factor is less than 75% !");
         }
@@ -400,7 +405,7 @@ public class GeoDataService {
     void saveSubstations(List<SubstationGeoData> substationsGeoData) {
         LOGGER.info("Saving {} substations geo data", substationsGeoData.size());
 
-        List<SubstationEntity> substationEntities = substationsGeoData.stream().map(SubstationEntity::create).toList();
+        List<SubstationEntity> substationEntities = substationsGeoData.stream().map(s -> SubstationEntity.create(s, geoDataRoundPrecision)).toList();
         substationRepository.saveAll(substationEntities);
     }
 
@@ -411,12 +416,17 @@ public class GeoDataService {
         try {
             List<LineEntity> linesEntities = new ArrayList<>(linesGeoData.size());
             for (LineGeoData l : linesGeoData) {
-                String coords = mapper.writeValueAsString(l.getCoordinates());
+                List<Coordinate> fullCoordinates = Objects.requireNonNull(l.getCoordinates());
+                // round the coordinates
+                List<Coordinate> roundedCoordinates = fullCoordinates.stream().map(coordinate ->
+                    new Coordinate(Precision.round(coordinate.getLatitude(), geoDataRoundPrecision),
+                        Precision.round(coordinate.getLongitude(), geoDataRoundPrecision))).toList();
+                String jsonCoords = mapper.writeValueAsString(roundedCoordinates);
                 if (l.getCountry1() == l.getCountry2()) {
-                    linesEntities.add(LineEntity.create(l, true, coords));
+                    linesEntities.add(LineEntity.create(l, true, jsonCoords));
                 } else {
-                    linesEntities.add(LineEntity.create(l, true, coords));
-                    linesEntities.add(LineEntity.create(l, false, coords));
+                    linesEntities.add(LineEntity.create(l, true, jsonCoords));
+                    linesEntities.add(LineEntity.create(l, false, jsonCoords));
                 }
             }
             lineRepository.saveAll(linesEntities);
@@ -629,7 +639,8 @@ public class GeoDataService {
     }
 
     private List<Coordinate> toDto(String coordinates) throws JsonProcessingException {
-        return mapper.readValue(coordinates, new TypeReference<>() { });
+        return mapper.readValue(coordinates, new TypeReference<>() {
+        });
     }
 
     private Map<String, SubstationGeoData> getSubstationMapByCountries(Network network, Set<Country> countries) {
