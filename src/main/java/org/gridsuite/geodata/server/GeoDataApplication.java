@@ -6,7 +6,10 @@
  */
 package org.gridsuite.geodata.server;
 
+import io.swagger.v3.oas.models.media.JsonSchema;
+import io.swagger.v3.oas.models.media.NumberSchema;
 import org.gridsuite.geodata.server.dto.json.CoordinateJsonModule;
+import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +22,10 @@ import org.springframework.context.annotation.Bean;
 public class GeoDataApplication {
 
     public static void main(String[] args) {
+        SpringDocUtils.getConfig().replaceWithSchema(
+                com.powsybl.iidm.network.extensions.Coordinate.class, new JsonSchema()
+                .addProperty("lat", new NumberSchema().format("double"))
+                .addProperty("lon", new NumberSchema().format("double")));
         SpringApplication.run(GeoDataApplication.class, args);
     }
 
