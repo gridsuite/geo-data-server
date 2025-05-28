@@ -263,14 +263,13 @@ class GeoDataServiceTest {
     void outOfSubstationVoltageLevelShouldNotHinderLineDataGathering() {
         Network network = EurostagTutorialExample1Factory.create();
         List<VoltageLevel> existingVls = network.getVoltageLevelStream().toList();
-        List<Line> existingLines = network.getLineStream().toList();
         VoltageLevel p1 = network.newVoltageLevel()
             .setId("PIQUAGE1").setNominalV(380).setTopologyKind(TopologyKind.BUS_BREAKER)
                 .add();
         Bus bus1 = p1.getBusBreakerView().newBus()
                 .setId("NPIQ1")
                 .add();
-        Line halfPiq = network.newLine()
+        network.newLine()
                 .setId("LINE_PIQ_AT_A_SIDE")
                 .setVoltageLevel1(existingVls.get(0).getId())
                 .setBus1(existingVls.get(0).getBusBreakerView().getBuses().iterator().next().getId())
