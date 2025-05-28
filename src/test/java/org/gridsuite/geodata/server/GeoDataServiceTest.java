@@ -245,6 +245,7 @@ class GeoDataServiceTest {
                 .setG2(0.0)
                 .setB2(386E-6 / 2)
                 .add();
+        // if not geo-data is associated to a substation, this substation shold not be mentionned in the returned value
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
         assertFalse(substationsGeoData.stream().anyMatch(Objects::isNull), "Must not contain nulls");
         assertFalse(substationsGeoData.stream().anyMatch(s -> notexistsub1.getId().equals(s.getId())),
@@ -256,6 +257,35 @@ class GeoDataServiceTest {
         assertFalse(linesGeoData.stream().anyMatch(Objects::isNull), "Must not contain nulls");
         assertFalse(linesGeoData.stream().anyMatch(s -> notexistline.getId().equals(s.getId())),
                 "Must not contain unknown lines " + notexistline.getId());
+    }
+
+    @Test
+    void outOfSubstationVoltageLevelShouldNotHinderLineDataGathering() {
+        Network network = EurostagTutorialExample1Factory.create();
+        List<VoltageLevel> existingVls = network.getVoltageLevelStream().toList();
+        List<Line> existingLines = network.getLineStream().toList();
+        VoltageLevel p1 = network.newVoltageLevel()
+            .setId("PIQUAGE1").setNominalV(380).setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus bus1 = p1.getBusBreakerView().newBus()
+                .setId("NPIQ1")
+                .add();
+        Line halfPiq = network.newLine()
+                .setId("LINE_PIQ_AT_A_SIDE")
+                .setVoltageLevel1(existingVls.get(0).getId())
+                .setBus1(existingVls.get(0).getBusBreakerView().getBuses().iterator().next().getId())
+                .setConnectableBus1(existingVls.get(0).getBusBreakerView().getBuses().iterator().next().getId())
+                .setVoltageLevel2(p1.getId()).setBus2(bus1.getId()).setConnectableBus2(bus1.getId())
+                .setR(3.0)
+                .setX(33.0)
+                .setG1(0.0)
+                .setB1(386E-6 / 2)
+                .setG2(0.0)
+                .setB2(386E-6 / 2)
+                .add();
+
+        List<LineGeoData> linesGeoData = geoDataService.getLinesByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
+        assertEquals(2, linesGeoData.size());
     }
 
     @Test
