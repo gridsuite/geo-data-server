@@ -245,7 +245,7 @@ class GeoDataServiceTest {
                 .setG2(0.0)
                 .setB2(386E-6 / 2)
                 .add();
-        // if not geo-data is associated to a substation, this substation shold not be mentionned in the returned value
+        // if not geo-data is associated to a substation, this substation should not be mentionned in the returned value
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
         assertFalse(substationsGeoData.stream().anyMatch(Objects::isNull), "Must not contain nulls");
         assertFalse(substationsGeoData.stream().anyMatch(s -> notexistsub1.getId().equals(s.getId())),
