@@ -554,16 +554,28 @@ public class GeoDataService {
         };
     }
 
+    public boolean preferPreload(Set<Country> countrySet, List<String> ids) {
+        if (ids == null || ids.size() > 4) {
+            return true;
+        }
+
+        return false;
+    }
+
     @Transactional(readOnly = true)
     public List<SubstationGeoData> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
         CompletableFuture<List<SubstationGeoData>> substationGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (substationIds != null) {
+            if (substationIds != null && substationIds.size() < 4) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter substation position.");
                 }
                 return getSubstationsByIds(network, new HashSet<>(substationIds));
             } else {
-                return getSubstationsByCountries(network, countrySet);
+                List<SubstationGeoData> substationsByCountries = getSubstationsByCountries(network, countrySet);
+                if (substationIds != null && !substationIds.isEmpty()) {
+                    return substationsByCountries.stream().filter(s -> substationIds.contains(s.getId())).toList();
+                }
+                return substationsByCountries;
             }
         });
         try {
@@ -579,13 +591,17 @@ public class GeoDataService {
     @Transactional(readOnly = true)
     public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
         CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (lineIds != null) {
+            if (!preferPreload(countrySet, lineIds)) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
                 return getLinesByIds(network, new HashSet<>(lineIds));
             } else {
-                return getLinesByCountries(network, countrySet);
+                List<LineGeoData> linesByCountries = getLinesByCountries(network, countrySet);
+                if (lineIds != null && !lineIds.isEmpty()) {
+                    return linesByCountries.stream().filter(ln -> lineIds.contains(ln.getId())).toList();
+                }
+                return linesByCountries;
             }
         });
         try {
