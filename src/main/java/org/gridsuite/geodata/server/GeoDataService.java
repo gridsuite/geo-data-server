@@ -554,12 +554,8 @@ public class GeoDataService {
         };
     }
 
-    public boolean preferPreload(Set<Country> countrySet, List<String> ids) {
-        if (ids == null || ids.size() > 4) {
-            return true;
-        }
-
-        return false;
+    public boolean preferPreload(List<String> ids) {
+        return ids == null || ids.size() > 4;
     }
 
     @Transactional(readOnly = true)
@@ -591,7 +587,7 @@ public class GeoDataService {
     @Transactional(readOnly = true)
     public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
         CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (!preferPreload(countrySet, lineIds)) {
+            if (!preferPreload(lineIds)) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }

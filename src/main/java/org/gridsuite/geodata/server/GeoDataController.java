@@ -58,7 +58,7 @@ public class GeoDataController {
                                                                   @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                                   @RequestBody(required = false) List<String> substationIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        PreloadingStrategy preloadingStrategy = geoDataService.preferPreload(countrySet, substationIds) ?
+        PreloadingStrategy preloadingStrategy = geoDataService.preferPreload(substationIds) ?
                 PreloadingStrategy.COLLECTION :
                 PreloadingStrategy.NONE;
         Network network = networkStoreService.getNetwork(networkUuid, preloadingStrategy);
@@ -77,7 +77,7 @@ public class GeoDataController {
                                                       @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                       @RequestBody(required = false) List<String> lineIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        PreloadingStrategy preloadingStrategy = geoDataService.preferPreload(countrySet, lineIds) ?
+        PreloadingStrategy preloadingStrategy = geoDataService.preferPreload(lineIds) ?
                 PreloadingStrategy.COLLECTION :
                 PreloadingStrategy.NONE;
         Network network = networkStoreService.getNetwork(networkUuid, preloadingStrategy);
