@@ -48,7 +48,7 @@
 
     <properties>
 
-        <gridsuite-dependencies.version>42.0.0</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>43.0.0</gridsuite-dependencies.version>
         <liquibase-hibernate-package>org.gridsuite.geodata.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
         <sonar.projectKey>org.gridsuite:geo-data-server</sonar.projectKey>
