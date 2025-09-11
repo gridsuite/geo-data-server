@@ -385,12 +385,11 @@ public class GeoDataService {
         for (Substation s : substations) {
             for (VoltageLevel vl : s.getVoltageLevels()) {
                 for (Line line : vl.getConnectables(Line.class)) {
-                    Substation s1 = line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(); // TODO
-                    Substation s2 = line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow(); // TODO
-                    if (s1 != s) {
-                        neighbours.get(s.getId()).add(s1.getId());
-                    } else if (s2 != s) {
-                        neighbours.get(s.getId()).add(s2.getId());
+                    Substation s1 = line.getTerminal1().getVoltageLevel().getSubstation().orElse(null);
+                    Substation s2 = line.getTerminal2().getVoltageLevel().getSubstation().orElse(null);
+                    Substation otherSide = s1 == s ? s2 : s1;
+                    if (otherSide != null) {
+                        neighbours.get(s.getId()).add(otherSide.getId());
                     }
                 }
             }
@@ -445,7 +444,8 @@ public class GeoDataService {
      * <p>
      * returns null when the substations at the end of the line are missing.
      */
-    private LineGeoData getLineGeoDataWithEndSubstations(Map<String, LineGeoData> linesGeoDataDb, Map<String, SubstationGeoData> substationGeoDataDb, String lineId, Substation substation1, Substation substation2) {
+    private LineGeoData getLineGeoDataWithEndSubstations(Map<String, LineGeoData> linesGeoDataDb,
+            Map<String, SubstationGeoData> substationGeoDataDb, String lineId, Substation substation1, Substation substation2) {
         LineGeoData geoData = linesGeoDataDb.get(lineId);
         SubstationGeoData substation1GeoData = substationGeoDataDb.get(substation1.getId());
         SubstationGeoData substation2GeoData = substationGeoDataDb.get(substation2.getId());
@@ -515,17 +515,25 @@ public class GeoDataService {
 
         // we also want the destination substation (so we add the neighbouring country)
         Set<Country> countryAndNextTo = mapSubstationsByLine.entrySet().stream().flatMap(entry ->
-             Stream.of(entry.getValue().getLeft(), entry.getValue().getRight()).map(Substation::getNullableCountry).filter(Objects::nonNull)).collect(Collectors.toSet());
+             Stream.of(entry.getValue().getLeft(), entry.getValue().getRight())
+                     .filter(Objects::nonNull)
+                     .map(Substation::getNullableCountry)
+                     .filter(Objects::nonNull)).collect(Collectors.toSet());
 
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
         List<LineGeoData> geoData = new ArrayList<>();
 
-        mapSubstationsByLine.forEach((key, value) -> {
-            LineGeoData geo = getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, key, value.getLeft(), value.getRight());
-            if (geo != null) {
-                geoData.add(geo);
-            }
-        });
+        mapSubstationsByLine.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .filter(entry -> entry.getValue().getLeft() != null)
+                .filter(entry -> entry.getValue().getRight() != null)
+                .forEach(entry -> {
+                    LineGeoData geo = getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, entry.getKey(),
+                            entry.getValue().getLeft(), entry.getValue().getRight());
+                    if (geo != null) {
+                        geoData.add(geo);
+                    }
+                });
 
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
@@ -534,8 +542,8 @@ public class GeoDataService {
 
     private Pair<Substation, Substation> getSubstations(Identifiable<?> identifiable) {
         return switch (identifiable.getType()) {
-            case LINE -> Pair.of(((Line) identifiable).getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
-                ((Line) identifiable).getTerminal2().getVoltageLevel().getSubstation().orElseThrow());
+            case LINE -> Pair.of(((Line) identifiable).getTerminal1().getVoltageLevel().getSubstation().orElse(null),
+                ((Line) identifiable).getTerminal2().getVoltageLevel().getSubstation().orElse(null));
             case TIE_LINE ->
                 Pair.of(((TieLine) identifiable).getDanglingLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
                     ((TieLine) identifiable).getDanglingLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow());
@@ -546,16 +554,24 @@ public class GeoDataService {
         };
     }
 
+    public boolean preferPreload(List<String> ids) {
+        return ids == null || ids.size() > 4;
+    }
+
     @Transactional(readOnly = true)
     public List<SubstationGeoData> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
         CompletableFuture<List<SubstationGeoData>> substationGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (substationIds != null) {
+            if (substationIds != null && substationIds.size() < 4) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter substation position.");
                 }
                 return getSubstationsByIds(network, new HashSet<>(substationIds));
             } else {
-                return getSubstationsByCountries(network, countrySet);
+                List<SubstationGeoData> substationsByCountries = getSubstationsByCountries(network, countrySet);
+                if (substationIds != null && !substationIds.isEmpty()) {
+                    return substationsByCountries.stream().filter(s -> substationIds.contains(s.getId())).toList();
+                }
+                return substationsByCountries;
             }
         });
         try {
@@ -571,13 +587,17 @@ public class GeoDataService {
     @Transactional(readOnly = true)
     public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
         CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (lineIds != null) {
+            if (!preferPreload(lineIds)) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
                 return getLinesByIds(network, new HashSet<>(lineIds));
             } else {
-                return getLinesByCountries(network, countrySet);
+                List<LineGeoData> linesByCountries = getLinesByCountries(network, countrySet);
+                if (lineIds != null && !lineIds.isEmpty()) {
+                    return linesByCountries.stream().filter(ln -> lineIds.contains(ln.getId())).toList();
+                }
+                return linesByCountries;
             }
         });
         try {
