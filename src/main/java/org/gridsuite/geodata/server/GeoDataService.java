@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import com.powsybl.commons.exceptions.UncheckedInterruptedException;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
@@ -29,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -546,48 +544,38 @@ public class GeoDataService {
         };
     }
 
-    @Transactional(readOnly = true)
-    public List<SubstationGeoData> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
-        CompletableFuture<List<SubstationGeoData>> substationGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (substationIds != null) {
-                if (!countrySet.isEmpty()) {
-                    LOGGER.warn("Countries will not be taken into account to filter substation position.");
+    public CompletableFuture<List<SubstationGeoData>> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
+        return geoDataExecutionService.supplyAsync(() -> {
+            try {
+                if (substationIds != null) {
+                    if (!countrySet.isEmpty()) {
+                        LOGGER.warn("Countries will not be taken into account to filter substation position.");
+                    }
+                    return getSubstationsByIds(network, new HashSet<>(substationIds));
+                } else {
+                    return getSubstationsByCountries(network, countrySet);
                 }
-                return getSubstationsByIds(network, new HashSet<>(substationIds));
-            } else {
-                return getSubstationsByCountries(network, countrySet);
+            } catch (Exception e) {
+                throw new GeoDataException(FAILED_SUBSTATIONS_LOADING, e);
             }
         });
-        try {
-            return substationGeoDataFuture.get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new UncheckedInterruptedException(e);
-        } catch (Exception e) {
-            throw new GeoDataException(FAILED_SUBSTATIONS_LOADING, e);
-        }
     }
 
-    @Transactional(readOnly = true)
-    public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
-        CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (lineIds != null) {
-                if (!countrySet.isEmpty()) {
-                    LOGGER.warn("Countries will not be taken into account to filter line position.");
+    public CompletableFuture<List<LineGeoData>> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
+        return geoDataExecutionService.supplyAsync(() -> {
+            try {
+                if (lineIds != null) {
+                    if (!countrySet.isEmpty()) {
+                        LOGGER.warn("Countries will not be taken into account to filter line position.");
+                    }
+                    return getLinesByIds(network, new HashSet<>(lineIds));
+                } else {
+                    return getLinesByCountries(network, countrySet);
                 }
-                return getLinesByIds(network, new HashSet<>(lineIds));
-            } else {
-                return getLinesByCountries(network, countrySet);
+            } catch (Exception e) {
+                throw new GeoDataException(FAILED_LINES_LOADING, e);
             }
         });
-        try {
-            return lineGeoDataFuture.get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new UncheckedInterruptedException(e);
-        } catch (Exception e) {
-            throw new GeoDataException(FAILED_LINES_LOADING, e);
-        }
     }
 
     List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
