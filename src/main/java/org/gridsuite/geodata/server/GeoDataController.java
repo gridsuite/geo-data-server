@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +54,7 @@ public class GeoDataController {
     @PostMapping(value = "/substations/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get geographical data for substations with the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data")})
-    public ResponseEntity<List<SubstationGeoData>> getSubstations(@Parameter(description = "Network UUID") @RequestParam UUID networkUuid,
+    public CompletableFuture<ResponseEntity<List<SubstationGeoData>>> getSubstations(@Parameter(description = "Network UUID") @RequestParam UUID networkUuid,
                                                                   @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                                   @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                                   @RequestBody(required = false) List<String> substationIds) {
@@ -62,14 +63,14 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<SubstationGeoData> substations = geoDataService.getSubstationsData(network, countrySet, substationIds);
-        return ResponseEntity.ok().body(substations);
+        return geoDataService.getSubstationsData(network, countrySet, substationIds).thenApply(
+            substations -> ResponseEntity.ok().body(substations));
     }
 
     @PostMapping(value = "/lines/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get lines geographical data")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data")})
-    public ResponseEntity<List<LineGeoData>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
+    public CompletableFuture<ResponseEntity<List<LineGeoData>>> getLines(@Parameter(description = "Network UUID")@RequestParam UUID networkUuid,
                                                       @Parameter(description = "Variant Id") @RequestParam(name = "variantId", required = false) String variantId,
                                                       @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                       @RequestBody(required = false) List<String> lineIds) {
@@ -78,8 +79,8 @@ public class GeoDataController {
         if (variantId != null) {
             network.getVariantManager().setWorkingVariant(variantId);
         }
-        List<LineGeoData> lines = geoDataService.getLinesData(network, countrySet, lineIds);
-        return ResponseEntity.ok().body(lines);
+        return geoDataService.getLinesData(network, countrySet, lineIds).thenApply(
+            lines -> ResponseEntity.ok().body(lines));
     }
 
     @PostMapping(value = "/substations")
