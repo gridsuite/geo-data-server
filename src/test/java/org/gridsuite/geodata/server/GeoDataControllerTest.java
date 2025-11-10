@@ -15,6 +15,7 @@ import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
+import com.powsybl.network.store.client.RestClientImpl;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineRepository;
@@ -65,6 +66,9 @@ class GeoDataControllerTest {
 
     @MockitoBean
     private GeoDataObserver geoDataObserver;
+
+    @MockitoBean
+    private RestClientImpl restClient;
 
     private static final String GEO_DATA_SUBSTATIONS = "/geo_data_substations.json";
     private static final String GEO_DATA_LINES = "/geo_data_lines.json";
