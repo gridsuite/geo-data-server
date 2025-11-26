@@ -10,7 +10,6 @@ import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextRegistry;
 import io.micrometer.context.ThreadLocalAccessor;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -25,12 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 class GeoDataExecutionServiceTest {
     private static final String THREAD_LOCAL_KEY = "geo-data-thread-local";
     private final ThreadLocal<String> threadLocal = new ThreadLocal<>();
-
-    @AfterEach
-    void tearDown() {
-        ContextRegistry.getInstance().removeThreadLocalAccessor(THREAD_LOCAL_KEY);
-        threadLocal.remove();
-    }
 
     @Test
     void supplyAsyncPropagatesContext() throws Exception {
@@ -51,7 +44,7 @@ class GeoDataExecutionServiceTest {
             }
 
             @Override
-            public void reset() {
+            public void setValue() {
                 threadLocal.remove();
             }
         });
