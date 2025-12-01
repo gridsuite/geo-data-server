@@ -30,8 +30,9 @@ public class GeoDataExecutionService {
                                    @NonNull GeoDataObserver geoDataObserver) {
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxConcurrentRequests);
         geoDataObserver.createThreadPoolMetric(threadPoolExecutor);
+        ContextSnapshotFactory snapshotFactory = ContextSnapshotFactory.builder().build();
         executorService = ContextExecutorService.wrap(threadPoolExecutor,
-                () -> ContextSnapshotFactory.builder().build().captureAll());
+            snapshotFactory::captureAll);
     }
 
     @PreDestroy
