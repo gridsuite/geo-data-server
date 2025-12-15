@@ -521,7 +521,7 @@ class GeoDataServiceTest {
                 .substationEnd("substation2")
                 .build(), true, "coordinates_error");
 
-        assertThrows(GeoDataException.class, () ->
+        assertThrows(RuntimeException.class, () ->
             geoDataService.toDto(lineEntity));
     }
 

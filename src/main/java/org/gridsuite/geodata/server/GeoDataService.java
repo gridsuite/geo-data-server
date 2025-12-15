@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Math.round;
-import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_LINES_LOADING;
-import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_SUBSTATIONS_LOADING;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -91,8 +89,8 @@ public class GeoDataService {
         List<SubstationEntity> substationEntities = countries.isEmpty() ? substationRepository.findAll() :
             substationRepository.findByCountryIn(toCountryIds(countries));
         Map<String, SubstationGeoData> substationsGeoDataDB = substationEntities.stream()
-                .map(SubstationEntity::toGeoData)
-                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+            .map(SubstationEntity::toGeoData)
+            .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
         LOGGER.info("{} substations read from DB in {} ms", substationsGeoDataDB.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
@@ -110,8 +108,8 @@ public class GeoDataService {
 
         // filter substation by countries
         List<Substation> substations = network.getSubstationStream()
-                .filter(s -> countries.isEmpty() || s.getCountry().filter(countries::contains).isPresent())
-                .toList();
+            .filter(s -> countries.isEmpty() || s.getCountry().filter(countries::contains).isPresent())
+            .toList();
 
         // split substations with a known position and the others
         Map<String, SubstationGeoData> substationsGeoData = new HashMap<>();
@@ -138,11 +136,11 @@ public class GeoDataService {
 
         // let's sort this map by values first : max neighbors having known GPS coords
         Map<String, Set<String>> sortedNeighbours = neighbours
-                .entrySet()
-                .stream()
-                .filter(e -> !substationsGeoData.containsKey(e.getKey()))
-                .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+            .entrySet()
+            .stream()
+            .filter(e -> !substationsGeoData.containsKey(e.getKey()))
+            .sorted((e1, e2) -> neighboursComparator(network, e1.getValue(), e2.getValue()))
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
         calculateMissingGeoData(network, sortedNeighbours, substationsGeoData, substationsToCalculate);
         calculateDefaultSubstationsGeoData(substationsGeoData, sortedNeighbours);
@@ -181,8 +179,8 @@ public class GeoDataService {
         Set<String> neighboursToBeTreated = new HashSet<>(neighbours);
         while (!neighboursToBeTreated.isEmpty()) {
             Map<String, SubstationGeoData> foundGeoData = substationRepository.findByIdIn(neighboursToBeTreated).stream()
-                    .map(SubstationEntity::toGeoData)
-                    .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
+                .map(SubstationEntity::toGeoData)
+                .collect(Collectors.toMap(SubstationGeoData::getId, Function.identity()));
 
             geoDataForComputation.putAll(foundGeoData);
 
@@ -246,8 +244,8 @@ public class GeoDataService {
 
             if (sortedNeighbours.get(substationToProcess) != null) {
                 Set<String> neighbours = sortedNeighbours.get(substationToProcess).stream()
-                        .filter(remainingSubstations::contains)
-                        .collect(Collectors.toSet());
+                    .filter(remainingSubstations::contains)
+                    .collect(Collectors.toSet());
 
                 for (String neighbour : neighbours) {
                     substationsGeoData.get(neighbour).setCoordinate(geoParameters.getCurrentCoordinate());
@@ -262,7 +260,7 @@ public class GeoDataService {
 
     private static int neighboursComparator(Network network, Set<String> neighbors1, Set<String> neighbors2) {
         return neighbors2.stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull).collect(Collectors.toSet()).size() -
-                neighbors1.stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull).collect(Collectors.toSet()).size();
+            neighbors1.stream().map(s -> network.getSubstation(s).getExtension(SubstationPosition.class)).filter(Objects::nonNull).collect(Collectors.toSet()).size();
     }
 
     enum Step {
@@ -295,7 +293,7 @@ public class GeoDataService {
         Map<Set<String>, Double> calculatedSubstationsOffset = new HashMap<>();
         for (int iteration = 0; iteration < maxIterations; iteration++) {
             int calculated = 0;
-            for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext();) {
+            for (Iterator<String> it = substationsToCalculate.iterator(); it.hasNext(); ) {
                 String substationId = it.next();
                 Set<String> neighbours = sortedNeighbours.get(substationId);
                 double neighborhoodOffset = calculatedSubstationsOffset.get(neighbours) != null ? nextNeighborhoodOffset(calculatedSubstationsOffset.get(neighbours)) : 0;
@@ -312,7 +310,7 @@ public class GeoDataService {
                 }
             }
             LOGGER.info("Step {}, iteration {}, {} substation's coordinates have been calculated, {} remains unknown",
-                    step == Step.ONE ? 1 : 2, iteration, calculated, substationsToCalculate.size());
+                step == Step.ONE ? 1 : 2, iteration, calculated, substationsToCalculate.size());
             if (calculated == 0) {
                 break;
             }
@@ -337,11 +335,11 @@ public class GeoDataService {
     }
 
     private SubstationGeoData calculateCentroidGeoData(Substation substation, Set<String> neighbours, Step step,
-                                                              Map<String, SubstationGeoData> substationsGeoData, double neighborhoodOffset) {
+                                                       Map<String, SubstationGeoData> substationsGeoData, double neighborhoodOffset) {
         // get neighbours geo data
         List<SubstationGeoData> neighboursGeoData = neighbours.stream().map(substationsGeoData::get)
-                .filter(Objects::nonNull)
-                .toList();
+            .filter(Objects::nonNull)
+            .toList();
 
         String substationCountry = substation.getNullableCountry() != null ? substation.getNullableCountry().name() : null;
         SubstationGeoData defaultSubstationGeoData = defaultSubstationsGeoData.get(substationCountry);
@@ -350,7 +348,7 @@ public class GeoDataService {
         if (neighboursGeoData.size() > 1) {
             // if no neighbour found in the same country, locate the substation to a default position in its country
             if (neighboursGeoData.stream().noneMatch(n -> Objects.equals(n.getCountry(), substation.getNullableCountry())) &&
-                    defaultSubstationGeoData != null) {
+                defaultSubstationGeoData != null) {
                 neighboursGeoData = Collections.singletonList(defaultSubstationGeoData);
             }
             coordinate = getAverageCoordinate(neighboursGeoData, neighborhoodOffset);
@@ -429,7 +427,7 @@ public class GeoDataService {
             }
             lineRepository.saveAll(linesEntities);
         } catch (JsonProcessingException e) {
-            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
+            throw new RuntimeException("Parsing error", e);
         }
     }
 
@@ -454,8 +452,8 @@ public class GeoDataService {
         // need to return the line in the network order without the substations
         if (substation1GeoData == null || substation2GeoData == null) {
             LOGGER.error("line {} has substations with unknown gps positions({}={}, {}={})", lineId,
-                    substation1.getId(), substation1GeoData,
-                    substation2.getId(), substation2GeoData);
+                substation1.getId(), substation1GeoData,
+                substation2.getId(), substation2GeoData);
             return null;
         }
 
@@ -506,14 +504,14 @@ public class GeoDataService {
 
         // read lines from DB
         Map<String, Pair<Substation, Substation>> mapSubstationsByLine =
-                Streams.concat(network.getLineStream(), network.getTieLineStream(), network.getHvdcLineStream())
-                        .collect(Collectors.toMap(Identifiable::getId, this::getSubstations));
+            Streams.concat(network.getLineStream(), network.getTieLineStream(), network.getHvdcLineStream())
+                .collect(Collectors.toMap(Identifiable::getId, this::getSubstations));
 
         Map<String, LineGeoData> linesGeoDataDb = lineRepository.findAllById(mapSubstationsByLine.keySet()).stream().collect(Collectors.toMap(LineEntity::getId, this::toDto));
 
         // we also want the destination substation (so we add the neighbouring country)
         Set<Country> countryAndNextTo = mapSubstationsByLine.entrySet().stream().flatMap(entry ->
-             Stream.of(entry.getValue().getLeft(), entry.getValue().getRight()).map(Substation::getNullableCountry).filter(Objects::nonNull)).collect(Collectors.toSet());
+            Stream.of(entry.getValue().getLeft(), entry.getValue().getRight()).map(Substation::getNullableCountry).filter(Objects::nonNull)).collect(Collectors.toSet());
 
         Map<String, SubstationGeoData> substationGeoDataDb = getSubstationMapByCountries(network, countryAndNextTo);
         List<LineGeoData> geoData = new ArrayList<>();
@@ -546,34 +544,27 @@ public class GeoDataService {
 
     public CompletableFuture<List<SubstationGeoData>> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
         return geoDataExecutionService.supplyAsync(() -> {
-            try {
-                if (substationIds != null) {
-                    if (!countrySet.isEmpty()) {
-                        LOGGER.warn("Countries will not be taken into account to filter substation position.");
-                    }
-                    return getSubstationsByIds(network, new HashSet<>(substationIds));
-                } else {
-                    return getSubstationsByCountries(network, countrySet);
+            if (substationIds != null) {
+                if (!countrySet.isEmpty()) {
+                    LOGGER.warn("Countries will not be taken into account to filter substation position.");
                 }
-            } catch (Exception e) {
-                throw new GeoDataException(FAILED_SUBSTATIONS_LOADING, e);
+                return getSubstationsByIds(network, new HashSet<>(substationIds));
+            } else {
+                return getSubstationsByCountries(network, countrySet);
             }
         });
     }
 
     public CompletableFuture<List<LineGeoData>> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
         return geoDataExecutionService.supplyAsync(() -> {
-            try {
-                if (lineIds != null) {
-                    if (!countrySet.isEmpty()) {
-                        LOGGER.warn("Countries will not be taken into account to filter line position.");
-                    }
-                    return getLinesByIds(network, new HashSet<>(lineIds));
-                } else {
-                    return getLinesByCountries(network, countrySet);
+
+            if (lineIds != null) {
+                if (!countrySet.isEmpty()) {
+                    LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
-            } catch (Exception e) {
-                throw new GeoDataException(FAILED_LINES_LOADING, e);
+                return getLinesByIds(network, new HashSet<>(lineIds));
+            } else {
+                return getLinesByCountries(network, countrySet);
             }
         });
     }
@@ -605,7 +596,7 @@ public class GeoDataService {
         List<LineGeoData> lineGeoData = lines.stream().map(line -> getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, line.getId(),
                 line.getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
                 line.getTerminal2().getVoltageLevel().getSubstation().orElseThrow()))
-                .filter(Objects::nonNull).toList();
+            .filter(Objects::nonNull).toList();
         LOGGER.info("{} lines read from DB in {} ms", linesGeoDataDb.size(), stopWatch.getTime(TimeUnit.MILLISECONDS));
 
         return lineGeoData;
@@ -618,7 +609,7 @@ public class GeoDataService {
                 toDto(lineEntity.getCoordinates())
             );
         } catch (JsonProcessingException e) {
-            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
+            throw new RuntimeException("Parsing error", e);
         }
     }
 
