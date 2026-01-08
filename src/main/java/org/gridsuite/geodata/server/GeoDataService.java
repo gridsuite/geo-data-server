@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -38,8 +39,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Math.round;
-import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_LINES_LOADING;
-import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_SUBSTATIONS_LOADING;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -429,7 +428,7 @@ public class GeoDataService {
             }
             lineRepository.saveAll(linesEntities);
         } catch (JsonProcessingException e) {
-            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
+            throw new UncheckedIOException("Parsing error", e);
         }
     }
 
@@ -546,34 +545,26 @@ public class GeoDataService {
 
     public CompletableFuture<List<SubstationGeoData>> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
         return geoDataExecutionService.supplyAsync(() -> {
-            try {
-                if (substationIds != null) {
-                    if (!countrySet.isEmpty()) {
-                        LOGGER.warn("Countries will not be taken into account to filter substation position.");
-                    }
-                    return getSubstationsByIds(network, new HashSet<>(substationIds));
-                } else {
-                    return getSubstationsByCountries(network, countrySet);
+            if (substationIds != null) {
+                if (!countrySet.isEmpty()) {
+                    LOGGER.warn("Countries will not be taken into account to filter substation position.");
                 }
-            } catch (Exception e) {
-                throw new GeoDataException(FAILED_SUBSTATIONS_LOADING, e);
+                return getSubstationsByIds(network, new HashSet<>(substationIds));
+            } else {
+                return getSubstationsByCountries(network, countrySet);
             }
         });
     }
 
     public CompletableFuture<List<LineGeoData>> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
         return geoDataExecutionService.supplyAsync(() -> {
-            try {
-                if (lineIds != null) {
-                    if (!countrySet.isEmpty()) {
-                        LOGGER.warn("Countries will not be taken into account to filter line position.");
-                    }
-                    return getLinesByIds(network, new HashSet<>(lineIds));
-                } else {
-                    return getLinesByCountries(network, countrySet);
+            if (lineIds != null) {
+                if (!countrySet.isEmpty()) {
+                    LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
-            } catch (Exception e) {
-                throw new GeoDataException(FAILED_LINES_LOADING, e);
+                return getLinesByIds(network, new HashSet<>(lineIds));
+            } else {
+                return getLinesByCountries(network, countrySet);
             }
         });
     }
@@ -618,7 +609,7 @@ public class GeoDataService {
                 toDto(lineEntity.getCoordinates())
             );
         } catch (JsonProcessingException e) {
-            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
+            throw new UncheckedIOException("Parsing error", e);
         }
     }
 

@@ -16,19 +16,23 @@ import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import com.powsybl.network.store.client.RestClientImpl;
+import com.powsybl.ws.commons.error.BaseExceptionHandler;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationRepository;
+import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @WebMvcTest(GeoDataController.class)
+@Import(BaseExceptionHandler.class)
 class GeoDataControllerTest {
 
     @Autowired
@@ -116,7 +121,7 @@ class GeoDataControllerTest {
 
         mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
                 .contentType(APPLICATION_JSON))
-                .andExpect(content().string("Variant '" + WRONG_VARIANT_ID + "' not found"))
+                .andExpect(content().string(StringContains.containsString("Variant '" + WRONG_VARIANT_ID + "' not found")))
                 .andExpect(status().isInternalServerError());
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid)
@@ -137,7 +142,7 @@ class GeoDataControllerTest {
 
         mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
                 .contentType(APPLICATION_JSON))
-                .andExpect(content().string("Variant '" + WRONG_VARIANT_ID + "' not found"))
+                .andExpect(content().string(StringContains.containsString("Variant '" + WRONG_VARIANT_ID + "' not found")))
                 .andExpect(status().isInternalServerError());
 
         String substationJson = objectMapper.writeValueAsString(Collections.singleton(
@@ -217,7 +222,7 @@ class GeoDataControllerTest {
         Network testNetwork = EurostagTutorialExample1Factory.create();
         given(service.getNetwork(networkUuid)).willReturn(testNetwork);
         given(service.getNetwork(networkUuid, PreloadingStrategy.COLLECTION)).willReturn(testNetwork);
-        given(lineRepository.findAllById(any())).willThrow(new GeoDataException(GeoDataException.Type.PARSING_ERROR, new RuntimeException("Error parsing")));
+        given(lineRepository.findAllById(any())).willThrow(new UncheckedIOException("Parsing error", new IOException("IO")));
 
         MvcResult mvcResult = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid)
             .contentType(APPLICATION_JSON))

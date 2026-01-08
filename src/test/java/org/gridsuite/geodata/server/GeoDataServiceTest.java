@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.UncheckedIOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -521,7 +522,7 @@ class GeoDataServiceTest {
                 .substationEnd("substation2")
                 .build(), true, "coordinates_error");
 
-        assertThrows(GeoDataException.class, () ->
+        assertThrows(UncheckedIOException.class, () ->
             geoDataService.toDto(lineEntity));
     }
 
