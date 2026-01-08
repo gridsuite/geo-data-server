@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -230,7 +231,7 @@ class GeoDataControllerTest {
         Network testNetwork = EurostagTutorialExample1Factory.create();
         given(service.getNetwork(networkUuid)).willReturn(testNetwork);
         given(service.getNetwork(networkUuid, PreloadingStrategy.COLLECTION)).willReturn(testNetwork);
-        given(lineRepository.findAllById(any())).willThrow(new RuntimeException("Parsing error"));
+        given(lineRepository.findAllById(any())).willThrow(new UncheckedIOException("Parsing error", new IOException("IO")));
 
         MvcResult mvcResult = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))

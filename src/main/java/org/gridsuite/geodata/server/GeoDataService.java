@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -427,7 +428,7 @@ public class GeoDataService {
             }
             lineRepository.saveAll(linesEntities);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Parsing error", e);
+            throw new UncheckedIOException("Parsing error", e);
         }
     }
 
@@ -609,7 +610,7 @@ public class GeoDataService {
                 toDto(lineEntity.getCoordinates())
             );
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Parsing error", e);
+            throw new UncheckedIOException("Parsing error", e);
         }
     }
 
