@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: geo-data-server
   jpa:
     database: H2
     properties:

@@ -6,23 +6,17 @@
  */
 package org.gridsuite.geodata.server;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.powsybl.ws.commons.error.ServerNameProvider;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
  */
 @Component
-public class ServerNameProvider implements com.powsybl.ws.commons.error.ServerNameProvider {
-
-    private final String name;
-
-    public ServerNameProvider(@Value("${spring.application.name:geo-data-server}") String name) {
-        this.name = name;
-    }
+public class GeoDataServerNameProvider implements ServerNameProvider {
 
     @Override
     public String serverName() {
-        return name;
+        return "geo-data-server";
     }
 }
