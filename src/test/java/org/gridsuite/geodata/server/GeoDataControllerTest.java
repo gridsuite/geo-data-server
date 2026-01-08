@@ -21,6 +21,7 @@ import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationRepository;
+import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -106,123 +107,115 @@ class GeoDataControllerTest {
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
-            .andExpect(request().asyncStarted());
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID)
                 .contentType(APPLICATION_JSON))
-            .andExpect(request().asyncStarted());
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
                 .contentType(APPLICATION_JSON))
-            .andExpect(status().isInternalServerError())
-            .andExpect(result -> {
-                Throwable ex = result.getResolvedException();
-                assertNotNull(ex);
-                assertEquals("Variant '" + WRONG_VARIANT_ID + "' not found", ex.getMessage());
-            });
+                .andExpect(content().string(StringContains.containsString("Variant '" + WRONG_VARIANT_ID + "' not found")))
+                .andExpect(status().isInternalServerError());
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
-            .andExpect(request().asyncStarted());
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID)
                 .contentType(APPLICATION_JSON))
-            .andExpect(request().asyncStarted());
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
                 .contentType(APPLICATION_JSON))
-            .andExpect(status().isInternalServerError())
-            .andExpect(result -> {
-                Throwable ex = result.getResolvedException();
-                assertNotNull(ex);
-                assertEquals("Variant '" + WRONG_VARIANT_ID + "' not found", ex.getMessage());
-            });
+                .andExpect(content().string(StringContains.containsString("Variant '" + WRONG_VARIANT_ID + "' not found")))
+                .andExpect(status().isInternalServerError());
 
         String substationJson = objectMapper.writeValueAsString(Collections.singleton(
-            SubstationGeoData.builder()
-                .id("testID")
-                .country(Country.FR)
-                .coordinate(new Coordinate(1, 1))
-                .build()));
+                SubstationGeoData.builder()
+                        .id("testID")
+                        .country(Country.FR)
+                        .coordinate(new Coordinate(1, 1))
+                        .build()));
 
         mvc.perform(post("/" + VERSION + "/substations")
                 .contentType(APPLICATION_JSON)
                 .content(substationJson))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         mvc.perform(post("/" + VERSION + "/lines")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Collections.singleton(
-                    LineGeoData.builder()
-                        .country1(Country.FR)
-                        .country2(Country.BE)
-                        .substationStart("subFR")
-                        .substationEnd("subBE")
-                        .coordinates(new ArrayList<>())
-                        .build()))))
-            .andExpect(status().isOk());
+                        LineGeoData.builder()
+                                .country1(Country.FR)
+                                .country2(Country.BE)
+                                .substationStart("subFR")
+                                .substationEnd("subBE")
+                                .coordinates(new ArrayList<>())
+                                .build()))))
+                .andExpect(status().isOk());
 
         mvc.perform(post("/" + VERSION + "/substations")
                 .contentType(APPLICATION_JSON)
                 .content(toString(GEO_DATA_SUBSTATIONS)))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         mvc.perform(post("/" + VERSION + "/lines")
                 .contentType(APPLICATION_JSON)
                 .content(toString(GEO_DATA_LINES)))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&country=" + Country.FR)
-                .contentType(APPLICATION_JSON)
-                .content("[\"P1\", \"P2\"]"))
-            .andExpect(request().asyncStarted());
+                        .contentType(APPLICATION_JSON)
+                        .content("[\"P1\", \"P2\"]"))
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID)
-                .contentType(APPLICATION_JSON)
-                .content("[\"P1\", \"P2\"]"))
-            .andExpect(request().asyncStarted());
+                        .contentType(APPLICATION_JSON)
+                        .content("[\"P1\", \"P2\"]"))
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&country=" + Country.FR)
-                .contentType(APPLICATION_JSON)
-                .content("[\"NHV1_NHV2_2\", \"NHV1_NHV2_1\"]"))
-            .andExpect(request().asyncStarted());
+                        .contentType(APPLICATION_JSON)
+                        .content("[\"NHV1_NHV2_2\", \"NHV1_NHV2_1\"]"))
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID)
-                .contentType(APPLICATION_JSON)
-                .content("[\"NHV1_NHV2_2\", \"NHV1_NHV2_1\"]"))
-            .andExpect(request().asyncStarted());
+                        .contentType(APPLICATION_JSON)
+                        .content("[\"NHV1_NHV2_2\", \"NHV1_NHV2_1\"]"))
+                .andExpect(request().asyncStarted());
         mvc.perform(asyncDispatch(mockMvcResultActions.andReturn()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-            .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
@@ -234,9 +227,9 @@ class GeoDataControllerTest {
         given(lineRepository.findAllById(any())).willThrow(new UncheckedIOException("Parsing error", new IOException("IO")));
 
         MvcResult mvcResult = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid)
-                .contentType(APPLICATION_JSON))
-            .andExpect(request().asyncStarted())
-            .andReturn();
+            .contentType(APPLICATION_JSON))
+                    .andExpect(request().asyncStarted())
+                    .andReturn();
         mvc.perform(asyncDispatch(mvcResult))
             .andExpect(status().isInternalServerError());
     }
