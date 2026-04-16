@@ -385,7 +385,7 @@ public class GeoDataService {
                     Substation s1 = line.getTerminal1().getVoltageLevel().getSubstation().orElse(null);
                     Substation s2 = line.getTerminal2().getVoltageLevel().getSubstation().orElse(null);
                     Substation otherSide = s1 == s ? s2 : s1;
-                    if (otherSide != null) {
+                    if (s != otherSide && otherSide != null) {
                         neighbours.get(s.getId()).add(otherSide.getId());
                     }
                 }
@@ -521,9 +521,7 @@ public class GeoDataService {
         List<LineGeoData> geoData = new ArrayList<>();
 
         mapSubstationsByLine.entrySet().stream()
-                .filter(entry -> entry.getValue() != null)
-                .filter(entry -> entry.getValue().getLeft() != null)
-                .filter(entry -> entry.getValue().getRight() != null)
+                .filter(entry -> entry.getValue().getLeft() != null && entry.getValue().getRight() != null)
                 .forEach(entry -> {
                     LineGeoData geo = getLineGeoDataWithEndSubstations(linesGeoDataDb, substationGeoDataDb, entry.getKey(),
                             entry.getValue().getLeft(), entry.getValue().getRight());
