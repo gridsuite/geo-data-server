@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-patch:
-    uses: powsybl/github-ci/.github/workflows/patch-backend-app-generic.yml@69b162754c0728d9aeb2ea568eaf47f28f60fafb
+    uses: powsybl/github-ci/.github/workflows/patch-backend-app-generic.yml@3ed0caeb3395e55868884f466d726ddaee877850
     with:
       githubappId: ${{ vars.GRIDSUITE_ACTIONS_APPID }}
       dockerImage: docker.io/gridsuite/geo-data-server

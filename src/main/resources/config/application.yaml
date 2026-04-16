@@ -1,6 +1,17 @@
 spring:
   application:
     name: geo-data-server
+  datasource:
+    hikari:
+      # By default the limit is 10, following our scalability study this service can be very solicited so
+      # we're increasing its limit
+      maximum-pool-size: 20
+
+  mvc:
+    async:
+      # To have the same behavior of no timeouts as regular endpoints for servlet 3.0+ asynccontext endpoints
+      # Can be removed when set as default in our common ws config
+      request-timeout: -1
 
 powsybl:
   services:

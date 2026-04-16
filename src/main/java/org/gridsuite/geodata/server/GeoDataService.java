@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import com.powsybl.commons.exceptions.UncheckedInterruptedException;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
@@ -29,8 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -40,8 +39,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Math.round;
-import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_LINES_LOADING;
-import static org.gridsuite.geodata.server.GeoDataException.Type.FAILED_SUBSTATIONS_LOADING;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
@@ -430,7 +427,7 @@ public class GeoDataService {
             }
             lineRepository.saveAll(linesEntities);
         } catch (JsonProcessingException e) {
-            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
+            throw new UncheckedIOException("Parsing error", e);
         }
     }
 
@@ -558,9 +555,8 @@ public class GeoDataService {
         return ids == null || ids.size() > 4;
     }
 
-    @Transactional(readOnly = true)
-    public List<SubstationGeoData> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
-        CompletableFuture<List<SubstationGeoData>> substationGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
+    public CompletableFuture<List<SubstationGeoData>> getSubstationsData(Network network, Set<Country> countrySet, List<String> substationIds) {
+        return geoDataExecutionService.supplyAsync(() -> {
             if (substationIds != null && substationIds.size() < 4) {
                 if (!countrySet.isEmpty()) {
                     LOGGER.warn("Countries will not be taken into account to filter substation position.");
@@ -574,21 +570,12 @@ public class GeoDataService {
                 return substationsByCountries;
             }
         });
-        try {
-            return substationGeoDataFuture.get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new UncheckedInterruptedException(e);
-        } catch (Exception e) {
-            throw new GeoDataException(FAILED_SUBSTATIONS_LOADING, e);
-        }
     }
 
-    @Transactional(readOnly = true)
-    public List<LineGeoData> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
-        CompletableFuture<List<LineGeoData>> lineGeoDataFuture = geoDataExecutionService.supplyAsync(() -> {
-            if (!preferPreload(lineIds)) {
-                if (!countrySet.isEmpty()) {
+    public CompletableFuture<List<LineGeoData>> getLinesData(Network network, Set<Country> countrySet, List<String> lineIds) {
+        return geoDataExecutionService.supplyAsync(() -> {
+            if (lineIds != null) {
+                if (!preferPreload(lineIds)) {
                     LOGGER.warn("Countries will not be taken into account to filter line position.");
                 }
                 return getLinesByIds(network, new HashSet<>(lineIds));
@@ -600,14 +587,6 @@ public class GeoDataService {
                 return linesByCountries;
             }
         });
-        try {
-            return lineGeoDataFuture.get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new UncheckedInterruptedException(e);
-        } catch (Exception e) {
-            throw new GeoDataException(FAILED_LINES_LOADING, e);
-        }
     }
 
     List<LineGeoData> getLinesByIds(Network network, Set<String> linesIds) {
@@ -650,7 +629,7 @@ public class GeoDataService {
                 toDto(lineEntity.getCoordinates())
             );
         } catch (JsonProcessingException e) {
-            throw new GeoDataException(GeoDataException.Type.PARSING_ERROR, e);
+            throw new UncheckedIOException("Parsing error", e);
         }
     }
 

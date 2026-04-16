@@ -6,11 +6,14 @@
  */
 package org.gridsuite.geodata.server;
 
+import io.micrometer.context.ContextExecutorService;
+import io.micrometer.context.ContextSnapshotFactory;
 import jakarta.annotation.PreDestroy;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -21,12 +24,15 @@ import java.util.function.Supplier;
  */
 @Service
 public class GeoDataExecutionService {
-    private final ThreadPoolExecutor executorService;
+    private final ExecutorService executorService;
 
     public GeoDataExecutionService(@Value("${max-concurrent-requests}") int maxConcurrentRequests,
                                    @NonNull GeoDataObserver geoDataObserver) {
-        executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxConcurrentRequests);
-        geoDataObserver.createThreadPoolMetric(executorService);
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxConcurrentRequests);
+        geoDataObserver.createThreadPoolMetric(threadPoolExecutor);
+        ContextSnapshotFactory snapshotFactory = ContextSnapshotFactory.builder().build();
+        executorService = ContextExecutorService.wrap(threadPoolExecutor,
+            snapshotFactory::captureAll);
     }
 
     @PreDestroy
