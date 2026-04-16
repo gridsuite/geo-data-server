@@ -497,7 +497,7 @@ public class GeoDataService {
 
     List<LineGeoData> getLinesByCountries(Network network, Set<Country> countries) {
         LOGGER.info("Loading lines geo data for countries {} of network '{}'", countries, network.getId());
-
+        // FIXME: countries is not taken into account
         Objects.requireNonNull(network);
         Objects.requireNonNull(countries);
 
@@ -580,11 +580,7 @@ public class GeoDataService {
                 }
                 return getLinesByIds(network, new HashSet<>(lineIds));
             } else {
-                List<LineGeoData> linesByCountries = getLinesByCountries(network, countrySet);
-                if (lineIds != null && !lineIds.isEmpty()) {
-                    return linesByCountries.stream().filter(ln -> lineIds.contains(ln.getId())).toList();
-                }
-                return linesByCountries;
+                return getLinesByCountries(network, countrySet);
             }
         });
     }
