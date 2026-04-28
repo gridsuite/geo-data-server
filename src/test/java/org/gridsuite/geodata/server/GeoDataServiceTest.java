@@ -815,8 +815,8 @@ class GeoDataServiceTest {
             .setActivePowerSetpoint(280)
             .add();
 
-        vlhv4.newDanglingLine()
-            .setId("DL1")
+        vlhv4.newBoundaryLine()
+            .setId("BL1")
             .setBus("NHV4")
             .setP0(0.0)
             .setQ0(0.0)
@@ -826,8 +826,8 @@ class GeoDataServiceTest {
             .setG(1.)
             .setPairingKey("ucte")
             .add();
-        vlhv5.newDanglingLine()
-            .setId("DL2")
+        vlhv5.newBoundaryLine()
+            .setId("BL2")
             .setBus("NHV5")
             .setP0(0.0)
             .setQ0(0.0)
@@ -838,8 +838,8 @@ class GeoDataServiceTest {
             .add();
         network.newTieLine()
                 .setId("TL1")
-                .setDanglingLine1("DL1")
-                .setDanglingLine2("DL2")
+                .setBoundaryLine1("BL1")
+                .setBoundaryLine2("BL2")
                 .add();
 
         return network;
