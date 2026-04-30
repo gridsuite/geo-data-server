@@ -534,8 +534,8 @@ public class GeoDataService {
             case LINE -> Pair.of(((Line) identifiable).getTerminal1().getVoltageLevel().getSubstation().orElseThrow(),
                 ((Line) identifiable).getTerminal2().getVoltageLevel().getSubstation().orElseThrow());
             case TIE_LINE ->
-                Pair.of(((TieLine) identifiable).getDanglingLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
-                    ((TieLine) identifiable).getDanglingLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow());
+                Pair.of(((TieLine) identifiable).getBoundaryLine1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
+                    ((TieLine) identifiable).getBoundaryLine2().getTerminal().getVoltageLevel().getSubstation().orElseThrow());
             case HVDC_LINE ->
                 Pair.of(((HvdcLine) identifiable).getConverterStation1().getTerminal().getVoltageLevel().getSubstation().orElseThrow(),
                     ((HvdcLine) identifiable).getConverterStation2().getTerminal().getVoltageLevel().getSubstation().orElseThrow());
