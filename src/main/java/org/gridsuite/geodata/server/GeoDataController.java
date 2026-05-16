@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +40,14 @@ public class GeoDataController {
 
     static final String API_VERSION = "v1";
 
-    @Autowired
-    private GeoDataService geoDataService;
+    private final GeoDataService geoDataService;
 
-    @Autowired
-    private NetworkStoreService networkStoreService;
+    private final NetworkStoreService networkStoreService;
+
+    public GeoDataController(GeoDataService geoDataService, NetworkStoreService networkStoreService) {
+        this.geoDataService = geoDataService;
+        this.networkStoreService = networkStoreService;
+    }
 
     private static Set<Country> toCountrySet(@RequestParam(required = false) List<String> countries) {
         return countries != null ? countries.stream().map(Country::valueOf).collect(Collectors.toSet()) : Collections.emptySet();
@@ -81,21 +83,5 @@ public class GeoDataController {
         }
         return geoDataService.getLinesData(network, countrySet, lineIds).thenApply(
             lines -> ResponseEntity.ok().body(lines));
-    }
-
-    @PostMapping(value = "/substations")
-    @Operation(summary = "Save substations geographical data")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Substations geographical data have been correctly saved")})
-    public ResponseEntity<Void> saveSubstations(@RequestBody List<SubstationGeoData> substationGeoData) {
-        geoDataService.saveSubstations(substationGeoData);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping(value = "/lines")
-    @Operation(summary = "Save lines geographical data")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lines geographical data have been correctly saved")})
-    public ResponseEntity<Void> saveLines(@RequestBody List<LineGeoData> linesGeoData) {
-        geoDataService.saveLines(linesGeoData);
-        return ResponseEntity.ok().build();
     }
 }
