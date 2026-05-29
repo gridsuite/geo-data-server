@@ -52,7 +52,8 @@ class LineRepositoryTest {
                 .substationEnd("way")
                 .coordinates(objectMapper.writeValueAsString(coordinateEntities));
 
-        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, coordinates=[{\"lat\":11.0,\"lon\":12.0},{\"lat\":13.0,\"lon\":14.1}])", lineEntityBuilder.toString());
+        assertEquals("LineEntity.LineEntityBuilder(country=FR, id=lineID, side1=false, otherCountry=BE, substationStart$value=sub, substationEnd$value=way, "
+                + "coordinates=[{\"lat\":11.0,\"lon\":12.0},{\"lat\":13.0,\"lon\":14.1}])", lineEntityBuilder.toString());
 
         repository.save(lineEntityBuilder.build());
         List<LineEntity> lines = repository.findAll();
