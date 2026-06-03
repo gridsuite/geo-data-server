@@ -6,14 +6,13 @@
  */
 package org.gridsuite.geodata.server.repositories;
 
-import org.gridsuite.geodata.server.dto.LineGeoData;
-import lombok.*;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.*;
+import org.gridsuite.geodata.server.dto.LineGeoData;
 
 /**
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>

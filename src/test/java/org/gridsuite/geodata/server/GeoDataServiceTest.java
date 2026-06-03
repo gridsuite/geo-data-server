@@ -526,6 +526,7 @@ class GeoDataServiceTest {
             geoDataService.toDto(lineEntity));
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     private static Network createGeoDataNetwork() {
         Network network = EurostagTutorialExample1Factory.create();
 

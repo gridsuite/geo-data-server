@@ -7,10 +7,9 @@
 package org.gridsuite.geodata.server.repositories;
 
 import com.powsybl.iidm.network.extensions.Coordinate;
-import lombok.*;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
