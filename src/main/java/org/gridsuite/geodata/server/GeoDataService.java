@@ -458,7 +458,7 @@ public class GeoDataService {
         // We could refactor this in separate methods if we ever have a
         // need to return the line in the network order without the substations
         if (substation1GeoData == null || substation2GeoData == null) {
-            LOGGER.error("line {} has substations with unknown gps positions({}={}, {}={})", lineId,
+            LOGGER.warn("line {} has substations with unknown gps positions({}={}, {}={})", lineId,
                     substation1.getId(), substation1GeoData,
                     substation2.getId(), substation2GeoData);
             return null;
@@ -482,7 +482,7 @@ public class GeoDataService {
                 addCoordinates(substation1Coordinate, geoData.getCoordinates(), substation2Coordinate, false));
         }
 
-        LOGGER.error("line {} has different substations set in geographical data ({}, {}) and network data ({}, {})", lineId, geoData.getSubstationStart(), geoData.getSubstationEnd(),
+        LOGGER.warn("line {} has different substations set in geographical data ({}, {}) and network data ({}, {})", lineId, geoData.getSubstationStart(), geoData.getSubstationEnd(),
                 substation1.getId(), substation2.getId());
         return new LineGeoData(lineId, substation1.getNullableCountry(), substation2.getNullableCountry(), substation1.getId(), substation2.getId(),
             List.of(substation1Coordinate, substation2Coordinate));
