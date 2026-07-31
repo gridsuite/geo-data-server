@@ -12,6 +12,7 @@ import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.iidm.network.test.NoEquipmentNetworkFactory;
+import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
 import org.gridsuite.geodata.server.repositories.*;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.UncheckedIOException;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -131,6 +133,15 @@ class GeoDataServiceTest {
     }
 
     @Test
+    void testPreloadingStrategy() {
+        assertEquals(PreloadingStrategy.COLLECTION, GeoDataService.getPreloadingStrategy(null));
+        List<String> tenIds = IntStream.range(0, 10).mapToObj(String::valueOf).toList();
+        List<String> elevenIds = IntStream.range(0, 11).mapToObj(String::valueOf).toList();
+        assertEquals(PreloadingStrategy.NONE, GeoDataService.getPreloadingStrategy(tenIds));
+        assertEquals(PreloadingStrategy.COLLECTION, GeoDataService.getPreloadingStrategy(elevenIds));
+    }
+
+    @Test
     void test() {
         Network network = createGeoDataNetwork();
         List<SubstationGeoData> substationsGeoData = geoDataService.getSubstationsByCountries(network, new HashSet<>(Collections.singletonList(Country.FR)));
@@ -185,6 +196,44 @@ class GeoDataServiceTest {
         assertEquals(8, substationsGeoData5.stream().filter(s -> s.getId().equals("P5")).toList().get(0).getCoordinate().getLongitude(), 0);
         assertEquals(8, substationsGeoData5.stream().filter(s -> s.getId().equals("P6")).toList().get(0).getCoordinate().getLatitude(), 0.002);
         assertEquals(12, substationsGeoData5.stream().filter(s -> s.getId().equals("P6")).toList().get(0).getCoordinate().getLongitude(), 0.007);
+    }
+
+    @Test
+    void voltageLevelWithoutSubstationShouldNotThrow() {
+        Network network = EurostagTutorialExample1Factory.create();
+        VoltageLevel existingVoltageLevel = network.getVoltageLevelStream().findFirst().orElseThrow();
+        String existingBusId = existingVoltageLevel.getBusBreakerView().getBuses().iterator().next().getId();
+
+        VoltageLevel standaloneVoltageLevel = network.newVoltageLevel()
+                .setId("STANDALONE_VL")
+                .setNominalV(380)
+                .setTopologyKind(TopologyKind.BUS_BREAKER)
+                .add();
+        Bus standaloneBus = standaloneVoltageLevel.getBusBreakerView().newBus()
+                .setId("STANDALONE_BUS")
+                .add();
+        Line standaloneLine = network.newLine()
+                .setId("LINE_TO_STANDALONE_VL")
+                .setVoltageLevel1(existingVoltageLevel.getId())
+                .setBus1(existingBusId)
+                .setConnectableBus1(existingBusId)
+                .setVoltageLevel2(standaloneVoltageLevel.getId())
+                .setBus2(standaloneBus.getId())
+                .setConnectableBus2(standaloneBus.getId())
+                .setR(1.0)
+                .setX(2.0)
+                .setG1(3.0)
+                .setB1(4)
+                .setG2(5)
+                .setB2(6)
+                .add();
+
+        assertDoesNotThrow(() -> geoDataService.getSubstationsByCountries(network, Set.of(Country.FR)));
+        assertDoesNotThrow(() -> geoDataService.getLinesByCountries(network, Set.of(Country.FR)));
+        List<LineGeoData> lineGeoData = assertDoesNotThrow(
+                () -> geoDataService.getLinesByIds(network, Set.of(standaloneLine.getId())));
+        assertTrue(lineGeoData.stream()
+                .noneMatch(line -> line.getId().equals(standaloneLine.getId())));
     }
 
     @Test
