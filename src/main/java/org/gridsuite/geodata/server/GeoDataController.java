@@ -7,9 +7,7 @@
 package org.gridsuite.geodata.server;
 
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
-import com.powsybl.network.store.client.PreloadingStrategy;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,11 +40,8 @@ public class GeoDataController {
 
     private final GeoDataService geoDataService;
 
-    private final NetworkStoreService networkStoreService;
-
-    public GeoDataController(GeoDataService geoDataService, NetworkStoreService networkStoreService) {
+    public GeoDataController(GeoDataService geoDataService) {
         this.geoDataService = geoDataService;
-        this.networkStoreService = networkStoreService;
     }
 
     private static Set<Country> toCountrySet(@RequestParam(required = false) List<String> countries) {
@@ -61,11 +56,7 @@ public class GeoDataController {
                                                                   @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                                   @RequestBody(required = false) List<String> substationIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid, substationIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
-        if (variantId != null) {
-            network.getVariantManager().setWorkingVariant(variantId);
-        }
-        return geoDataService.getSubstationsData(network, countrySet, substationIds).thenApply(
+        return geoDataService.getSubstationsData(networkUuid, variantId, countrySet, substationIds).thenApply(
             substations -> ResponseEntity.ok().body(substations));
     }
 
@@ -77,11 +68,7 @@ public class GeoDataController {
                                                       @Parameter(description = "Countries") @RequestParam(name = "country", required = false) List<String> countries,
                                                       @RequestBody(required = false) List<String> lineIds) {
         Set<Country> countrySet = toCountrySet(countries);
-        Network network = networkStoreService.getNetwork(networkUuid, lineIds != null ? PreloadingStrategy.NONE : PreloadingStrategy.COLLECTION);
-        if (variantId != null) {
-            network.getVariantManager().setWorkingVariant(variantId);
-        }
-        return geoDataService.getLinesData(network, countrySet, lineIds).thenApply(
+        return geoDataService.getLinesData(networkUuid, variantId, countrySet, lineIds).thenApply(
             lines -> ResponseEntity.ok().body(lines));
     }
 }
