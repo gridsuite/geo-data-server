@@ -841,8 +841,7 @@ class GeoDataServiceTest {
             .setConnectableBus("NHV7")
             .setBus("NHV7")
             .setLossFactor(1.1f)
-            .setVoltageRegulatorOn(false)
-            .setReactivePowerSetpoint(100.)
+            .setLocalTargetQ(100.)
             .add();
         vlhv6.newVscConverterStation()
             .setId("C2")
@@ -850,8 +849,7 @@ class GeoDataServiceTest {
             .setConnectableBus("NHV6")
             .setBus("NHV6")
             .setLossFactor(1.1f)
-            .setReactivePowerSetpoint(123)
-            .setVoltageRegulatorOn(false)
+            .setLocalTargetQ(123)
             .add();
         network.newHvdcLine()
             .setId("L")
