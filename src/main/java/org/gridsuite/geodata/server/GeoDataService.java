@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import com.powsybl.commons.PowsyblException;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.Coordinate;
 import com.powsybl.iidm.network.extensions.SubstationPosition;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.util.Precision;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
+import org.gridsuite.geodata.server.error.GeoDataException;
 import org.gridsuite.geodata.server.repositories.LineEntity;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationEntity;
@@ -93,8 +95,15 @@ public class GeoDataService {
 
     private Network getNetwork(UUID networkUuid, String variantId, List<String> equipmentIds) {
         Network network = networkStoreService.getNetwork(networkUuid, getPreloadingStrategy(equipmentIds));
+        if (network == null) {
+            throw GeoDataException.createNetworkNotFound(networkUuid);
+        }
         if (variantId != null) {
-            network.getVariantManager().setWorkingVariant(variantId);
+            try {
+                network.getVariantManager().setWorkingVariant(variantId);
+            } catch (PowsyblException _) {
+                throw GeoDataException.createVariantNotFound(variantId);
+            }
         }
         return network;
     }

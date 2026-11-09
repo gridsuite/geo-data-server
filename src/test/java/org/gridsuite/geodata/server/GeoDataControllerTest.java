@@ -6,6 +6,9 @@
  */
 package org.gridsuite.geodata.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManagerConstants;
@@ -14,6 +17,7 @@ import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import com.powsybl.network.store.client.RestClientImpl;
 import com.powsybl.ws.commons.error.BaseExceptionHandler;
+import org.gridsuite.geodata.server.error.GeoDataExceptionHandler;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationRepository;
 import org.hamcrest.core.StringContains;
@@ -32,6 +36,9 @@ import java.util.UUID;
 
 import static com.powsybl.network.store.model.NetworkStoreApi.VERSION;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -43,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Chamseddine Benhamed <chamseddine.benhamed at rte-france.com>
  */
 @WebMvcTest(GeoDataController.class)
-@Import(BaseExceptionHandler.class)
+@Import({BaseExceptionHandler.class, GeoDataExceptionHandler.class, PropertyServerNameProvider.class})
 class GeoDataControllerTest {
 
     @Autowired
@@ -104,7 +111,7 @@ class GeoDataControllerTest {
         mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
                 .contentType(APPLICATION_JSON))
                 .andExpect(content().string(StringContains.containsString("Variant '" + WRONG_VARIANT_ID + "' not found")))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid)
                 .contentType(APPLICATION_JSON))
@@ -125,7 +132,7 @@ class GeoDataControllerTest {
         mvc.perform(post("/" + VERSION + "/lines/infos?networkUuid=" + networkUuid + "&variantId=" + WRONG_VARIANT_ID)
                 .contentType(APPLICATION_JSON))
                 .andExpect(content().string(StringContains.containsString("Variant '" + WRONG_VARIANT_ID + "' not found")))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
 
         mockMvcResultActions = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&variantId=" + VARIANT_ID + "&country=" + Country.FR)
                         .contentType(APPLICATION_JSON)
@@ -178,5 +185,40 @@ class GeoDataControllerTest {
                     .andReturn();
         mvc.perform(asyncDispatch(mvcResult))
             .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void testNetworkNotFound() throws Exception {
+        UUID unknownNetworkUuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        given(service.getNetwork(unknownNetworkUuid, PreloadingStrategy.COLLECTION)).willReturn(null);
+
+        String res = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + unknownNetworkUuid)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn().getResponse().getContentAsString();
+
+        assertProblemDetailBody(res, "geoData.networkNotFound");
+    }
+
+    @Test
+    void testInvalidCountry() throws Exception {
+        UUID networkUuid = UUID.fromString("7928181c-7977-4592-ba19-88027e4254e4");
+
+        String res = mvc.perform(post("/" + VERSION + "/substations/infos?networkUuid=" + networkUuid + "&country=NOT_A_COUNTRY")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        assertProblemDetailBody(res, "geoData.invalidCountry");
+    }
+
+    private void assertProblemDetailBody(String responseBody, String expectedBusinessErrorCode) throws JsonProcessingException {
+        JsonNode body = new ObjectMapper().readTree(responseBody);
+        assertEquals(expectedBusinessErrorCode, body.get("businessErrorCode").asText());
+        assertTrue(body.has("detail"));
+        assertFalse(body.get("detail").asText().isBlank());
+        assertTrue(body.has("server"));
+        assertFalse(body.get("server").asText().isBlank());
+        assertTrue(body.has("timestamp"));
     }
 }
