@@ -12,7 +12,7 @@ import com.powsybl.iidm.network.VariantManagerConstants;
 import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
-import com.powsybl.network.store.client.RestClientImpl;
+import com.powsybl.network.store.client.ResourceAttributesRestClientImpl;
 import com.powsybl.ws.commons.error.BaseExceptionHandler;
 import org.gridsuite.geodata.server.repositories.LineRepository;
 import org.gridsuite.geodata.server.repositories.SubstationRepository;
@@ -62,7 +62,7 @@ class GeoDataControllerTest {
     private GeoDataObserver geoDataObserver;
 
     @MockitoBean
-    private RestClientImpl restClient;
+    private ResourceAttributesRestClientImpl restClient;
 
     private static final String VARIANT_ID = "First_variant";
     private static final String WRONG_VARIANT_ID = "Wrong_variant";
