@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gridsuite.geodata.server.dto.LineGeoData;
 import org.gridsuite.geodata.server.dto.SubstationGeoData;
+import org.gridsuite.geodata.server.error.GeoDataException;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,16 @@ public class GeoDataController {
     }
 
     private static Set<Country> toCountrySet(@RequestParam(required = false) List<String> countries) {
-        return countries != null ? countries.stream().map(Country::valueOf).collect(Collectors.toSet()) : Collections.emptySet();
+        if (countries == null) {
+            return Collections.emptySet();
+        }
+        return countries.stream().map(country -> {
+            try {
+                return Country.valueOf(country);
+            } catch (IllegalArgumentException _) {
+                throw GeoDataException.createInvalidCountry(country);
+            }
+        }).collect(Collectors.toSet());
     }
 
     @PostMapping(value = "/substations/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
